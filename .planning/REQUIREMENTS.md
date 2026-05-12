@@ -43,9 +43,9 @@ Requirements pour la première release. Chaque exigence est mappée à une phase
 
 - [x] **EXT-01**: Un opérateur de pelle/chargeuse saisit ses cycles d'extraction (tonnage estimé, banc, type matériau) sur mobile offline
 - [x] **EXT-02**: Le système calcule le rendement par engin d'extraction et par opérateur, avec temps d'arrêt
-- [ ] **TRP-01**: Chaque rotation camion est enregistrée avec point de chargement, point de déchargement, tonnage pesé, temps de cycle
-- [ ] **TRP-02**: Le pesage produit un ticket de pesée numérique avec signature ; le ticket peut être généré offline et synchronisé après
-- [ ] **TRP-03**: Le dispatching affecte les camions disponibles aux rotations selon priorités définies
+- [x] **TRP-01**: Chaque rotation camion est enregistrée avec point de chargement, point de déchargement, tonnage pesé, temps de cycle
+- [x] **TRP-02**: Le pesage produit un ticket de pesée numérique avec signature ; le ticket peut être généré offline et synchronisé après
+- [x] **TRP-03**: Le dispatching affecte les camions disponibles aux rotations selon priorités définies
 - [ ] **CON-01**: Le tonnage entrant et sortant de chaque concasseur est suivi (primaire, secondaire), avec performance et heures de fonctionnement
 - [ ] **CON-02**: La consommation énergétique des concasseurs est suivie par session
 - [ ] **CRI-01**: Le criblage classe la production en calibres avec contrôle qualité et déclaration de non-conformités
@@ -187,9 +187,9 @@ Mapping requirement ↔ phase (validé après création du roadmap).
 | FOR-05 | Phase 2 — Vertical Slice Production | Complete |
 | EXT-01 | Phase 2 — Vertical Slice Production | Complete |
 | EXT-02 | Phase 2 — Vertical Slice Production | Complete |
-| TRP-01 | Phase 2 — Vertical Slice Production | Pending |
-| TRP-02 | Phase 2 — Vertical Slice Production | Pending |
-| TRP-03 | Phase 2 — Vertical Slice Production | Pending |
+| TRP-01 | Phase 2 — Vertical Slice Production | Complete |
+| TRP-02 | Phase 2 — Vertical Slice Production | Complete |
+| TRP-03 | Phase 2 — Vertical Slice Production | Complete |
 | STK-01 | Phase 2 — Vertical Slice Production | Complete |
 | STK-02 | Phase 2 — Vertical Slice Production | Complete |
 | STK-03 | Phase 2 — Vertical Slice Production | Pending |

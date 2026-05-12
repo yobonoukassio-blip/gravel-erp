@@ -1,3 +1,17 @@
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: Not started
+last_updated: "2026-05-12T15:16:27.915Z"
+progress:
+  total_phases: 6
+  completed_phases: 0
+  total_plans: 6
+  completed_plans: 3
+  percent: 50
+---
+
 # STATE: Gravel Ivoire — ERP Carrière de Granite
 
 ## Project Reference
@@ -12,7 +26,7 @@
 - **Phase:** 1 — Foundation
 - **Plan:** Not yet planned (run `/gsd:plan-phase 1`)
 - **Status:** Not started
-- **Progress:** [░░░░░░░░░░] 0% (0/5 phases complete in v1)
+- **Progress:** [█████░░░░░] 50%
 
 ## Phase Map
 

@@ -18,8 +18,8 @@ Requirements pour la première release. Chaque exigence est mappée à une phase
 - [ ] **FND-07**: Chaque montant financier est stocké en unités mineures entières avec sa devise (XOF=0 décimale, EUR=2) et trois représentations (origine / site-fonctionnel / groupe-reporting)
 - [ ] **FND-08**: Chaque transaction opérationnelle est rattachée à un OperationalDay (shift_start_local + IANA timezone du site) et non au created_at brut
 - [ ] **FND-09**: L'interface web et mobile sont disponibles en français et anglais, avec sélection par utilisateur
-- [ ] **FND-10**: L'application mobile Android fonctionne en mode offline-first ; les captures sont persistées localement et synchronisées dès que la connectivité revient
-- [ ] **FND-11**: Le service de sync applique une politique de conflit par-entité (append-only pour captures terrain, event-sourced pour livres, lock pessimiste pour plans, LWW pour préférences)
+- [x] **FND-10**: L'application mobile Android fonctionne en mode offline-first ; les captures sont persistées localement et synchronisées dès que la connectivité revient
+- [x] **FND-11**: Le service de sync applique une politique de conflit par-entité (append-only pour captures terrain, event-sourced pour livres, lock pessimiste pour plans, LWW pour préférences)
 
 ### Production — Foration
 
@@ -178,8 +178,8 @@ Mapping requirement ↔ phase (validé après création du roadmap).
 | FND-07 | Phase 1 — Foundation | Pending |
 | FND-08 | Phase 1 — Foundation | Pending |
 | FND-09 | Phase 1 — Foundation | Pending |
-| FND-10 | Phase 1 — Foundation | Pending |
-| FND-11 | Phase 1 — Foundation | Pending |
+| FND-10 | Phase 1 — Foundation | Complete |
+| FND-11 | Phase 1 — Foundation | Complete |
 | FOR-01 | Phase 2 — Vertical Slice Production | Pending |
 | FOR-02 | Phase 2 — Vertical Slice Production | Pending |
 | FOR-03 | Phase 2 — Vertical Slice Production | Pending |

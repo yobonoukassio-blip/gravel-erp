@@ -41,8 +41,8 @@ Requirements pour la première release. Chaque exigence est mappée à une phase
 
 ### Production — Extraction, Transport, Concassage, Criblage, Stockage
 
-- [ ] **EXT-01**: Un opérateur de pelle/chargeuse saisit ses cycles d'extraction (tonnage estimé, banc, type matériau) sur mobile offline
-- [ ] **EXT-02**: Le système calcule le rendement par engin d'extraction et par opérateur, avec temps d'arrêt
+- [x] **EXT-01**: Un opérateur de pelle/chargeuse saisit ses cycles d'extraction (tonnage estimé, banc, type matériau) sur mobile offline
+- [x] **EXT-02**: Le système calcule le rendement par engin d'extraction et par opérateur, avec temps d'arrêt
 - [ ] **TRP-01**: Chaque rotation camion est enregistrée avec point de chargement, point de déchargement, tonnage pesé, temps de cycle
 - [ ] **TRP-02**: Le pesage produit un ticket de pesée numérique avec signature ; le ticket peut être généré offline et synchronisé après
 - [ ] **TRP-03**: Le dispatching affecte les camions disponibles aux rotations selon priorités définies
@@ -185,8 +185,8 @@ Mapping requirement ↔ phase (validé après création du roadmap).
 | FOR-03 | Phase 2 — Vertical Slice Production | Pending |
 | FOR-04 | Phase 2 — Vertical Slice Production | Pending |
 | FOR-05 | Phase 2 — Vertical Slice Production | Complete |
-| EXT-01 | Phase 2 — Vertical Slice Production | Pending |
-| EXT-02 | Phase 2 — Vertical Slice Production | Pending |
+| EXT-01 | Phase 2 — Vertical Slice Production | Complete |
+| EXT-02 | Phase 2 — Vertical Slice Production | Complete |
 | TRP-01 | Phase 2 — Vertical Slice Production | Pending |
 | TRP-02 | Phase 2 — Vertical Slice Production | Pending |
 | TRP-03 | Phase 2 — Vertical Slice Production | Pending |

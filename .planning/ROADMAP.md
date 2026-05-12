@@ -52,7 +52,7 @@ Donner à un groupe minier une visibilité temps réel consolidée sur la produc
 **Plans:** 8 plans across 4 waves (W0=P01, W1=P02+P03 parallel, W2=P04+P05 sequential, W3=P06+P07+P08 parallel)
   - [x] 02-W0-P01-PLAN.md (Wave 0) — Foundations: outbox + alerts + event-chain verifier + S3 Object Lock + Keycloak roles + i18n + 5 ADR drafts + co-design workshop (BLOCKING mobile)
   - [ ] 02-W1-P02-PLAN.md (Wave 1) — Foration backend + web + mobile (FOR-01..05)
-  - [ ] 02-W1-P03-PLAN.md (Wave 1) — Extraction backend + web + mobile (EXT-01, EXT-02)
+  - [x] 02-W1-P03-PLAN.md (Wave 1) — Extraction backend + web + mobile (EXT-01, EXT-02)
   - [ ] 02-W2-P04-PLAN.md (Wave 2) — Transport + Pesage (TRP-01..03) + ADR-0009
   - [ ] 02-W2-P05-PLAN.md (Wave 2) — Stockpile event-sourced + chain-of-hash + outbox consumer (STK-01..03) + ADR-0006
   - [ ] 02-W3-P06-PLAN.md (Wave 3) — Carburant + Énergie (CAR-01..04) + ADR-0007

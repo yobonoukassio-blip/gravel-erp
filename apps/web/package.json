@@ -32,6 +32,7 @@
     "ag-grid-angular": "^32.2.0",
     "ag-grid-enterprise": "^32.2.0",
     "@jsverse/transloco": "^7.5.0",
+    "angular-auth-oidc-client": "^19.0.0",
     "leaflet": "^1.9.4",
     "@asymmetrik/ngx-leaflet": "^19.0.0",
     "@gravel/shared-types": "workspace:*",

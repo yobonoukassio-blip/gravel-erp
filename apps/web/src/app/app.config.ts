@@ -1,18 +1,36 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import {
+  ApplicationConfig,
+  importProvidersFrom,
+  provideZoneChangeDetection,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import {
+  provideHttpClient,
+  withInterceptors,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { AuthModule, authInterceptor } from 'angular-auth-oidc-client';
+
 import { routes } from './app.routes';
+import { oidcConfig } from './core/auth/oidc.config';
+import { provideAppTransloco } from './core/i18n/transloco.config';
 
 /**
- * Application config for the standalone Angular 20 bootstrap.
- * Transloco provider, auth interceptors, and TanStack Query wiring land in W1-P04.
+ * Application config. Wires:
+ *   - Router (lazy routes)
+ *   - HttpClient + OIDC interceptor (attaches access token to /api calls)
+ *   - angular-auth-oidc-client AuthModule
+ *   - Transloco (FR/EN, loaded from /assets/i18n/)
+ *   - Material animations (async)
  */
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(withInterceptorsFromDi(), withInterceptors([authInterceptor()])),
     provideAnimationsAsync(),
+    importProvidersFrom(AuthModule.forRoot({ config: oidcConfig })),
+    provideAppTransloco(),
   ],
 };

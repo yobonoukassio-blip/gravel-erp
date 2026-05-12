@@ -1,0 +1,13 @@
+{
+  "app.name": "Gravel Ivoire ERP",
+  "header.sites": "site(s)",
+  "header.logout": "Déconnexion",
+  "nav.sites": "Sites",
+  "nav.zones": "Zones de production",
+  "nav.permits": "Permis",
+  "nav.activityLog": "Journal d'activité",
+  "login.subtitle": "Connectez-vous avec votre compte Keycloak.",
+  "login.button": "Se connecter avec Keycloak",
+  "common.locale.fr": "Français (Côte d'Ivoire)",
+  "common.locale.en": "Anglais (Côte d'Ivoire)"
+}

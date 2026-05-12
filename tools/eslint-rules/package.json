@@ -1,0 +1,7 @@
+{
+  "name": "@gravel/eslint-rules",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Gravel Phase-1 custom ESLint rules — bans float money + raw created_at::date in reports.",
+  "main": "index.js"
+}

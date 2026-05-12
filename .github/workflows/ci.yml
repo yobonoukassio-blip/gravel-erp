@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   lint:
-    name: Lint workspaces
+    name: Lint workspaces (--max-warnings=0)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm -r run lint
+      - run: pnpm -r run lint -- --max-warnings=0
 
   build:
     name: Build workspaces
@@ -42,3 +42,17 @@ jobs:
       - run: pnpm --filter @gravel/shared-types build
       - run: pnpm --filter @gravel/api build
       - run: pnpm --filter @gravel/web build
+
+  ci-gate:
+    name: CI gate (branch protection check)
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [lint, build]
+    steps:
+      - name: Verify lint + build green
+        run: |
+          if [[ "${{ needs.lint.result }}" != "success" \
+             || "${{ needs.build.result }}" != "success" ]]; then
+            echo "::error::lint or build failed — blocking merge."
+            exit 1
+          fi

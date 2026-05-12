@@ -9,6 +9,9 @@ concurrency:
   group: test-${{ github.ref }}
   cancel-in-progress: true
 
+# All BLOCKING jobs MUST NOT use `continue-on-error`. The terminal `gate`
+# job aggregates needs and is the single status branch protection requires.
+
 jobs:
   unit:
     name: Unit (api + web)
@@ -24,8 +27,62 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @gravel/shared-types build
       - run: pnpm --filter @gravel/api test:quick
-      # Web unit tests via ng test --watch=false --browsers=ChromeHeadless
       - run: pnpm --filter @gravel/web test:quick
+
+  forbidden-imports:
+    name: Forbidden imports / patterns (lint gate)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Forbid removed /api/sync/preferences route
+        run: |
+          if grep -RIn --include='*.ts' --include='*.dart' \
+            -e '/api/sync/preferences' apps/web/src apps/mobile/lib; then
+            echo "::error::Removed route /api/sync/preferences still referenced — remove it."
+            exit 1
+          fi
+      - name: Forbid float/numeric money columns in SQL migrations
+        run: |
+          # Money columns must be bigint minor units (FND-07). Block FLOAT,
+          # DOUBLE PRECISION, REAL, NUMERIC on any column whose name suggests money.
+          if grep -RInE \
+            '(amount|price|cost|total|fee|tax|balance)[a-zA-Z_]*\s+(FLOAT|DOUBLE PRECISION|REAL|NUMERIC)' \
+            apps/api/src/migrations 2>/dev/null; then
+            echo "::error::Money column with float/numeric type detected — use BIGINT minor units (FND-07, ADR-0003)."
+            exit 1
+          fi
+      - name: Forbid device.now() in sync ordering paths
+        run: |
+          # Sync ordering must use server lamport clock, not device wall clock
+          # (D-12, ADR-0002). Mobile sync code must NOT call DateTime.now().millisecondsSinceEpoch
+          # to order operations.
+          if grep -RInE 'DateTime\.now\(\)\.(millisecondsSinceEpoch|microsecondsSinceEpoch)' \
+            apps/mobile/lib/core/sync apps/mobile/lib/sync 2>/dev/null; then
+            echo "::error::device wall clock used in sync ordering path — use server lamport (D-12)."
+            exit 1
+          fi
+      - name: Forbid created_at::date in reports
+        run: |
+          # ADR-0003 OperationalDay: report aggregations MUST use operational_day,
+          # never created_at::date.
+          if grep -RInE 'created_at::date' apps/api/src 2>/dev/null; then
+            echo "::error::created_at::date used in source — use operational_day (ADR-0003)."
+            exit 1
+          fi
+
+  lint-max-warnings:
+    name: Lint (--max-warnings=0)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r run lint -- --max-warnings=0
 
   integration:
     name: Integration (api + Postgres 18 + Keycloak 26)
@@ -66,8 +123,8 @@ jobs:
       - run: pnpm --filter @gravel/shared-types build
       - run: pnpm --filter @gravel/api test:int
 
-  security:
-    name: Security (RLS cross-tenant leak — BLOCKING per D-08)
+  identity-int:
+    name: Identity integration (FND-01 — BLOCKING)
     runs-on: ubuntu-latest
     needs: unit
     services:
@@ -80,25 +137,29 @@ jobs:
         ports: ['5432:5432']
         options: >-
           --health-cmd "pg_isready -U gravel_admin"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
+          --health-interval 5s --health-timeout 5s --health-retries 10
+      keycloak:
+        image: quay.io/keycloak/keycloak:26.0
+        env:
+          KEYCLOAK_ADMIN: admin
+          KEYCLOAK_ADMIN_PASSWORD: admin
+          KC_HEALTH_ENABLED: 'true'
+        ports: ['8080:8080']
     env:
       DATABASE_URL: postgres://gravel_admin:gravel_dev@localhost:5432/gravel_test
+      KEYCLOAK_URL: http://localhost:8080
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with: { version: 9 }
       - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: pnpm
+        with: { node-version: 24, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @gravel/shared-types build
-      - run: pnpm --filter @gravel/api test:rls-leak
+      - run: pnpm --filter @gravel/api test:int -- identity.spec.ts
 
-  chaos:
-    name: Chaos (sync conflict resolution — BLOCKING per D-13)
+  master-data-int:
+    name: Master-data integration (FND-05 — BLOCKING)
     runs-on: ubuntu-latest
     needs: unit
     services:
@@ -111,9 +172,7 @@ jobs:
         ports: ['5432:5432']
         options: >-
           --health-cmd "pg_isready -U gravel_admin"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
+          --health-interval 5s --health-timeout 5s --health-retries 10
     env:
       DATABASE_URL: postgres://gravel_admin:gravel_dev@localhost:5432/gravel_test
     steps:
@@ -121,15 +180,125 @@ jobs:
       - uses: pnpm/action-setup@v4
         with: { version: 9 }
       - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: pnpm
+        with: { node-version: 24, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @gravel/shared-types build
+      - run: pnpm --filter @gravel/api test:int -- master-data.spec.ts
+
+  rls-leak:
+    name: RLS cross-tenant leak (FND-02 — BLOCKING per D-08)
+    runs-on: ubuntu-latest
+    needs: unit
+    services:
+      postgres:
+        image: postgis/postgis:18-3.5
+        env:
+          POSTGRES_USER: gravel_admin
+          POSTGRES_PASSWORD: gravel_dev
+          POSTGRES_DB: gravel_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U gravel_admin"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://gravel_admin:gravel_dev@localhost:5432/gravel_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @gravel/shared-types build
+      # fail-closed: any RED in the auto-generated cross-tenant suite blocks
+      - run: pnpm --filter @gravel/api test:rls-leak
+
+  audit-chain:
+    name: Audit chain-of-hash (FND-06 — BLOCKING per D-29)
+    runs-on: ubuntu-latest
+    needs: unit
+    services:
+      postgres:
+        image: postgis/postgis:18-3.5
+        env:
+          POSTGRES_USER: gravel_admin
+          POSTGRES_PASSWORD: gravel_dev
+          POSTGRES_DB: gravel_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U gravel_admin"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://gravel_admin:gravel_dev@localhost:5432/gravel_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @gravel/shared-types build
+      - run: pnpm --filter @gravel/api test:int -- audit-chain.spec.ts
+
+  dst-test:
+    name: OperationalDay DST crossing (FND-08 — BLOCKING per D-21)
+    runs-on: ubuntu-latest
+    needs: unit
+    env:
+      TZ: Europe/Paris
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @gravel/shared-types build
+      - run: pnpm --filter @gravel/api test -- operational-day.spec.ts
+
+  money-test:
+    name: Money bigint minor units (FND-07 — BLOCKING)
+    runs-on: ubuntu-latest
+    needs: unit
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @gravel/shared-types build
+      - run: pnpm --filter @gravel/api test -- money.spec.ts
+
+  chaos:
+    name: Sync chaos (FND-11 — BLOCKING per D-13)
+    runs-on: ubuntu-latest
+    needs: unit
+    services:
+      postgres:
+        image: postgis/postgis:18-3.5
+        env:
+          POSTGRES_USER: gravel_admin
+          POSTGRES_PASSWORD: gravel_dev
+          POSTGRES_DB: gravel_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U gravel_admin"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://gravel_admin:gravel_dev@localhost:5432/gravel_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @gravel/shared-types build
       - run: pnpm --filter @gravel/api test:chaos
 
   mobile:
-    name: Mobile (Flutter unit + integration)
+    name: Mobile (Flutter unit)
     runs-on: ubuntu-latest
     needs: unit
     steps:
@@ -142,6 +311,93 @@ jobs:
         run: flutter pub get
       - working-directory: apps/mobile
         run: flutter test
-      # integration_test runs require an emulator; Wave 0 stubs run as widget tests
+
+  mobile-int:
+    name: Mobile sync offline integration (FND-10 — BLOCKING)
+    runs-on: ubuntu-latest
+    needs: unit
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.35.0
       - working-directory: apps/mobile
-        run: flutter test integration_test/ || echo "integration_test stubs RED — expected at Wave 0"
+        run: flutter pub get
+      - working-directory: apps/mobile
+        # integration_test/ runs without an emulator using flutter_test harness
+        # for the Wave-1 sync stub. Real-device runs are nightly, not per-PR.
+        run: flutter test integration_test/sync_offline_test.dart
+
+  web-e2e:
+    name: Web E2E (Playwright, PR to main only)
+    runs-on: ubuntu-latest
+    needs: unit
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @gravel/web exec playwright install --with-deps chromium
+      - run: pnpm --filter @gravel/web e2e
+
+  # ---------------------------------------------------------------------------
+  # Aggregator job — the SINGLE check branch protection requires on main.
+  # If ANY required gate above failed, this job fails. Uses `if: always()`
+  # so it runs even when a dependency fails, and explicitly evaluates results.
+  # ---------------------------------------------------------------------------
+  gate:
+    name: Phase-1 BLOCKING gate (branch protection check)
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - unit
+      - forbidden-imports
+      - lint-max-warnings
+      - integration
+      - identity-int
+      - master-data-int
+      - rls-leak
+      - audit-chain
+      - dst-test
+      - money-test
+      - chaos
+      - mobile
+      - mobile-int
+    steps:
+      - name: Verify all blocking gates passed
+        run: |
+          echo "Results of required gates:"
+          echo "  unit              : ${{ needs.unit.result }}"
+          echo "  forbidden-imports : ${{ needs.forbidden-imports.result }}"
+          echo "  lint-max-warnings : ${{ needs.lint-max-warnings.result }}"
+          echo "  integration       : ${{ needs.integration.result }}"
+          echo "  identity-int      : ${{ needs.identity-int.result }}"
+          echo "  master-data-int   : ${{ needs.master-data-int.result }}"
+          echo "  rls-leak          : ${{ needs.rls-leak.result }}"
+          echo "  audit-chain       : ${{ needs.audit-chain.result }}"
+          echo "  dst-test          : ${{ needs.dst-test.result }}"
+          echo "  money-test        : ${{ needs.money-test.result }}"
+          echo "  chaos             : ${{ needs.chaos.result }}"
+          echo "  mobile            : ${{ needs.mobile.result }}"
+          echo "  mobile-int        : ${{ needs.mobile-int.result }}"
+          if [[ "${{ needs.unit.result }}" != "success" \
+             || "${{ needs.forbidden-imports.result }}" != "success" \
+             || "${{ needs.lint-max-warnings.result }}" != "success" \
+             || "${{ needs.integration.result }}" != "success" \
+             || "${{ needs.identity-int.result }}" != "success" \
+             || "${{ needs.master-data-int.result }}" != "success" \
+             || "${{ needs.rls-leak.result }}" != "success" \
+             || "${{ needs.audit-chain.result }}" != "success" \
+             || "${{ needs.dst-test.result }}" != "success" \
+             || "${{ needs.money-test.result }}" != "success" \
+             || "${{ needs.chaos.result }}" != "success" \
+             || "${{ needs.mobile.result }}" != "success" \
+             || "${{ needs.mobile-int.result }}" != "success" ]]; then
+            echo "::error::One or more Phase-1 BLOCKING gates failed — see job log."
+            exit 1
+          fi
+          echo "All Phase-1 BLOCKING gates green."

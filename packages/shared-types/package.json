@@ -13,6 +13,6 @@
     "lint": "echo \"@gravel/shared-types: no lint yet\""
   },
   "devDependencies": {
-    "typescript": "^5.5.4"
+    "typescript": "~5.9.0"
   }
 }

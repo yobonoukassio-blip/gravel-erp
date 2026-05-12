@@ -18,7 +18,7 @@
     "prepare": "husky || true"
   },
   "devDependencies": {
-    "typescript": "^5.5.4",
+    "typescript": "~5.9.0",
     "eslint": "^8.57.0",
     "@typescript-eslint/parser": "^8.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
@@ -29,5 +29,13 @@
   },
   "lint-staged": {
     "*.{ts,json,md}": ["prettier --write"]
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "@angular/core": "20",
+        "@angular/common": "20"
+      }
+    }
   }
 }

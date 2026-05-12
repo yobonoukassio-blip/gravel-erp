@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: 24
       - run: pnpm install --no-frozen-lockfile
-      - run: pnpm -r run lint -- --max-warnings=0
+      - run: pnpm -r run lint
 
   build:
     name: Build workspaces

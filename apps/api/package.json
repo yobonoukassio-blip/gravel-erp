@@ -13,7 +13,7 @@
     "test:int": "jest --selectProjects integration",
     "test:rls-leak": "jest --selectProjects security",
     "test:chaos": "jest --selectProjects chaos",
-    "lint": "eslint src test --ext .ts",
+    "lint": "eslint src test --ext .ts --max-warnings=0",
     "migration:run": "typeorm-ts-node-commonjs migration:run -d ormconfig.ts",
     "migration:generate": "typeorm-ts-node-commonjs migration:generate -d ormconfig.ts",
     "migration:revert": "typeorm-ts-node-commonjs migration:revert -d ormconfig.ts"
@@ -71,7 +71,7 @@
     "supertest": "^7.0.0",
     "testcontainers": "^10.13.0",
     "@testcontainers/postgresql": "^10.13.0",
-    "typescript": "^5.5.4",
+    "typescript": "~5.9.0",
     "eslint": "^8.57.0",
     "@typescript-eslint/parser": "^8.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0"

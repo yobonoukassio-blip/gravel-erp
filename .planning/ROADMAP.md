@@ -49,7 +49,15 @@ Donner à un groupe minier une visibilité temps réel consolidée sur la produc
   4. Un incident HSE est saisi en append-only avec photos en object storage immuable content-addressed (SHA-256), chaîne de hash vérifiable, et déclenche un workflow d'actions correctives suivi jusqu'à clôture
   5. Le KPI taux de fréquence accidents (TF) et les KPI production (tonnes jour/semaine/mois, rendement forage, temps d'arrêt) s'affichent en temps réel sur le dashboard Directeur Site et Chef Carrière
   6. Un ratio L/h anormal sur un engin déclenche une alerte exploitable (détection vol/fuite)
-**Plans**: TBD
+**Plans:** 8 plans across 4 waves (W0=P01, W1=P02+P03 parallel, W2=P04+P05 sequential, W3=P06+P07+P08 parallel)
+  - [ ] 02-W0-P01-PLAN.md (Wave 0) — Foundations: outbox + alerts + event-chain verifier + S3 Object Lock + Keycloak roles + i18n + 5 ADR drafts + co-design workshop (BLOCKING mobile)
+  - [ ] 02-W1-P02-PLAN.md (Wave 1) — Foration backend + web + mobile (FOR-01..05)
+  - [ ] 02-W1-P03-PLAN.md (Wave 1) — Extraction backend + web + mobile (EXT-01, EXT-02)
+  - [ ] 02-W2-P04-PLAN.md (Wave 2) — Transport + Pesage (TRP-01..03) + ADR-0009
+  - [ ] 02-W2-P05-PLAN.md (Wave 2) — Stockpile event-sourced + chain-of-hash + outbox consumer (STK-01..03) + ADR-0006
+  - [ ] 02-W3-P06-PLAN.md (Wave 3) — Carburant + Énergie (CAR-01..04) + ADR-0007
+  - [ ] 02-W3-P07-PLAN.md (Wave 3) — HSE (HSE-01, HSE-02, HSE-06 + deferred stubs HSE-03/04/05) + ADR-0008
+  - [ ] 02-W3-P08-PLAN.md (Wave 3) — Dashboards + Alertes + SSE (DSH-01, DSH-02) + ADR-0010
 **UI hint**: yes
 
 ### Phase 3: Operational Completeness

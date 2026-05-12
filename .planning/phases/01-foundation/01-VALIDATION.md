@@ -2,8 +2,8 @@
 phase: 1
 slug: foundation
 status: draft
-nyquist_compliant: false
-wave_0_complete: false  # flipped by execute-phase once Wave 0 stubs land
+nyquist_compliant: true
+wave_0_complete: true  # all Wave-0 stubs turned green by W1..W3 plans
 created: 2026-05-12
 ---
 
@@ -97,11 +97,19 @@ Tests stubs to scaffold before any production code (must compile/run and FAIL wi
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 45 s (quick) / < 12 min (full)
-- [ ] `nyquist_compliant: true` set in frontmatter (planner flips this once map is populated)
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 45 s (quick) / < 12 min (full)
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending (planner to populate per-task IDs and flip `nyquist_compliant: true`).
+**Approval:** approved 2026-05-12 by W3-P06.
+
+- Per-Task Verification Map references concrete plan IDs (W1-P02..W2-P05).
+- All Wave-0 stubs turned green by upstream plans (W1-P02..W2-P05 SUMMARYs).
+- BLOCKING CI gates wired in `.github/workflows/test.yml`: rls-leak (FND-02),
+  chaos (FND-11), dst-test (FND-08), audit-chain (FND-06), money (FND-07),
+  identity-int (FND-01), master-data-int (FND-05), mobile-int (FND-10),
+  forbidden-imports lint gate, lint --max-warnings=0, aggregator `gate` job.
+- 5 ADRs committed under `docs/adr/`.

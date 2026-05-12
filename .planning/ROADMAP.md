@@ -36,7 +36,7 @@ Donner à un groupe minier une visibilité temps réel consolidée sur la produc
   - [x] 01-W2-P03-PLAN.md (Wave 2) — Sync framework + mobile shell + journal activite round-trip + chaos harness (FND-10, FND-11)
   - [x] 01-W2-P04-PLAN.md (Wave 2) — Keycloak 26 realm-as-code + NestJS JWT/CLS guards + web/mobile auth + i18n FR/EN (FND-01, FND-03, FND-09)
   - [x] 01-W3-P05-PLAN.md (Wave 3) — Master Data CRUD UI: Site/Zone/Bench/Permit + activity-log read-only (FND-04, FND-05)
-  - [ ] 01-W3-P06-PLAN.md (Wave 3) — OTel + Grafana LGTM + CI gates BLOCKING + 5 ADRs (cross-cutting close-out)
+  - [x] 01-W3-P06-PLAN.md (Wave 3) — OTel + Grafana LGTM + CI gates BLOCKING + 5 ADRs (cross-cutting close-out)
 
 ### Phase 2: Vertical Slice Production
 **Goal**: Une chaîne opérationnelle étroite mais réelle (foration → extraction → transport → stockpile → carburant → HSE) fonctionne en offline-first depuis le mobile terrain jusqu'au dashboard site, validant les patterns avant extension.

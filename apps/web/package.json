@@ -34,7 +34,7 @@
     "@jsverse/transloco": "^7.5.0",
     "angular-auth-oidc-client": "^19.0.0",
     "leaflet": "^1.9.4",
-    "@asymmetrik/ngx-leaflet": "^19.0.0",
+    "@asymmetrik/ngx-leaflet": "^18.0.1",
     "@gravel/shared-types": "workspace:*",
     "@gravel/i18n": "workspace:*",
     "@opentelemetry/api": "^1.9.0",

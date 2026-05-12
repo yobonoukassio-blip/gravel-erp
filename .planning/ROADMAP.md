@@ -35,7 +35,7 @@ Donner à un groupe minier une visibilité temps réel consolidée sur la produc
   - [x] 01-W1-P02-PLAN.md (Wave 1) — Data platform: RLS isolation, audit chain-of-hash, money helpers, OperationalDay + DST test (FND-02, FND-06, FND-07, FND-08)
   - [x] 01-W2-P03-PLAN.md (Wave 2) — Sync framework + mobile shell + journal activite round-trip + chaos harness (FND-10, FND-11)
   - [x] 01-W2-P04-PLAN.md (Wave 2) — Keycloak 26 realm-as-code + NestJS JWT/CLS guards + web/mobile auth + i18n FR/EN (FND-01, FND-03, FND-09)
-  - [ ] 01-W3-P05-PLAN.md (Wave 3) — Master Data CRUD UI: Site/Zone/Bench/Permit + activity-log read-only (FND-04, FND-05)
+  - [x] 01-W3-P05-PLAN.md (Wave 3) — Master Data CRUD UI: Site/Zone/Bench/Permit + activity-log read-only (FND-04, FND-05)
   - [ ] 01-W3-P06-PLAN.md (Wave 3) — OTel + Grafana LGTM + CI gates BLOCKING + 5 ADRs (cross-cutting close-out)
 
 ### Phase 2: Vertical Slice Production

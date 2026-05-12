@@ -12,8 +12,8 @@ Requirements pour la première release. Chaque exigence est mappée à une phase
 - [x] **FND-01**: Direction Groupe et opérateurs site s'authentifient via Keycloak (SSO OIDC) avec MFA optionnelle
 - [ ] **FND-02**: Le système isole strictement les données par tenant via PostgreSQL Row-Level Security, avec un test cross-tenant qui échoue au moindre leak
 - [x] **FND-03**: Un utilisateur a un rôle (Direction Groupe, Directeur Site, Chef Carrière, Maintenance, HSE, Finance, Opérateur Terrain) scopé à un ou plusieurs sites
-- [ ] **FND-04**: Un administrateur tenant crée et gère le référentiel des sites (carrière, pays, fuseau horaire, devise fonctionnelle, GPS, responsable, statut)
-- [ ] **FND-05**: Un administrateur site définit les zones de production, bancs d'exploitation, et permis/licences associés
+- [x] **FND-04**: Un administrateur tenant crée et gère le référentiel des sites (carrière, pays, fuseau horaire, devise fonctionnelle, GPS, responsable, statut)
+- [x] **FND-05**: Un administrateur site définit les zones de production, bancs d'exploitation, et permis/licences associés
 - [ ] **FND-06**: Le système enregistre toutes les opérations dans un audit trail immuable (utilisateur, timestamp, action, valeurs avant/après)
 - [ ] **FND-07**: Chaque montant financier est stocké en unités mineures entières avec sa devise (XOF=0 décimale, EUR=2) et trois représentations (origine / site-fonctionnel / groupe-reporting)
 - [ ] **FND-08**: Chaque transaction opérationnelle est rattachée à un OperationalDay (shift_start_local + IANA timezone du site) et non au created_at brut
@@ -172,8 +172,8 @@ Mapping requirement ↔ phase (validé après création du roadmap).
 | FND-01 | Phase 1 — Foundation | Complete |
 | FND-02 | Phase 1 — Foundation | Pending |
 | FND-03 | Phase 1 — Foundation | Complete |
-| FND-04 | Phase 1 — Foundation | Pending |
-| FND-05 | Phase 1 — Foundation | Pending |
+| FND-04 | Phase 1 — Foundation | Complete |
+| FND-05 | Phase 1 — Foundation | Complete |
 | FND-06 | Phase 1 — Foundation | Pending |
 | FND-07 | Phase 1 — Foundation | Pending |
 | FND-08 | Phase 1 — Foundation | Pending |

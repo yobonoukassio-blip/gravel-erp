@@ -7,5 +7,10 @@
   "common.search": "Search",
   "common.loading": "Loading…",
   "common.error": "Error",
-  "common.confirm": "Confirm"
+  "common.confirm": "Confirm",
+  "common.back": "Back",
+  "common.locale.fr": "French (Côte d'Ivoire)",
+  "common.locale.en": "English (Côte d'Ivoire)",
+  "settings.title": "Settings",
+  "settings.language": "Language"
 }

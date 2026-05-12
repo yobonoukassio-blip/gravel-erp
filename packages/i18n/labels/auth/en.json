@@ -1,0 +1,8 @@
+{
+  "auth.login.button": "Sign in with Keycloak",
+  "auth.login.error": "Sign-in failed. Please try again.",
+  "auth.login.title": "Welcome to Gravel Ivoire ERP",
+  "auth.login.subtitle": "Secure authentication via Keycloak.",
+  "auth.logout.button": "Sign out",
+  "auth.session.expired": "Your session has expired, please sign in again."
+}

@@ -6,6 +6,8 @@ import { SyncModule } from './modules/sync/sync.module';
 import { IdentityModule } from './modules/identity/identity.module';
 import { I18nModule } from './modules/i18n/i18n.module';
 import { MasterDataModule } from './modules/master-data/master-data.module';
+import { ExtractionModule } from './modules/extraction/extraction.module';
+import { ForationModule } from './modules/foration/foration.module';
 
 /**
  * Root application module.
@@ -34,6 +36,8 @@ import { MasterDataModule } from './modules/master-data/master-data.module';
     IdentityModule,
     I18nModule,
     MasterDataModule,
+    ExtractionModule,
+    ForationModule,
   ],
 })
 export class AppModule {}

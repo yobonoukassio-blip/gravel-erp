@@ -10,11 +10,16 @@
  */
 import type { ConflictPolicy, ConflictStrategy } from '@gravel/shared-types';
 
-export type SyncEntityName = 'daily_activity_log' | 'user_preferences';
+export type SyncEntityName =
+  | 'daily_activity_log'
+  | 'user_preferences'
+  | 'extraction_cycle';
 
 export const ConflictRegistry: Readonly<Record<SyncEntityName, ConflictPolicy>> = Object.freeze({
   daily_activity_log: { strategy: 'append_only_event' },
   user_preferences: { strategy: 'last_write_wins' },
+  // Phase 2 W1-P03 — D2-20
+  extraction_cycle: { strategy: 'append_only_event' },
 });
 
 export function getPolicy(entity: string): ConflictPolicy | undefined {

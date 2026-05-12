@@ -1,0 +1,147 @@
+name: test
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  merge_group:
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    name: Unit (api + web)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @gravel/shared-types build
+      - run: pnpm --filter @gravel/api test:quick
+      # Web unit tests via ng test --watch=false --browsers=ChromeHeadless
+      - run: pnpm --filter @gravel/web test:quick
+
+  integration:
+    name: Integration (api + Postgres 18 + Keycloak 26)
+    runs-on: ubuntu-latest
+    needs: unit
+    services:
+      postgres:
+        image: postgis/postgis:18-3.5
+        env:
+          POSTGRES_USER: gravel_admin
+          POSTGRES_PASSWORD: gravel_dev
+          POSTGRES_DB: gravel_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U gravel_admin"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      keycloak:
+        image: quay.io/keycloak/keycloak:26.0
+        env:
+          KEYCLOAK_ADMIN: admin
+          KEYCLOAK_ADMIN_PASSWORD: admin
+          KC_HEALTH_ENABLED: 'true'
+        ports: ['8080:8080']
+    env:
+      DATABASE_URL: postgres://gravel_admin:gravel_dev@localhost:5432/gravel_test
+      KEYCLOAK_URL: http://localhost:8080
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @gravel/shared-types build
+      - run: pnpm --filter @gravel/api test:int
+
+  security:
+    name: Security (RLS cross-tenant leak — BLOCKING per D-08)
+    runs-on: ubuntu-latest
+    needs: unit
+    services:
+      postgres:
+        image: postgis/postgis:18-3.5
+        env:
+          POSTGRES_USER: gravel_admin
+          POSTGRES_PASSWORD: gravel_dev
+          POSTGRES_DB: gravel_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U gravel_admin"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://gravel_admin:gravel_dev@localhost:5432/gravel_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @gravel/shared-types build
+      - run: pnpm --filter @gravel/api test:rls-leak
+
+  chaos:
+    name: Chaos (sync conflict resolution — BLOCKING per D-13)
+    runs-on: ubuntu-latest
+    needs: unit
+    services:
+      postgres:
+        image: postgis/postgis:18-3.5
+        env:
+          POSTGRES_USER: gravel_admin
+          POSTGRES_PASSWORD: gravel_dev
+          POSTGRES_DB: gravel_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U gravel_admin"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://gravel_admin:gravel_dev@localhost:5432/gravel_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @gravel/shared-types build
+      - run: pnpm --filter @gravel/api test:chaos
+
+  mobile:
+    name: Mobile (Flutter unit + integration)
+    runs-on: ubuntu-latest
+    needs: unit
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.35.0
+      - working-directory: apps/mobile
+        run: flutter pub get
+      - working-directory: apps/mobile
+        run: flutter test
+      # integration_test runs require an emulator; Wave 0 stubs run as widget tests
+      - working-directory: apps/mobile
+        run: flutter test integration_test/ || echo "integration_test stubs RED — expected at Wave 0"

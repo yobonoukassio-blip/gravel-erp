@@ -1,0 +1,35 @@
+name: tofu-validate
+on:
+  push:
+    branches: [master, main]
+    paths:
+      - 'infra/**'
+      - '.github/workflows/tofu-validate.yml'
+  pull_request:
+    paths:
+      - 'infra/**'
+      - '.github/workflows/tofu-validate.yml'
+  merge_group:
+
+concurrency:
+  group: tofu-validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: tofu fmt + init + validate (envs/dev) — BLOCKING
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: 1.8.0
+      - name: tofu fmt -recursive -check
+        working-directory: infra/tofu
+        run: tofu fmt -recursive -check
+      - name: tofu init (no backend)
+        working-directory: infra/tofu/envs/dev
+        run: tofu init -backend=false
+      - name: tofu validate
+        working-directory: infra/tofu/envs/dev
+        run: tofu validate

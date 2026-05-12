@@ -12,12 +12,15 @@ Donner à un groupe minier (Gravel Ivoire) une visibilité temps réel consolid�
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ Gestion multi-site / multi-pays / multi-devise / multi-langue — Phase 1 (FND-01, FND-07, FND-09 ; RLS + Keycloak realm `gravel-dev` + dinero.js v2 + Transloco/ARB codegen)
+- ✓ Référentiel sites (carrières, zones de production, bancs, GPS, permis) — Phase 1 (FND-04, FND-05 ; PostGIS GeoJSON + master-data CRUD + Leaflet pickers + soft-delete)
+- ✓ Mode offline avec synchronisation différée — Phase 1 (FND-10, FND-11 ; PowerSync + Drift + ConflictRegistry + chaos spec GREEN)
+- ✓ Gestion fine des rôles et permissions par profil / site — Phase 1 (FND-03 ; 7 rôles + SiteScopeGuard + groupScope + RBAC matrix tests)
+- ✓ Application mobile Android pour saisie terrain — Phase 1 (Flutter 3.35 + Riverpod + flutter_appauth + Android Keystore)
+- ✓ Audit trail immuable — Phase 1 (FND-02, FND-06 ; RLS forcée + chain-of-hash sha256 per-(tenant,table) + REVOKE UPDATE/DELETE)
 
 ### Active
 
-- [ ] Gestion multi-site / multi-pays / multi-devise / multi-langue
-- [ ] Référentiel sites (carrières, zones de production, bancs, GPS, permis)
 - [ ] Module Foration (plans, GPS trous, profondeur/diamètre/inclinaison, conso gasoil, opérateurs, machines)
 - [ ] Module Tir de mine (chargement explosifs, plans tir, validation HSE, historique, contrôle vibrations/fragmentation)
 - [ ] Module Extraction / Excavation (rendement pelles/chargeuses, opérateurs, temps d'arrêt)
@@ -33,9 +36,7 @@ Donner à un groupe minier (Gravel Ivoire) une visibilité temps réel consolid�
 - [ ] Module Finance / Contrôle de gestion (coût/tonne, rentabilité par site, budget, consolidation multi-pays, comptabilité analytique)
 - [ ] Dashboards temps réel + KPIs Production / Finance / HSE
 - [ ] Reporting consolidé groupe
-- [ ] Application mobile Android/iOS pour saisie terrain
-- [ ] Mode offline avec synchronisation différée
-- [ ] Gestion fine des rôles et permissions par profil / site
+- [ ] Application mobile iOS pour saisie terrain (Android livré Phase 1)
 - [ ] Alertes et notifications opérationnelles
 - [ ] Intégration GPS/télématique flotte et capteurs carburant (IoT)
 
@@ -68,12 +69,20 @@ Donner à un groupe minier (Gravel Ivoire) une visibilité temps réel consolid�
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Architecture microservices multi-tenant | Multi-site/multi-pays exige isolation logique forte + scalabilité indépendante par module | — Pending |
-| PostgreSQL comme SGBD principal | Open-source mature, géospatial (PostGIS) pour cartographie carrières, réplication éprouvée | — Pending |
-| Mobile Flutter | Cible Android/iOS depuis un codebase unique ; perf native acceptable pour saisie terrain | — Pending |
-| Synchronisation offline-first sur mobile | Connectivité non garantie sur sites miniers reculés | — Pending |
+| Architecture modular monolith (NestJS 11) au lieu de microservices | Talent pool TS West Africa + ops simplifié ; split par bounded context quand la charge l'exige (ADR Phase 6) | ✓ Phase 1 |
+| PostgreSQL 18 + PostGIS 3.5 + TimescaleDB | Géospatial (carrières, permits, GPS), time-series IoT, RLS pour multi-tenant | ✓ Phase 1 |
+| Mobile Flutter 3.35 + PowerSync + Drift | Codebase unique, perf Impeller sur low-end Android, sync engine production-grade vs reinventing | ✓ Phase 1 |
+| Sync offline-first via NestJS proxy (D-10) | RLS + validation + audit dans un seul funnel ; PowerSync = pull/replication uniquement | ✓ Phase 1 |
+| Defense-in-depth multi-tenant 3-couches (D-07) | RLS DB + TenantAwareRepository ORM + JWT→CLS→GUC middleware ; chacune défaillit-fermée | ✓ Phase 1 (ADR-0001) |
+| Audit chain-of-hash per-(tenant_id, table_name) | Évite global-lock pitfall ; tenants/tables concurrents ne contentent pas | ✓ Phase 1 (ADR-0004) |
+| Money en bigint minor units + dinero.js v2 | XOF=0 / EUR=2 décimales ; banker's rounding ; aucun float ; lint + grep gates BLOCKING | ✓ Phase 1 (FND-07) |
+| OperationalDay comme entité first-class | Reports interrogent `operational_day_id`, JAMAIS `created_at::date` (D-20 lint gate) | ✓ Phase 1 (ADR-0003) |
+| Keycloak 26 single realm + groupes par site | Data residency OHADA self-host ; pas d'auth0 unit-economics ; realms par pays différé Phase 6 | ✓ Phase 1 (ADR-0005) |
+| Angular 20 (pas React) | ERP forms-heavy + AG-Grid + Formly + grandes équipes plurianuelles : Angular = bonnes guardrails | ✓ Phase 1 |
+| Soft-delete only sur master-data | Zero `@Delete` decorators ; PATCH /:id/archive partout ; visibilité opérationnelle préservée | ✓ Phase 1 |
 | Transformation aval reportée hors MVP | Optionnelle dans le draft, complexité usine ≠ carrière, à isoler pour V2 | — Pending |
 | Paie complète hors MVP | SIRH dédiés existent ; ERP fournira export vers paie tierce | — Pending |
+| OTel + Grafana LGTM self-host (pas Datadog) | Coût IoT-heavy ingestion ; OSS souverain ; OTLP/HTTP unifié api/web/mobile | ✓ Phase 1 |
 
 ## Evolution
 
@@ -93,4 +102,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-12 after initialization*
+*Last updated: 2026-05-12 after Phase 1 (Foundation)*

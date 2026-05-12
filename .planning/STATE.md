@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Not started
-last_updated: "2026-05-12T15:32:22.368Z"
+status: planning
+last_updated: "2026-05-12T16:12:20.612Z"
 progress:
   total_phases: 6
   completed_phases: 1
@@ -17,22 +17,22 @@ progress:
 ## Project Reference
 
 - **Core Value:** Donner à un groupe minier une visibilité temps réel consolidée sur la production, les coûts à la tonne et la sécurité de chaque site/pays, avec saisie terrain mobile fiable même en mode offline.
-- **Current Focus:** Phase 1 — Foundation (tenancy, sync, master data, mobile shell)
+- **Current Focus:** Phase 2 — Vertical Slice Production (Foration → Extraction → Transport → Stockpile → Carburant → HSE → Dashboard site)
 - **Domain:** Mining / Quarry ERP — multi-site, multi-country (West Africa / OHADA)
 - **Stack (recommended):** NestJS 11 / Node 24, PostgreSQL 18 + PostGIS + TimescaleDB, Flutter + PowerSync + Drift, Angular 20, Keycloak 26
 
 ## Current Position
 
-- **Phase:** 1 — Foundation
-- **Plan:** Not yet planned (run `/gsd:plan-phase 1`)
-- **Status:** Not started
+- **Phase:** 2
+- **Plan:** Not started
+- **Status:** Ready to plan
 - **Progress:** [██████████] 100%
 
 ## Phase Map
 
 | # | Phase | Status |
 |---|-------|--------|
-| 1 | Foundation | Not started |
+| 1 | Foundation | ✓ Complete (2026-05-12) |
 | 2 | Vertical Slice Production | Not started |
 | 3 | Operational Completeness | Not started |
 | 4 | Analytics, Consolidation & Finance | Not started |
@@ -41,9 +41,9 @@ progress:
 
 ## Performance Metrics
 
-- **Phases complete:** 0/5 (v1)
-- **Plans complete:** 0
-- **Requirements validated:** 0/71
+- **Phases complete:** 1/5 (v1)
+- **Plans complete:** 6
+- **Requirements validated:** 11/71 (FND-01..FND-11)
 - **Phases with success criteria:** 6/6
 
 ## Accumulated Context
@@ -52,10 +52,17 @@ progress:
 
 | Decision | Status |
 |----------|--------|
-| Architecture monolithe modulaire (strangler vers microservices ciblés) | Pending validation Phase 1 |
-| PostgreSQL + PostGIS + TimescaleDB | Pending install verification (TimescaleDB ↔ PG18) |
-| Flutter + PowerSync + Drift pour mobile | Pending Phase 1 spike |
-| Sync offline-first per-entity (append-only / event-sourced / pessimistic / LWW) | Pending Phase 1 |
+| Modular monolith NestJS 11 + Node 24 | ✓ Validated Phase 1 |
+| PostgreSQL 18 + PostGIS 3.5 + TimescaleDB (en image postgis/postgis:18-3.5) | ✓ Validated Phase 1 |
+| Flutter 3.35 + PowerSync 1.9 + Drift 2.20 mobile | ✓ Validated Phase 1 |
+| Sync per-entity via ConflictRegistry (4 strategies, 2 wired Phase 1) | ✓ Validated Phase 1 |
+| Defense-in-depth tenant: RLS + TenantAwareRepo + JWT→CLS→GUC | ✓ Validated Phase 1 (ADR-0001) |
+| Audit chain-of-hash sha256 per (tenant_id, table_name) | ✓ Validated Phase 1 (ADR-0004) |
+| Money bigint minor units + dinero.js v2 + banker's rounding | ✓ Validated Phase 1 |
+| Keycloak 26 single realm + groupes par site (realms par pays Phase 6) | ✓ Validated Phase 1 (ADR-0005) |
+| Angular 20 + Material + AG-Grid + Formly + Transloco | ✓ Validated Phase 1 |
+| OTel + Grafana LGTM self-host (api/web/mobile OTLP/HTTP) | ✓ Validated Phase 1 |
+| CI BLOCKING gates via `gate` aggregator job | ✓ Validated Phase 1 |
 | Transformation aval reportée hors MVP | Confirmed |
 | Paie complète hors MVP (export SIRH) | Confirmed |
 | OHADA: analytique uniquement, export vers Sage/Ciel/Odoo | Confirmed |
@@ -73,7 +80,8 @@ progress:
 
 ### Blockers
 
-- None
+- ⚠️ [Phase 1 carry-over] Local-env tooling absent (pnpm, docker, flutter, tofu non installés sur le host Windows). UAT live impossible localement ; CI = source of truth. Installer la toolchain avant Phase 2 ou prévoir preview env CI déployable.
+- ⚠️ [Phase 2 prep] Confirmer compatibilité TimescaleDB ↔ PostgreSQL 18 (fallback PG17 si Timescale retarde). Risque hypertables IoT Phase 5.
 
 ### Pitfalls to Address by Phase (from research)
 
@@ -85,8 +93,10 @@ progress:
 
 ## Session Continuity
 
-- **Last action:** Roadmap created from REQUIREMENTS.md + research/SUMMARY.md
-- **Next action:** `/gsd:plan-phase 1` to decompose Phase 1 into executable plans
+- **Last session:** 2026-05-12
+- **Stopped at:** Phase 1 complete (6/6 plans, 11/11 FND-* requirements validated, UAT blocked on local-env tooling — CI is source of truth)
+- **Next action:** `/gsd:discuss-phase 2` then `/gsd:plan-phase 2` for Vertical Slice Production
+- **Resume file:** None
 - **Files:**
   - `.planning/PROJECT.md` — project vision + constraints
   - `.planning/REQUIREMENTS.md` — 71 v1 requirements + traceability
@@ -95,4 +105,4 @@ progress:
   - `.planning/config.json` — granularity=standard, mode=yolo, ui_phase=true
 
 ---
-*State initialized: 2026-05-12*
+*State updated: 2026-05-12 — after Phase 1 transition*

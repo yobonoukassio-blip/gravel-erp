@@ -1,0 +1,31 @@
+{
+  "name": "gravel-erp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Gravel Ivoire ERP — multi-tenant, multi-site quarry operations platform",
+  "engines": {
+    "node": ">=24.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.12.0",
+  "scripts": {
+    "test:quick": "pnpm -r --parallel run test:quick",
+    "test:ci": "pnpm -r run test:ci",
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint",
+    "format": "prettier --write \"**/*.{ts,json,md}\"",
+    "prepare": "husky || true"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "eslint": "^8.57.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "prettier": "^3.3.3",
+    "husky": "^9.1.4",
+    "lint-staged": "^15.2.7"
+  },
+  "lint-staged": {
+    "*.{ts,json,md}": ["prettier --write"]
+  }
+}

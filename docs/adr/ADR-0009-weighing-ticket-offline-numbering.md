@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft — to be refined in Wave 2 (transport module). Date: 2026-05-12. Authors: Phase 2 planner.
+Accepted (2026-05-12) — refined during Wave 2 (transport module). Authors: Phase 2 planner; refined by W2-P04 executor.
 
 ## Context
 
@@ -112,6 +112,45 @@ Negative:
   on the phone, no audit hint.
 - **DEVICE_SHORT_ID = MAC address** — rejected: privacy / Android 11+
   restriction; explicit short ID is auditor-friendlier anyway.
+
+## Implementation Notes
+
+Refined in W2-P04 (Transport + Pesage vertical slice).
+
+**Server-side validator** — `apps/api/src/modules/transport/services/ticket-number-generator.service.ts`:
+
+- Validates ticket number format with regex: `^[A-Z0-9]{2,10}-\d{8}-[A-Z0-9]{2,10}-\d{4,}$`
+- Server recomputes `content_hash` from the canonical payload on insert and rejects with `ERR_CONTENT_HASH_MISMATCH` if the client-provided hash differs.
+- Server recomputes `net_kg` (database-generated column, `gross_kg - tare_kg`) — client cannot overrule arithmetic.
+- Uniqueness enforced via `UNIQUE (tenant_id, ticket_number)` constraint; duplicates return HTTP 409.
+
+**Client-side generator** — `apps/mobile/lib/features/transport/services/offline_ticket_numbering.dart`:
+
+- Reads `DEVICE_SHORT_ID` from `flutter_secure_storage`, initialized on first launch.
+- Counter persisted in Drift table `ticket_counter (device_id, yyyymmdd, last_seq)` — atomic increment scoped per (device, day).
+- Returns formatted string `${siteCode}-${yyyymmdd}-${deviceId}-${seq}` (4-digit zero-padded sequence).
+
+**Canonical payload field order** (must match server + client to keep `content_hash` deterministic):
+
+1. `ticket_number`
+2. `gross_kg`
+3. `tare_kg`
+4. `net_kg`
+5. `truck_equipment_id`
+6. `driver_id`
+7. `material_type`
+8. `weighed_at_local`
+9. `iana_timezone`
+10. `weighing_station_code`
+11. `client_signature_blob_sha256`
+12. `driver_signature_blob_sha256`
+
+Hash algorithm: SHA-256 over canonical JSON (sorted keys, UTF-8, no whitespace).
+
+**Linked work:**
+
+- W2-P04 Task 1 — backend `WeighingTicketService` + `TicketNumberGeneratorService`
+- W2-P04 Task 4 — mobile `OfflineTicketNumbering` + `SignaturePad` + offline integration test
 
 ## References
 

@@ -1,9 +1,9 @@
----
+ 03 / W1-P03-T01 (ConflictRegistry) + W1-P03-T03 (chaos harness) | 03 / W1-P03-T03 (offline integration_test) | 04 / W1-P04-T04 (web i18n e2e) + W1-P04-T05 (mobile widget) | 02 / W1-P02-T04 (OperationalDay + DST Europe/Paris) | 02 / W1-P02-T04 (money helpers + tests) | 02 / W1-P02-T03 (audit triggers + chain verifier) | 02 / W1-P02-T05 (schema) + 05 / W2-P05-T01 (API) + W2-P05-T02 (UI) | 05 / W2-P05-T03 (E2E site-create) | 04 / W1-P04-T03 (RBAC role+site) | 02 / W1-P02-T02 (RLS + auto-generated leak test) | 04 / W1-P04-T03 (api int) + W1-P04-T05 (mobile auth) |---
 phase: 1
 slug: foundation
 status: draft
 nyquist_compliant: false
-wave_0_complete: false
+wave_0_complete: false  # flipped by execute-phase once Wave 0 stubs land
 created: 2026-05-12
 ---
 
@@ -43,8 +43,8 @@ created: 2026-05-12
 Tasks are not yet enumerated (planner produces them). The map below pre-allocates
 verification commands per Phase-1 requirement so the planner can attach them.
 
-| REQ-ID | Behaviour to prove | Test type | Automated command | Wave 0 file |
-|--------|-------------------|-----------|-------------------|-------------|
+| REQ-ID | Plan / Task ID | Behaviour to prove | Test type | Automated command | Wave 0 file |
+|--------|----------------|-------------------|-----------|-------------------|-------------|
 | FND-01 | SSO Keycloak OIDC + MFA optionnelle | integration | `pnpm --filter @gravel/api test:int -- identity.spec.ts` | `apps/api/test/integration/identity.spec.ts` (W0 stub) |
 | FND-02 | RLS isolation cross-tenant sur **chaque table** | generated integration | `pnpm --filter @gravel/api test:rls-leak` | `apps/api/test/security/rls-leak.generated.spec.ts` (W0 generator) |
 | FND-03 | Rôle (Direction Groupe/Directeur Site/Chef Carrière/Maintenance/HSE/Finance/Opérateur Terrain) scopé site | unit + integration | `pnpm --filter @gravel/api test -- rbac.spec.ts` | `apps/api/test/unit/rbac.spec.ts` (W0 stub) |

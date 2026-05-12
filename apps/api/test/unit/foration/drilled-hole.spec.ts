@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { DrilledHoleController } from '../../../src/modules/foration/controllers/drilled-hole.controller';
 import { DrilledHole } from '../../../src/modules/foration/entities/drilled-hole.entity';

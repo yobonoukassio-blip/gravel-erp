@@ -1,0 +1,18 @@
+{
+  "fuel_tank": "Cuve carburant",
+  "fuel_delivery_in": "Livraison fournisseur",
+  "fuel_dispense_out": "Ravitaillement engin",
+  "fuel_adjustment": "Ajustement jauge",
+  "fuel_reconciliation": "Réconciliation quotidienne",
+  "liters": "Litres",
+  "liters_delta": "Variation litres",
+  "cost_per_liter": "Coût par litre",
+  "hour_meter_reading": "Compteur heures engin",
+  "gauge_photo": "Photo de la jauge",
+  "gauge_photo_recommended": "Photo de la jauge recommandée",
+  "ratio_l_per_h": "Ratio L/h",
+  "anomaly_high": "Anomalie : consommation élevée",
+  "anomaly_low": "Anomalie : consommation faible",
+  "reconciliation_drift_alert": "Écart > 0.5% volume cuve",
+  "energy_reading_monthly": "Relevé énergie mensuel"
+}

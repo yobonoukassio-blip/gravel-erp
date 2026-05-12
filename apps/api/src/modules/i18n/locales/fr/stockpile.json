@@ -1,0 +1,18 @@
+{
+  "stockpile": "Stockpile",
+  "stockpile_balance": "Solde stockpile",
+  "calibre_code": "Code calibre",
+  "tonnage_delta_kg": "Variation tonnage (kg)",
+  "event_inflow": "Entrée (INFLOW)",
+  "event_outflow_sale": "Sortie vente",
+  "event_adjustment": "Ajustement inventaire",
+  "event_transfer": "Transfert inter-pile",
+  "threshold_low": "Seuil bas",
+  "threshold_critical_low": "Seuil critique bas",
+  "threshold_high": "Seuil haut",
+  "threshold_crossed": "Seuil franchi",
+  "valuation_weighted_avg": "Coût moyen pondéré",
+  "cost_model_version_disclaimer": "Coût provisoire — calcul complet en Phase 4",
+  "adjustment_requires_reason": "Ajustement requiert une raison + photo",
+  "adjustment_role_required": "Réservé au Directeur Site"
+}

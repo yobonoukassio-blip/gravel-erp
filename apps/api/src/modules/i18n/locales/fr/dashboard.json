@@ -1,0 +1,18 @@
+{
+  "dashboard_site_director": "Tableau de bord Directeur Site",
+  "dashboard_quarry_chief": "Tableau de bord Chef Carrière",
+  "kpi_tonnage_produced": "Tonnage produit",
+  "kpi_drilling_yield": "Rendement forage m/h",
+  "kpi_extraction_yield": "Rendement extraction t/h",
+  "kpi_tf_accident": "TF accident (12 mois glissant)",
+  "kpi_tf_since_launch": "TF depuis lancement",
+  "kpi_incidents_open": "Incidents ouverts",
+  "kpi_fuel_levels": "Niveaux cuves carburant",
+  "kpi_stockpile_balances": "Soldes stockpile",
+  "kpi_equipment_in_maintenance": "Équipements en panne",
+  "kpi_active_plans": "Plans de forage actifs",
+  "kpi_rotations_today": "Rotations camions aujourd'hui",
+  "kpi_weighing_queue": "File d'attente pesage",
+  "cost_per_ton_provisional_label": "Coût/tonne (provisoire)",
+  "cost_per_ton_disclaimer": "Provisoire — calcul finalisé Phase 4"
+}

@@ -1,0 +1,20 @@
+{
+  "hse_incident": "حادث الصحة والسلامة",
+  "category_accident_personnel": "حادث شخصي",
+  "category_accident_materiel": "حادث مادي",
+  "category_near_miss": "حادث وشيك",
+  "category_environnement": "بيئي",
+  "category_securite": "أمان",
+  "category_autre": "أخرى",
+  "severity": "الخطورة",
+  "severity_1_minor": "1 — طفيف",
+  "severity_5_fatal": "5 — مميت / كارثي",
+  "chronology": "التسلسل الزمني",
+  "chronology_append_only": "التعديل يولد حدثًا جديدًا غير قابل للتعديل",
+  "people_impacted": "الأشخاص المتأثرون",
+  "equipment_impacted": "المعدات المتأثرة",
+  "corrective_action": "إجراء تصحيحي (CAPA)",
+  "capa_required_before_close": "الخطورة ≥4: يلزم التحقق من CAPA قبل الإغلاق",
+  "attachment_retention_7y": "تُحفظ المرفقات لمدة 7 سنوات (قفل الكائنات)",
+  "tf_accident_rate": "معدل تكرار الحوادث"
+}

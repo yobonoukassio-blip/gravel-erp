@@ -1,0 +1,19 @@
+{
+  "alerts": "Alerts",
+  "alerts_inbox": "Alerts inbox",
+  "severity_low": "Low",
+  "severity_medium": "Medium",
+  "severity_high": "High",
+  "severity_critical": "Critical",
+  "status_open": "Open",
+  "status_acked": "Acknowledged",
+  "status_resolved": "Resolved",
+  "action_ack": "Acknowledge",
+  "action_resolve": "Resolve",
+  "channel_in_app": "In-app notification",
+  "channel_email": "Email",
+  "channel_sms_deferred": "SMS (deferred Phase 6)",
+  "dedupe_open_per_threshold": "One open alert per threshold crossing",
+  "no_alerts_open": "No open alerts",
+  "alert_created_at": "Created at"
+}

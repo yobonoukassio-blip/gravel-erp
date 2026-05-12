@@ -1,0 +1,21 @@
+{
+  "extraction_cycle": "Extraction cycle",
+  "bench": "Bench",
+  "equipment": "Equipment",
+  "operator": "Operator",
+  "material_type": "Material type",
+  "material_granite_brut": "Raw granite",
+  "material_tout_venant": "Tout-venant (mixed)",
+  "material_sterile": "Sterile",
+  "estimated_tonnage_t": "Estimated tonnage (t)",
+  "estimated_disclaimer": "Estimated — authoritative tonnage = transport weighing",
+  "cycle_started_at": "Started at",
+  "cycle_ended_at": "Ended at",
+  "downtime_minutes": "Downtime (min)",
+  "downtime_reason_meal_break": "Meal break",
+  "downtime_reason_fuel": "Fuel",
+  "downtime_reason_mechanical": "Mechanical",
+  "downtime_reason_weather": "Weather",
+  "downtime_reason_safety": "Safety",
+  "downtime_reason_other": "Other"
+}

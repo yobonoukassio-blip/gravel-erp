@@ -1,0 +1,18 @@
+{
+  "stockpile": "Stockpile",
+  "stockpile_balance": "Stockpile balance",
+  "calibre_code": "Calibre code",
+  "tonnage_delta_kg": "Tonnage delta (kg)",
+  "event_inflow": "Inflow",
+  "event_outflow_sale": "Sale outflow",
+  "event_adjustment": "Inventory adjustment",
+  "event_transfer": "Inter-pile transfer",
+  "threshold_low": "Low threshold",
+  "threshold_critical_low": "Critical low threshold",
+  "threshold_high": "High threshold",
+  "threshold_crossed": "Threshold crossed",
+  "valuation_weighted_avg": "Weighted average cost",
+  "cost_model_version_disclaimer": "Provisional cost — full calculation in Phase 4",
+  "adjustment_requires_reason": "Adjustment requires reason + photo",
+  "adjustment_role_required": "Restricted to Site Manager"
+}

@@ -1,0 +1,18 @@
+{
+  "truck_rotation": "Rotation de camion",
+  "truck": "Camion",
+  "driver": "Chauffeur",
+  "loaded_at_bench": "Banc d'origine",
+  "unloaded_at_zone": "Stockpile cible",
+  "loaded_tonnage_t": "Tonnage chargé (t)",
+  "loaded_at": "Chargé à",
+  "unloaded_at": "Déchargé à",
+  "cycle_time_minutes": "Temps de cycle (min)",
+  "weighing_ticket": "Ticket de pesage",
+  "weighing_ticket_required": "Ticket de pesage obligatoire",
+  "load_truck": "Charger",
+  "unload_truck": "Décharger au stockpile",
+  "dispatch_queue": "File d'attente d'affectation",
+  "assign_truck": "Affecter ce camion",
+  "rotation_in_progress": "Rotation en cours"
+}

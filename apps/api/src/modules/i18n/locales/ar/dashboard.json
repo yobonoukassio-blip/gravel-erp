@@ -1,0 +1,18 @@
+{
+  "dashboard_site_director": "لوحة معلومات مدير الموقع",
+  "dashboard_quarry_chief": "لوحة معلومات رئيس المحجر",
+  "kpi_tonnage_produced": "الحمولة المنتجة",
+  "kpi_drilling_yield": "مردود الحفر متر/ساعة",
+  "kpi_extraction_yield": "مردود الاستخراج طن/ساعة",
+  "kpi_tf_accident": "معدل تكرار الحوادث (12 شهر متجدد)",
+  "kpi_tf_since_launch": "TF منذ الإطلاق",
+  "kpi_incidents_open": "الحوادث المفتوحة",
+  "kpi_fuel_levels": "مستويات خزانات الوقود",
+  "kpi_stockpile_balances": "أرصدة المخزون",
+  "kpi_equipment_in_maintenance": "المعدات في الصيانة",
+  "kpi_active_plans": "خطط الحفر النشطة",
+  "kpi_rotations_today": "دورات الشاحنات اليوم",
+  "kpi_weighing_queue": "طابور الوزن",
+  "cost_per_ton_provisional_label": "التكلفة/الطن (مؤقت)",
+  "cost_per_ton_disclaimer": "مؤقت — الحساب النهائي في المرحلة 4"
+}

@@ -1,0 +1,20 @@
+{
+  "hse_incident": "Incident HSE",
+  "category_accident_personnel": "Accident personnel",
+  "category_accident_materiel": "Accident matériel",
+  "category_near_miss": "Presqu'accident",
+  "category_environnement": "Environnement",
+  "category_securite": "Sécurité",
+  "category_autre": "Autre",
+  "severity": "Sévérité",
+  "severity_1_minor": "1 — Mineur",
+  "severity_5_fatal": "5 — Fatal / catastrophique",
+  "chronology": "Chronologie",
+  "chronology_append_only": "L'édition génère un nouvel événement append-only",
+  "people_impacted": "Personnes impactées",
+  "equipment_impacted": "Équipements impactés",
+  "corrective_action": "Action corrective (CAPA)",
+  "capa_required_before_close": "Sévérité ≥4 : CAPA verified obligatoire avant clôture",
+  "attachment_retention_7y": "Pièces jointes conservées 7 ans (Object Lock)",
+  "tf_accident_rate": "Taux de fréquence accidents"
+}

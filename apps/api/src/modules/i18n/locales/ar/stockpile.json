@@ -1,0 +1,18 @@
+{
+  "stockpile": "كومة مخزون",
+  "stockpile_balance": "رصيد المخزون",
+  "calibre_code": "رمز المعيار",
+  "tonnage_delta_kg": "تغير الحمولة (كغ)",
+  "event_inflow": "دخول",
+  "event_outflow_sale": "خروج للبيع",
+  "event_adjustment": "تعديل المخزون",
+  "event_transfer": "تحويل بين الأكوام",
+  "threshold_low": "العتبة المنخفضة",
+  "threshold_critical_low": "العتبة الحرجة المنخفضة",
+  "threshold_high": "العتبة المرتفعة",
+  "threshold_crossed": "تم تجاوز العتبة",
+  "valuation_weighted_avg": "متوسط التكلفة المرجح",
+  "cost_model_version_disclaimer": "تكلفة مؤقتة — الحساب الكامل في المرحلة 4",
+  "adjustment_requires_reason": "التعديل يتطلب سببًا وصورة",
+  "adjustment_role_required": "مقصور على مدير الموقع"
+}

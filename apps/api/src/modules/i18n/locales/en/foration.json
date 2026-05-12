@@ -1,0 +1,20 @@
+{
+  "drilling_plan": "Drilling plan",
+  "drilled_hole": "Drilled hole",
+  "depth": "Depth",
+  "diameter": "Diameter",
+  "inclination": "Inclination",
+  "target_depth_m": "Target depth (m)",
+  "actual_depth_m": "Actual depth (m)",
+  "hole_index": "Hole number",
+  "gps_accuracy": "GPS accuracy",
+  "gps_accuracy_low": "Low GPS accuracy (>30 m)",
+  "fuel_consumed_l": "Fuel consumed (L)",
+  "operator": "Operator",
+  "machine": "Drill rig",
+  "machine_status_not_active": "Drill rig in maintenance — cannot be assigned",
+  "out_of_tolerance_depth": "Depth out of tolerance",
+  "out_of_tolerance_reason": "Reason for the deviation",
+  "confirm_append_only": "Once submitted, not modifiable. Confirm.",
+  "yield_m_per_hour": "Yield m/h"
+}

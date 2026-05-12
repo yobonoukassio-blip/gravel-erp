@@ -1,0 +1,20 @@
+{
+  "drilling_plan": "Plan de forage",
+  "drilled_hole": "Trou foré",
+  "depth": "Profondeur",
+  "diameter": "Diamètre",
+  "inclination": "Inclinaison",
+  "target_depth_m": "Profondeur cible (m)",
+  "actual_depth_m": "Profondeur réelle (m)",
+  "hole_index": "Numéro de trou",
+  "gps_accuracy": "Précision GPS",
+  "gps_accuracy_low": "Précision GPS faible (>30 m)",
+  "fuel_consumed_l": "Carburant consommé (L)",
+  "operator": "Opérateur",
+  "machine": "Foreuse",
+  "machine_status_not_active": "Foreuse en panne — affectation impossible",
+  "out_of_tolerance_depth": "Écart profondeur hors tolérance",
+  "out_of_tolerance_reason": "Raison de l'écart",
+  "confirm_append_only": "Une fois envoyé, non modifiable. Confirmer.",
+  "yield_m_per_hour": "Rendement m/h"
+}

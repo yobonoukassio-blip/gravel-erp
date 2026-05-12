@@ -30,7 +30,7 @@
     "@ngx-formly/core": "^6.3.0",
     "@ngx-formly/material": "^6.3.0",
     "ag-grid-angular": "^32.2.0",
-    "ag-grid-enterprise": "^32.2.0",
+    "ag-grid-community": "^32.2.0",
     "@jsverse/transloco": "^7.5.0",
     "angular-auth-oidc-client": "^19.0.0",
     "leaflet": "^1.9.4",

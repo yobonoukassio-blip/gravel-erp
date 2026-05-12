@@ -1,0 +1,21 @@
+{
+  "extraction_cycle": "Cycle d'extraction",
+  "bench": "Banc",
+  "equipment": "Engin",
+  "operator": "Opérateur",
+  "material_type": "Type de matériau",
+  "material_granite_brut": "Granite brut",
+  "material_tout_venant": "Tout-venant",
+  "material_sterile": "Stérile",
+  "estimated_tonnage_t": "Tonnage estimé (t)",
+  "estimated_disclaimer": "Estimé — tonnage faisant foi = pesage transport",
+  "cycle_started_at": "Démarré à",
+  "cycle_ended_at": "Terminé à",
+  "downtime_minutes": "Temps d'arrêt (min)",
+  "downtime_reason_meal_break": "Repas",
+  "downtime_reason_fuel": "Carburant",
+  "downtime_reason_mechanical": "Mécanique",
+  "downtime_reason_weather": "Météo",
+  "downtime_reason_safety": "Sécurité",
+  "downtime_reason_other": "Autre"
+}

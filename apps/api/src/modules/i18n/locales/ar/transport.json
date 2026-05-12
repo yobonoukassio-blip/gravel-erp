@@ -1,0 +1,18 @@
+{
+  "truck_rotation": "دورة الشاحنة",
+  "truck": "شاحنة",
+  "driver": "السائق",
+  "loaded_at_bench": "المدرج الأصلي",
+  "unloaded_at_zone": "المخزون المستهدف",
+  "loaded_tonnage_t": "الحمولة المحملة (طن)",
+  "loaded_at": "تم التحميل في",
+  "unloaded_at": "تم التفريغ في",
+  "cycle_time_minutes": "زمن الدورة (دقيقة)",
+  "weighing_ticket": "تذكرة الوزن",
+  "weighing_ticket_required": "تذكرة الوزن مطلوبة",
+  "load_truck": "تحميل",
+  "unload_truck": "تفريغ عند المخزون",
+  "dispatch_queue": "قائمة الانتظار للتخصيص",
+  "assign_truck": "تخصيص هذه الشاحنة",
+  "rotation_in_progress": "الدورة قيد التنفيذ"
+}

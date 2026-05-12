@@ -1,0 +1,18 @@
+{
+  "fuel_tank": "خزان الوقود",
+  "fuel_delivery_in": "توريد من المورد",
+  "fuel_dispense_out": "تزويد المعدات",
+  "fuel_adjustment": "تعديل المقياس",
+  "fuel_reconciliation": "تسوية يومية",
+  "liters": "لترات",
+  "liters_delta": "تغير اللترات",
+  "cost_per_liter": "التكلفة لكل لتر",
+  "hour_meter_reading": "عداد ساعات المعدة",
+  "gauge_photo": "صورة المقياس",
+  "gauge_photo_recommended": "يُوصى بصورة المقياس",
+  "ratio_l_per_h": "نسبة لتر/ساعة",
+  "anomaly_high": "شذوذ: استهلاك مرتفع",
+  "anomaly_low": "شذوذ: استهلاك منخفض",
+  "reconciliation_drift_alert": "الانحراف > 0.5٪ من حجم الخزان",
+  "energy_reading_monthly": "قراءة الطاقة الشهرية"
+}

@@ -1,0 +1,19 @@
+{
+  "alerts": "Alertes",
+  "alerts_inbox": "Boîte de réception alertes",
+  "severity_low": "Faible",
+  "severity_medium": "Moyen",
+  "severity_high": "Élevé",
+  "severity_critical": "Critique",
+  "status_open": "Ouverte",
+  "status_acked": "Prise en compte",
+  "status_resolved": "Résolue",
+  "action_ack": "Prendre en compte",
+  "action_resolve": "Résoudre",
+  "channel_in_app": "Notification in-app",
+  "channel_email": "Email",
+  "channel_sms_deferred": "SMS (reporté Phase 6)",
+  "dedupe_open_per_threshold": "Une seule alerte ouverte par franchissement",
+  "no_alerts_open": "Aucune alerte ouverte",
+  "alert_created_at": "Créée à"
+}

@@ -1,0 +1,20 @@
+{
+  "hse_incident": "HSE incident",
+  "category_accident_personnel": "Personal accident",
+  "category_accident_materiel": "Material accident",
+  "category_near_miss": "Near miss",
+  "category_environnement": "Environmental",
+  "category_securite": "Safety",
+  "category_autre": "Other",
+  "severity": "Severity",
+  "severity_1_minor": "1 — Minor",
+  "severity_5_fatal": "5 — Fatal / catastrophic",
+  "chronology": "Chronology",
+  "chronology_append_only": "Edit generates a new append-only event",
+  "people_impacted": "People impacted",
+  "equipment_impacted": "Equipment impacted",
+  "corrective_action": "Corrective action (CAPA)",
+  "capa_required_before_close": "Severity ≥4: CAPA verified required before close",
+  "attachment_retention_7y": "Attachments retained 7 years (Object Lock)",
+  "tf_accident_rate": "Accident frequency rate"
+}

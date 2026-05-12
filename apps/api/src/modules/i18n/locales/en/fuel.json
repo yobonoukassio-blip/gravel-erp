@@ -1,0 +1,18 @@
+{
+  "fuel_tank": "Fuel tank",
+  "fuel_delivery_in": "Supplier delivery",
+  "fuel_dispense_out": "Equipment refuel",
+  "fuel_adjustment": "Gauge adjustment",
+  "fuel_reconciliation": "Daily reconciliation",
+  "liters": "Liters",
+  "liters_delta": "Liters delta",
+  "cost_per_liter": "Cost per liter",
+  "hour_meter_reading": "Equipment hour meter",
+  "gauge_photo": "Gauge photo",
+  "gauge_photo_recommended": "Gauge photo recommended",
+  "ratio_l_per_h": "L/h ratio",
+  "anomaly_high": "Anomaly: high consumption",
+  "anomaly_low": "Anomaly: low consumption",
+  "reconciliation_drift_alert": "Drift > 0.5% tank volume",
+  "energy_reading_monthly": "Monthly energy reading"
+}

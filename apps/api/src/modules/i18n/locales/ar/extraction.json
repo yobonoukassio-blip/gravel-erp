@@ -1,0 +1,21 @@
+{
+  "extraction_cycle": "دورة الاستخراج",
+  "bench": "المدرج",
+  "equipment": "المعدات",
+  "operator": "المشغل",
+  "material_type": "نوع المادة",
+  "material_granite_brut": "غرانيت خام",
+  "material_tout_venant": "خليط طبيعي",
+  "material_sterile": "مادة عقيمة",
+  "estimated_tonnage_t": "الحمولة المقدرة (طن)",
+  "estimated_disclaimer": "مقدر — الحمولة المعتمدة = وزن النقل",
+  "cycle_started_at": "بدأت في",
+  "cycle_ended_at": "انتهت في",
+  "downtime_minutes": "وقت التوقف (دقيقة)",
+  "downtime_reason_meal_break": "استراحة الغداء",
+  "downtime_reason_fuel": "وقود",
+  "downtime_reason_mechanical": "عطل ميكانيكي",
+  "downtime_reason_weather": "الطقس",
+  "downtime_reason_safety": "السلامة",
+  "downtime_reason_other": "أخرى"
+}

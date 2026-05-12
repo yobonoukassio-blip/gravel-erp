@@ -1,0 +1,19 @@
+{
+  "alerts": "التنبيهات",
+  "alerts_inbox": "صندوق التنبيهات",
+  "severity_low": "منخفض",
+  "severity_medium": "متوسط",
+  "severity_high": "مرتفع",
+  "severity_critical": "حرج",
+  "status_open": "مفتوح",
+  "status_acked": "تم الإقرار",
+  "status_resolved": "تم الحل",
+  "action_ack": "إقرار",
+  "action_resolve": "حل",
+  "channel_in_app": "إشعار داخل التطبيق",
+  "channel_email": "بريد إلكتروني",
+  "channel_sms_deferred": "رسائل SMS (مؤجلة للمرحلة 6)",
+  "dedupe_open_per_threshold": "تنبيه مفتوح واحد لكل تجاوز للعتبة",
+  "no_alerts_open": "لا توجد تنبيهات مفتوحة",
+  "alert_created_at": "أُنشئ في"
+}

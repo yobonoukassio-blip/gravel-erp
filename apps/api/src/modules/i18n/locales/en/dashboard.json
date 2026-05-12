@@ -1,0 +1,18 @@
+{
+  "dashboard_site_director": "Site Director dashboard",
+  "dashboard_quarry_chief": "Quarry Chief dashboard",
+  "kpi_tonnage_produced": "Tonnage produced",
+  "kpi_drilling_yield": "Drilling yield m/h",
+  "kpi_extraction_yield": "Extraction yield t/h",
+  "kpi_tf_accident": "Accident TF (rolling 12 months)",
+  "kpi_tf_since_launch": "TF since launch",
+  "kpi_incidents_open": "Open incidents",
+  "kpi_fuel_levels": "Fuel tank levels",
+  "kpi_stockpile_balances": "Stockpile balances",
+  "kpi_equipment_in_maintenance": "Equipment in maintenance",
+  "kpi_active_plans": "Active drilling plans",
+  "kpi_rotations_today": "Truck rotations today",
+  "kpi_weighing_queue": "Weighing queue",
+  "cost_per_ton_provisional_label": "Cost/ton (provisional)",
+  "cost_per_ton_disclaimer": "Provisional — final calculation Phase 4"
+}

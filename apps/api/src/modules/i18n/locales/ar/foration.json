@@ -1,0 +1,20 @@
+{
+  "drilling_plan": "خطة الحفر",
+  "drilled_hole": "حفرة محفورة",
+  "depth": "العمق",
+  "diameter": "القطر",
+  "inclination": "الميل",
+  "target_depth_m": "العمق المستهدف (م)",
+  "actual_depth_m": "العمق الفعلي (م)",
+  "hole_index": "رقم الحفرة",
+  "gps_accuracy": "دقة GPS",
+  "gps_accuracy_low": "دقة GPS منخفضة (أكثر من 30 م)",
+  "fuel_consumed_l": "الوقود المستهلك (لتر)",
+  "operator": "المشغل",
+  "machine": "حفارة",
+  "machine_status_not_active": "الحفارة في صيانة — لا يمكن تخصيصها",
+  "out_of_tolerance_depth": "العمق خارج التحمل",
+  "out_of_tolerance_reason": "سبب الانحراف",
+  "confirm_append_only": "بعد الإرسال، لا يمكن التعديل. تأكيد.",
+  "yield_m_per_hour": "المردود متر/ساعة"
+}

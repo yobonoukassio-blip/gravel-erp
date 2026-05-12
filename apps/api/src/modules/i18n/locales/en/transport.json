@@ -1,0 +1,18 @@
+{
+  "truck_rotation": "Truck rotation",
+  "truck": "Truck",
+  "driver": "Driver",
+  "loaded_at_bench": "Origin bench",
+  "unloaded_at_zone": "Target stockpile",
+  "loaded_tonnage_t": "Loaded tonnage (t)",
+  "loaded_at": "Loaded at",
+  "unloaded_at": "Unloaded at",
+  "cycle_time_minutes": "Cycle time (min)",
+  "weighing_ticket": "Weighing ticket",
+  "weighing_ticket_required": "Weighing ticket required",
+  "load_truck": "Load",
+  "unload_truck": "Unload at stockpile",
+  "dispatch_queue": "Dispatch queue",
+  "assign_truck": "Assign this truck",
+  "rotation_in_progress": "Rotation in progress"
+}

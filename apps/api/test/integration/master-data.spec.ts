@@ -112,6 +112,29 @@ describe('FND-04/FND-05: Master data schema + RLS + soft-delete + audit triggers
     expect(row.archived_at).not.toBeNull();
   });
 
+  it('PostGIS GeoJSON round-trip: ST_AsGeoJSON returns a parseable {type:Point, coordinates:[lng,lat]} payload', async () => {
+    const [row] = await asTenant(stack.appDs, seed.tenantA, (mgr) =>
+      mgr.query(
+        `SELECT ST_AsGeoJSON(gps_point) AS geojson FROM sites WHERE id = $1`,
+        [seed.siteA1],
+      ),
+    );
+    const parsed = JSON.parse(row.geojson) as { type: string; coordinates: [number, number] };
+    expect(parsed.type).toBe('Point');
+    expect(Array.isArray(parsed.coordinates)).toBe(true);
+    expect(parsed.coordinates).toHaveLength(2);
+  });
+
+  it('ST_GeomFromGeoJSON accepts a GeoJSON Point and round-trips through ST_AsText to POINT(lng lat)', async () => {
+    const [row] = await asTenant(stack.appDs, seed.tenantA, (mgr) =>
+      mgr.query(
+        `SELECT ST_AsText(ST_GeomFromGeoJSON($1)) AS wkt`,
+        [JSON.stringify({ type: 'Point', coordinates: [-4.024, 5.345] })],
+      ),
+    );
+    expect(row.wkt).toBe('POINT(-4.024 5.345)');
+  });
+
   it('audit_log entries are produced for each mutation (site update creates UPDATE row)', async () => {
     const rows: Array<{ action: string }> = await stack.serviceDs.query(
       `SELECT action FROM audit_log

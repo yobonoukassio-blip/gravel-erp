@@ -5,6 +5,7 @@ import { HealthModule } from './modules/health/health.module';
 import { SyncModule } from './modules/sync/sync.module';
 import { IdentityModule } from './modules/identity/identity.module';
 import { I18nModule } from './modules/i18n/i18n.module';
+import { MasterDataModule } from './modules/master-data/master-data.module';
 
 /**
  * Root application module.
@@ -32,6 +33,7 @@ import { I18nModule } from './modules/i18n/i18n.module';
     SyncModule,
     IdentityModule,
     I18nModule,
+    MasterDataModule,
   ],
 })
 export class AppModule {}

@@ -1,0 +1,44 @@
+[
+  {
+    "name": "OPERATOR_DRILLING",
+    "description": "Field operator authorized to capture DrilledHole entries (D2-11). Site-scoped via Keycloak group.",
+    "composite": false,
+    "clientRole": false
+  },
+  {
+    "name": "OPERATOR_EXCAVATOR",
+    "description": "Field operator authorized to capture ExtractionCycle entries (D2-20). Site-scoped.",
+    "composite": false,
+    "clientRole": false
+  },
+  {
+    "name": "TRUCK_DRIVER",
+    "description": "Driver authorized to create TruckRotation rows + scan WeighingTicket QR codes (D2-30). Site-scoped.",
+    "composite": false,
+    "clientRole": false
+  },
+  {
+    "name": "WEIGHING_OPERATOR",
+    "description": "Pont-bascule operator authorized to create WeighingTicket rows (D2-31). Site-scoped. Phase 2 = manual entry.",
+    "composite": false,
+    "clientRole": false
+  },
+  {
+    "name": "HSE_OFFICER",
+    "description": "Authorized to declare HseIncident, assign CAPA, verify CAPA closure (D2-60, D2-62). Site-scoped.",
+    "composite": false,
+    "clientRole": false
+  },
+  {
+    "name": "SITE_MANAGER",
+    "description": "Directeur Site. STOCKPILE_ADJUSTMENT + FUEL_ADJUSTMENT restricted to this role (D2-111). Site-scoped.",
+    "composite": false,
+    "clientRole": false
+  },
+  {
+    "name": "QUARRY_CHIEF",
+    "description": "Chef Carrière. Manages DrillingPlan lifecycle, assigns crews, reviews anomalies (D2-73). Site-scoped.",
+    "composite": false,
+    "clientRole": false
+  }
+]

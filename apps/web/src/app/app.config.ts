@@ -11,6 +11,10 @@ import {
 } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { AuthModule, authInterceptor } from 'angular-auth-oidc-client';
+import { FormlyModule } from '@ngx-formly/core';
+import { FormlyMaterialModule } from '@ngx-formly/material';
+import { GpsPickerLeafletType } from './shared/formly/gps-picker-leaflet.type';
+import { PolygonPickerLeafletType } from './shared/formly/polygon-picker-leaflet.type';
 
 import { routes } from './app.routes';
 import { oidcConfig } from './core/auth/oidc.config';
@@ -36,6 +40,15 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptorsFromDi(), withInterceptors([authInterceptor()])),
     provideAnimationsAsync(),
     importProvidersFrom(AuthModule.forRoot({ config: oidcConfig })),
+    importProvidersFrom(
+      FormlyModule.forRoot({
+        types: [
+          { name: 'gps-picker-leaflet', component: GpsPickerLeafletType },
+          { name: 'polygon-picker-leaflet', component: PolygonPickerLeafletType },
+        ],
+      }),
+      FormlyMaterialModule,
+    ),
     provideAppTransloco(),
   ],
 };

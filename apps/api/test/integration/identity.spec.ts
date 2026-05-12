@@ -74,8 +74,10 @@ describe('FND-01 — Keycloak JWT validation, tenant-context middleware, CLS iso
       algorithm: 'RS256',
       audience: args.audience ?? AUDIENCE,
       issuer: args.issuer ?? ISSUER,
-      expiresIn: args.expiresIn ?? '15m',
-    });
+      // jsonwebtoken's expiresIn typing is narrow; '15m' is a valid runtime
+      // shorthand. Cast the options bag to bypass the narrow union.
+      expiresIn: (args.expiresIn ?? '15m') as unknown,
+    } as Parameters<typeof jwtSign>[2]);
   }
 
   describe('JWT validation', () => {

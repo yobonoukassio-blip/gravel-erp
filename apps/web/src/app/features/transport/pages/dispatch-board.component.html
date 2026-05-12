@@ -1,0 +1,60 @@
+<!--
+  Dispatch board (TRP-03). Manual rotation/truck assignment.
+-->
+<div class="dispatch-board">
+  <header class="toolbar">
+    <h1>{{ 'transport.dispatch_board_title' | transloco }}</h1>
+    <button mat-stroked-button (click)="refresh()">
+      {{ 'transport.refresh' | transloco }}
+    </button>
+  </header>
+
+  <div class="board">
+    <section class="pane">
+      <h2>{{ 'transport.pending_rotations' | transloco }}</h2>
+      @if (pending().length === 0) {
+        <p class="empty">{{ 'transport.no_pending' | transloco }}</p>
+      }
+      @for (r of pending(); track r.id) {
+        <mat-card
+          class="card"
+          [class.selected]="selectedRotationId() === r.id"
+          (click)="selectRotation(r.id)"
+          [attr.data-rotation-id]="r.id"
+        >
+          <mat-card-content>
+            <strong>{{ r.id }}</strong> — {{ r.material_type }}
+            <br />
+            {{ r.loaded_at_bench_id }} → {{ r.unloaded_at_zone_id }}
+            <br />
+            {{ r.loaded_tonnage_t }} t
+          </mat-card-content>
+        </mat-card>
+      }
+    </section>
+
+    <section class="pane">
+      <h2>{{ 'transport.available_trucks' | transloco }}</h2>
+      @if (trucks().length === 0) {
+        <p class="empty">{{ 'transport.no_trucks' | transloco }}</p>
+      }
+      @for (t of trucks(); track t.id) {
+        <mat-card class="card" [attr.data-truck-id]="t.id">
+          <mat-card-content>
+            <strong>{{ t.code }}</strong> — {{ t.label }}
+            <br />
+            <button
+              mat-flat-button
+              color="primary"
+              (click)="assign(t.id)"
+              [disabled]="!selectedRotationId()"
+              [attr.data-testid]="'assign-truck-' + t.id"
+            >
+              {{ 'transport.assign' | transloco }}
+            </button>
+          </mat-card-content>
+        </mat-card>
+      }
+    </section>
+  </div>
+</div>

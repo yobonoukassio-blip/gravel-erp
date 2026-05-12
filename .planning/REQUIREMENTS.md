@@ -23,10 +23,10 @@ Requirements pour la première release. Chaque exigence est mappée à une phase
 
 ### Production — Foration
 
-- [ ] **FOR-01**: Un Chef Carrière crée un plan de forage (zone, banc, nombre de trous prévu, profondeur cible, diamètre, opérateur, machine)
-- [ ] **FOR-02**: Un opérateur de foreuse saisit chaque trou foré sur mobile offline (GPS, profondeur réelle, diamètre, inclinaison, durée, opérateur, machine)
-- [ ] **FOR-03**: Le système calcule le rendement de forage (mètres forés / heure machine) par campagne, opérateur et machine
-- [ ] **FOR-04**: Le système enregistre la consommation gasoil par foreuse et par session de forage
+- [x] **FOR-01**: Un Chef Carrière crée un plan de forage (zone, banc, nombre de trous prévu, profondeur cible, diamètre, opérateur, machine)
+- [x] **FOR-02**: Un opérateur de foreuse saisit chaque trou foré sur mobile offline (GPS, profondeur réelle, diamètre, inclinaison, durée, opérateur, machine)
+- [x] **FOR-03**: Le système calcule le rendement de forage (mètres forés / heure machine) par campagne, opérateur et machine
+- [x] **FOR-04**: Le système enregistre la consommation gasoil par foreuse et par session de forage
 - [x] **FOR-05**: Une foreuse en panne ou maintenance bloque l'affectation à un nouveau plan de forage
 
 ### Production — Tir de mine & Explosifs
@@ -180,10 +180,10 @@ Mapping requirement ↔ phase (validé après création du roadmap).
 | FND-09 | Phase 1 — Foundation | Complete |
 | FND-10 | Phase 1 — Foundation | Complete |
 | FND-11 | Phase 1 — Foundation | Complete |
-| FOR-01 | Phase 2 — Vertical Slice Production | Pending |
-| FOR-02 | Phase 2 — Vertical Slice Production | Pending |
-| FOR-03 | Phase 2 — Vertical Slice Production | Pending |
-| FOR-04 | Phase 2 — Vertical Slice Production | Pending |
+| FOR-01 | Phase 2 — Vertical Slice Production | Complete |
+| FOR-02 | Phase 2 — Vertical Slice Production | Complete |
+| FOR-03 | Phase 2 — Vertical Slice Production | Complete |
+| FOR-04 | Phase 2 — Vertical Slice Production | Complete |
 | FOR-05 | Phase 2 — Vertical Slice Production | Complete |
 | EXT-01 | Phase 2 — Vertical Slice Production | Complete |
 | EXT-02 | Phase 2 — Vertical Slice Production | Complete |

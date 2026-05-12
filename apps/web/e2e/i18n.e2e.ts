@@ -18,7 +18,7 @@ const API = 'http://localhost:3000';
 test.describe('FND-09 — locale switcher (canonical write path)', () => {
   test('FR → EN persists via PUT /api/users/me/preferences and survives reload', async ({ page }) => {
     let preferredLocale = 'fr-CI';
-    let putCalls: Array<{ url: string; body: unknown }> = [];
+    const putCalls: Array<{ url: string; body: unknown }> = [];
 
     // Mock the auth bootstrap + GET /api/users/me.
     await page.route(`${API}/api/users/me`, async (route) => {
@@ -50,7 +50,7 @@ test.describe('FND-09 — locale switcher (canonical write path)', () => {
     });
 
     // CRITICAL gate: a hit on /api/sync/preferences MUST fail the test.
-    await page.route('**/api/sync/preferences', async (route) => {
+    await page.route('**/api/sync/preferences', async (_route) => {
       throw new Error(
         'Locale switcher must NOT call /api/sync/preferences. ' +
           'Canonical write path is PUT /api/users/me/preferences (W2-P04).',

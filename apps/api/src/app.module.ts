@@ -1,21 +1,37 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { ClsModule } from 'nestjs-cls';
 import { HealthModule } from './modules/health/health.module';
 import { SyncModule } from './modules/sync/sync.module';
+import { IdentityModule } from './modules/identity/identity.module';
+import { I18nModule } from './modules/i18n/i18n.module';
 
 /**
  * Root application module.
  *
- * Phase 1 modules (added progressively by W1-P01..W2-P05):
- *   - identity     : Keycloak JWT validation, role/site claims (W1-P04)
- *   - tenancy      : Tenant/Country entities + admin (W1-P02)
- *   - master-data  : Site, ProductionZone, Bench, Permit, OperationalDay, FxRate (W1-P02, W2-P05)
- *   - sync         : PowerSync bridge + conflict registry (W1-P03)
- *   - audit        : append-only audit_log + chain-of-hash verifier (W1-P02)
- *   - i18n         : locale resolver, label store (W1-P04)
+ * Phase 1 modules wired so far:
+ *   - health     (W0-P01)  : /health/live, /health/ready (Public)
+ *   - sync       (W2-P03)  : PowerSync bridge + conflict registry
+ *   - identity   (W2-P04)  : Keycloak JWT validation, RBAC guards,
+ *                            /api/users/me + /api/users/me/preferences
+ *   - i18n       (W2-P04)  : LocaleResolver from CLS preferredLocale
  *
- * Only `health` is wired in Wave 0 so the skeleton boots.
+ * Pending plans:
+ *   - tenancy / master-data entities live under src/modules/* (W1-P02);
+ *     their module wiring is composed by feature plans (W2-P05).
+ *   - audit      (W1-P02)  : append-only audit_log + chain-of-hash.
  */
 @Module({
-  imports: [HealthModule, SyncModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    ClsModule.forRoot({
+      global: true,
+      middleware: { mount: true },
+    }),
+    HealthModule,
+    SyncModule,
+    IdentityModule,
+    I18nModule,
+  ],
 })
 export class AppModule {}

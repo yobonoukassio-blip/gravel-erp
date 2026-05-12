@@ -1,0 +1,18 @@
+<!--
+  Snapshot of the inline template in drilling-plan-list.component.ts.
+  Kept as a separate file for plan acceptance check (grep transloco + ag-grid).
+-->
+<div class="drilling-plan-list">
+  <header class="toolbar">
+    <h1>{{ 'foration.drilling_plan_list_title' | transloco }}</h1>
+    <a mat-flat-button color="primary" routerLink="new" data-testid="drilling-plan-new">
+      {{ 'foration.new_plan' | transloco }}
+    </a>
+  </header>
+  <ag-grid-angular
+    class="ag-theme-material"
+    style="width: 100%; height: 600px"
+    [rowData]="rows()"
+    [columnDefs]="columnDefs"
+  />
+</div>

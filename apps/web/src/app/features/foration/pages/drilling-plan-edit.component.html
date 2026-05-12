@@ -1,0 +1,10 @@
+<!--
+  Snapshot of the inline template in drilling-plan-edit.component.ts.
+  Kept for plan acceptance (formly + transloco).
+-->
+<div class="plan-edit">
+  <h1>{{ 'foration.drilling_plan_edit_title' | transloco }}</h1>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <formly-form [form]="form" [fields]="fields" [model]="model"></formly-form>
+  </form>
+</div>

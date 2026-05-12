@@ -63,6 +63,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'foration',
+        loadChildren: () =>
+          import('./features/foration/foration-routes').then(
+            (m) => m.FORATION_ROUTES,
+          ),
+      },
+      {
         path: 'activity-log',
         canActivate: [roleGuard(['DIRECTION_GROUPE', 'DIRECTEUR_SITE'])],
         loadComponent: () =>

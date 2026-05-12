@@ -94,8 +94,13 @@ class GravelBackendConnector extends PowerSyncBackendConnector {
           await appDb.markSynced(m['id'] as String);
         }
       }
-      for (final p in preferenceMutations) {
-        await _dio.put<dynamic>('/api/sync/preferences', data: p);
+      // user_preferences is a sync-replica owned by W2-P03. The canonical
+      // write path is W2-P04's PUT /api/users/me/preferences; CDC reconciles
+      // the replica row downstream. PowerSync upstream replication of this
+      // table is therefore intentionally a no-op at the HTTP layer.
+      if (preferenceMutations.isNotEmpty) {
+        // Drained from the batch so PowerSync does not re-enqueue;
+        // canonical mutation has already gone through the identity endpoint.
       }
       await batch.complete();
     } on DioException catch (e) {

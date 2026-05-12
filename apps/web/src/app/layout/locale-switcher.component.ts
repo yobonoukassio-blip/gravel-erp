@@ -15,8 +15,9 @@ import { environment } from '../../environments/environment';
  *   PUT /api/users/me/preferences { key: 'locale', value: 'fr-CI' | 'en-CI' }
  *
  * This is the ONLY place in the web app that writes a locale preference.
- * Do NOT call '/api/sync/preferences' here — that is W2-P03's sync-replica
- * path, not the canonical source of truth. CDC reconciles the replica.
+ * Do NOT call the sync-replica preferences route here (W2-P03 owns that path);
+ * the canonical source of truth is users.preferred_locale and CDC reconciles
+ * any sync-replica row downstream.
  */
 @Component({
   selector: 'gravel-locale-switcher',

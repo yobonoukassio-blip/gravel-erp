@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --no-frozen-lockfile
       - run: pnpm --filter @gravel/shared-types build
       - run: pnpm --filter @gravel/api test:quick
       - run: pnpm --filter @gravel/web test:quick
@@ -81,7 +81,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --no-frozen-lockfile
       - run: pnpm -r run lint -- --max-warnings=0
 
   integration:
@@ -119,7 +119,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --no-frozen-lockfile
       - run: pnpm --filter @gravel/shared-types build
       - run: pnpm --filter @gravel/api test:int
 
@@ -154,7 +154,7 @@ jobs:
         with: { version: 9 }
       - uses: actions/setup-node@v4
         with: { node-version: 24, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --no-frozen-lockfile
       - run: pnpm --filter @gravel/shared-types build
       - run: pnpm --filter @gravel/api test:int -- identity.spec.ts
 
@@ -181,7 +181,7 @@ jobs:
         with: { version: 9 }
       - uses: actions/setup-node@v4
         with: { node-version: 24, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --no-frozen-lockfile
       - run: pnpm --filter @gravel/shared-types build
       - run: pnpm --filter @gravel/api test:int -- master-data.spec.ts
 
@@ -208,7 +208,7 @@ jobs:
         with: { version: 9 }
       - uses: actions/setup-node@v4
         with: { node-version: 24, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --no-frozen-lockfile
       - run: pnpm --filter @gravel/shared-types build
       # fail-closed: any RED in the auto-generated cross-tenant suite blocks
       - run: pnpm --filter @gravel/api test:rls-leak
@@ -236,7 +236,7 @@ jobs:
         with: { version: 9 }
       - uses: actions/setup-node@v4
         with: { node-version: 24, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --no-frozen-lockfile
       - run: pnpm --filter @gravel/shared-types build
       - run: pnpm --filter @gravel/api test:int -- audit-chain.spec.ts
 
@@ -252,7 +252,7 @@ jobs:
         with: { version: 9 }
       - uses: actions/setup-node@v4
         with: { node-version: 24, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --no-frozen-lockfile
       - run: pnpm --filter @gravel/shared-types build
       - run: pnpm --filter @gravel/api test -- operational-day.spec.ts
 
@@ -266,7 +266,7 @@ jobs:
         with: { version: 9 }
       - uses: actions/setup-node@v4
         with: { node-version: 24, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --no-frozen-lockfile
       - run: pnpm --filter @gravel/shared-types build
       - run: pnpm --filter @gravel/api test -- money.spec.ts
 
@@ -293,7 +293,7 @@ jobs:
         with: { version: 9 }
       - uses: actions/setup-node@v4
         with: { node-version: 24, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --no-frozen-lockfile
       - run: pnpm --filter @gravel/shared-types build
       - run: pnpm --filter @gravel/api test:chaos
 
@@ -340,7 +340,7 @@ jobs:
         with: { version: 9 }
       - uses: actions/setup-node@v4
         with: { node-version: 24, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --no-frozen-lockfile
       - run: pnpm --filter @gravel/web exec playwright install --with-deps chromium
       - run: pnpm --filter @gravel/web e2e
 

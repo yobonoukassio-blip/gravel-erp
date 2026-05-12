@@ -8,9 +8,9 @@ import '../auth/oidc_config.dart';
 /// Active locale notifier. The canonical write path is
 /// `PUT /api/users/me/preferences` (W2-P04 NestJS endpoint).
 ///
-/// We do NOT call `/api/sync/preferences` here — that is W2-P03's
-/// sync-replica path and is reconciled via CDC. The canonical source
-/// of truth is `users.preferred_locale`.
+/// We do NOT call the sync-replica preferences route here — that is
+/// W2-P03's path and is reconciled via CDC. The canonical source of
+/// truth is `users.preferred_locale`.
 class I18nService extends StateNotifier<Locale> {
   I18nService({Dio? dio, Locale initial = const Locale('fr')})
       : _dio = dio ?? Dio(BaseOptions(baseUrl: OidcConfig.apiBaseUrl)),

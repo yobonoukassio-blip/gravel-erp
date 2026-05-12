@@ -1,0 +1,33 @@
+# PowerSync sync rules — Phase 1 scope (D-12).
+#
+# Buckets are scoped by JWT claims:
+#   - tenant_id  : every row filtered by current tenant (multi-tenant safety).
+#   - site_ids[] : subset of sites the user is authorized for (D-07 RBAC).
+#   - sub        : the user's UUID, used to scope user_preferences.
+#
+# Tables published: daily_activity_log, user_preferences
+# (the only sync-replicated tables in Phase 1 per D-12).
+#
+# The publication itself is created by migration 1715600100000__powersync_publication.sql.
+
+bucket_definitions:
+  global_user:
+    # Per-user bucket — one parameter row per (tenant, site set, user).
+    parameters: |
+      select
+        request.jwt() ->> 'tenant_id' as tenant_id,
+        request.jwt() -> 'site_ids'   as site_ids,
+        request.jwt() ->> 'sub'       as user_id
+
+    data:
+      # daily_activity_log: filtered by tenant + site authorization.
+      - select *
+          from daily_activity_log
+         where tenant_id = bucket.tenant_id::uuid
+           and site_id::text = ANY(bucket.site_ids::text[])
+
+      # user_preferences: per-user, per-tenant (no site scope).
+      - select *
+          from user_preferences
+         where tenant_id = bucket.tenant_id::uuid
+           and user_id   = bucket.user_id::uuid

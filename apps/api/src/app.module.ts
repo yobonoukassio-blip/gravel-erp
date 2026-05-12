@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { HealthModule } from './modules/health/health.module';
+import { SyncModule } from './modules/sync/sync.module';
 
 /**
  * Root application module.
@@ -15,6 +16,6 @@ import { HealthModule } from './modules/health/health.module';
  * Only `health` is wired in Wave 0 so the skeleton boots.
  */
 @Module({
-  imports: [HealthModule],
+  imports: [HealthModule, SyncModule],
 })
 export class AppModule {}

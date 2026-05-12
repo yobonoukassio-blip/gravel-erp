@@ -26,7 +26,6 @@
     "@nestjs/typeorm": "^11.0.0",
     "@nestjs/passport": "^11.0.0",
     "@nestjs/terminus": "^11.0.0",
-    "@nestjs/cls": "^5.0.0",
     "nestjs-cls": "^5.0.0",
     "nestjs-pino": "^4.1.0",
     "nestjs-i18n": "^10.5.0",

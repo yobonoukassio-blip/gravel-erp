@@ -165,27 +165,85 @@ Explicitement exclus. Documentés pour prévenir le scope creep.
 
 ## Traceability
 
-Mapping requirement ↔ phase (rempli après création du roadmap).
+Mapping requirement ↔ phase (validé après création du roadmap).
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FND-01 → FND-11 | Phase 1 | Pending |
-| FOR-01 → FOR-05 | Phase 2 | Pending |
-| EXT-01, EXT-02 | Phase 2 | Pending |
-| TRP-01 → TRP-03 | Phase 2 | Pending |
-| STK-01 → STK-03 | Phase 2 | Pending |
-| CAR-01 → CAR-04 | Phase 2 | Pending |
-| HSE-01 → HSE-06 | Phase 2 | Pending |
-| DSH-01, DSH-02 (Production) | Phase 2 | Pending |
-| TIR-01 → TIR-07 | Phase 3 | Pending |
-| CON-01, CON-02 | Phase 3 | Pending |
-| CRI-01 | Phase 3 | Pending |
-| MNT-01 → MNT-05 | Phase 3 | Pending |
-| RH-01 → RH-04 | Phase 3 | Pending |
-| VTE-01 → VTE-06 | Phase 3 | Pending |
-| FIN-01 → FIN-06 | Phase 4 | Pending |
-| DSH-03 → DSH-06 | Phase 4 | Pending |
-| IOT-01 → IOT-04 | Phase 5 | Pending |
+| FND-01 | Phase 1 — Foundation | Pending |
+| FND-02 | Phase 1 — Foundation | Pending |
+| FND-03 | Phase 1 — Foundation | Pending |
+| FND-04 | Phase 1 — Foundation | Pending |
+| FND-05 | Phase 1 — Foundation | Pending |
+| FND-06 | Phase 1 — Foundation | Pending |
+| FND-07 | Phase 1 — Foundation | Pending |
+| FND-08 | Phase 1 — Foundation | Pending |
+| FND-09 | Phase 1 — Foundation | Pending |
+| FND-10 | Phase 1 — Foundation | Pending |
+| FND-11 | Phase 1 — Foundation | Pending |
+| FOR-01 | Phase 2 — Vertical Slice Production | Pending |
+| FOR-02 | Phase 2 — Vertical Slice Production | Pending |
+| FOR-03 | Phase 2 — Vertical Slice Production | Pending |
+| FOR-04 | Phase 2 — Vertical Slice Production | Pending |
+| FOR-05 | Phase 2 — Vertical Slice Production | Pending |
+| EXT-01 | Phase 2 — Vertical Slice Production | Pending |
+| EXT-02 | Phase 2 — Vertical Slice Production | Pending |
+| TRP-01 | Phase 2 — Vertical Slice Production | Pending |
+| TRP-02 | Phase 2 — Vertical Slice Production | Pending |
+| TRP-03 | Phase 2 — Vertical Slice Production | Pending |
+| STK-01 | Phase 2 — Vertical Slice Production | Pending |
+| STK-02 | Phase 2 — Vertical Slice Production | Pending |
+| STK-03 | Phase 2 — Vertical Slice Production | Pending |
+| CAR-01 | Phase 2 — Vertical Slice Production | Pending |
+| CAR-02 | Phase 2 — Vertical Slice Production | Pending |
+| CAR-03 | Phase 2 — Vertical Slice Production | Pending |
+| CAR-04 | Phase 2 — Vertical Slice Production | Pending |
+| HSE-01 | Phase 2 — Vertical Slice Production | Pending |
+| HSE-02 | Phase 2 — Vertical Slice Production | Pending |
+| HSE-03 | Phase 2 — Vertical Slice Production | Pending |
+| HSE-04 | Phase 2 — Vertical Slice Production | Pending |
+| HSE-05 | Phase 2 — Vertical Slice Production | Pending |
+| HSE-06 | Phase 2 — Vertical Slice Production | Pending |
+| DSH-01 | Phase 2 — Vertical Slice Production | Pending |
+| DSH-02 | Phase 2 — Vertical Slice Production | Pending |
+| TIR-01 | Phase 3 — Operational Completeness | Pending |
+| TIR-02 | Phase 3 — Operational Completeness | Pending |
+| TIR-03 | Phase 3 — Operational Completeness | Pending |
+| TIR-04 | Phase 3 — Operational Completeness | Pending |
+| TIR-05 | Phase 3 — Operational Completeness | Pending |
+| TIR-06 | Phase 3 — Operational Completeness | Pending |
+| TIR-07 | Phase 3 — Operational Completeness | Pending |
+| CON-01 | Phase 3 — Operational Completeness | Pending |
+| CON-02 | Phase 3 — Operational Completeness | Pending |
+| CRI-01 | Phase 3 — Operational Completeness | Pending |
+| MNT-01 | Phase 3 — Operational Completeness | Pending |
+| MNT-02 | Phase 3 — Operational Completeness | Pending |
+| MNT-03 | Phase 3 — Operational Completeness | Pending |
+| MNT-04 | Phase 3 — Operational Completeness | Pending |
+| MNT-05 | Phase 3 — Operational Completeness | Pending |
+| RH-01 | Phase 3 — Operational Completeness | Pending |
+| RH-02 | Phase 3 — Operational Completeness | Pending |
+| RH-03 | Phase 3 — Operational Completeness | Pending |
+| RH-04 | Phase 3 — Operational Completeness | Pending |
+| VTE-01 | Phase 3 — Operational Completeness | Pending |
+| VTE-02 | Phase 3 — Operational Completeness | Pending |
+| VTE-03 | Phase 3 — Operational Completeness | Pending |
+| VTE-04 | Phase 3 — Operational Completeness | Pending |
+| VTE-05 | Phase 3 — Operational Completeness | Pending |
+| VTE-06 | Phase 3 — Operational Completeness | Pending |
+| FIN-01 | Phase 4 — Analytics, Consolidation & Finance | Pending |
+| FIN-02 | Phase 4 — Analytics, Consolidation & Finance | Pending |
+| FIN-03 | Phase 4 — Analytics, Consolidation & Finance | Pending |
+| FIN-04 | Phase 4 — Analytics, Consolidation & Finance | Pending |
+| FIN-05 | Phase 4 — Analytics, Consolidation & Finance | Pending |
+| FIN-06 | Phase 4 — Analytics, Consolidation & Finance | Pending |
+| DSH-03 | Phase 4 — Analytics, Consolidation & Finance | Pending |
+| DSH-04 | Phase 4 — Analytics, Consolidation & Finance | Pending |
+| DSH-05 | Phase 4 — Analytics, Consolidation & Finance | Pending |
+| DSH-06 | Phase 4 — Analytics, Consolidation & Finance | Pending |
+| IOT-01 | Phase 5 — IoT Integration | Pending |
+| IOT-02 | Phase 5 — IoT Integration | Pending |
+| IOT-03 | Phase 5 — IoT Integration | Pending |
+| IOT-04 | Phase 5 — IoT Integration | Pending |
 
 **Coverage:**
 - v1 requirements: 71 total
@@ -194,4 +252,4 @@ Mapping requirement ↔ phase (rempli après création du roadmap).
 
 ---
 *Requirements defined: 2026-05-12*
-*Last updated: 2026-05-12 after initial definition*
+*Last updated: 2026-05-12 after roadmap creation*

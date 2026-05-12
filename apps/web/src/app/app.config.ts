@@ -15,6 +15,11 @@ import { AuthModule, authInterceptor } from 'angular-auth-oidc-client';
 import { routes } from './app.routes';
 import { oidcConfig } from './core/auth/oidc.config';
 import { provideAppTransloco } from './core/i18n/transloco.config';
+import { startWebOtel } from './core/otel/otel';
+
+// Start OTel BEFORE the Angular bootstrap so the document-load instrumentation
+// captures the cold-start span. Idempotent on repeat calls (HMR / SSR replay).
+startWebOtel();
 
 /**
  * Application config. Wires:

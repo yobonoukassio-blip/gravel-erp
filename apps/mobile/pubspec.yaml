@@ -34,6 +34,10 @@ dependencies:
   cupertino_icons: ^1.0.8
   uuid: ^4.5.0
 
+  # OpenTelemetry Dart SDK — D-37. Exports OTLP/HTTP to Grafana LGTM
+  # collector; W3C traceparent propagation via Dio interceptor.
+  opentelemetry: ^0.18.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

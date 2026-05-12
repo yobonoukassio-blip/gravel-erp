@@ -36,7 +36,18 @@
     "leaflet": "^1.9.4",
     "@asymmetrik/ngx-leaflet": "^19.0.0",
     "@gravel/shared-types": "workspace:*",
-    "@gravel/i18n": "workspace:*"
+    "@gravel/i18n": "workspace:*",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/core": "^1.28.0",
+    "@opentelemetry/context-zone": "^1.28.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.55.0",
+    "@opentelemetry/instrumentation": "^0.55.0",
+    "@opentelemetry/instrumentation-document-load": "^0.41.0",
+    "@opentelemetry/instrumentation-fetch": "^0.55.0",
+    "@opentelemetry/resources": "^1.28.0",
+    "@opentelemetry/sdk-trace-base": "^1.28.0",
+    "@opentelemetry/sdk-trace-web": "^1.28.0",
+    "@opentelemetry/semantic-conventions": "^1.28.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^20.0.0",

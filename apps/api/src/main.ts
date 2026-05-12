@@ -1,9 +1,14 @@
+// IMPORTANT: OTel must be started BEFORE any module that should be instrumented
+// is imported. Keep this import at the very top of the file.
+import { startOtel } from './otel/otel';
+startOtel();
+
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   app.useGlobalPipes(
     new ValidationPipe({

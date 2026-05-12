@@ -9,7 +9,7 @@
  *   - FX conversion references an immutable `fx_rate_id`. Rounding is applied
  *     ONCE at the final minor-unit step (no cumulative rounding).
  */
-import { CURRENCY_SCALE, getCurrencyScale, MoneyAmount, TransactionAmounts } from '@gravel/shared-types';
+import { getCurrencyScale, MoneyAmount, TransactionAmounts } from '@gravel/shared-types';
 
 export { CURRENCY_SCALE, getCurrencyScale } from '@gravel/shared-types';
 export type { MoneyAmount, TransactionAmounts } from '@gravel/shared-types';

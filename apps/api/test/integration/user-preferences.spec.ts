@@ -110,8 +110,12 @@ describe('FND-09 — PUT /api/users/me/preferences (canonical locale write)', ()
   it('cannot mutate another user via routing: PUT path has no user_id param', () => {
     // Static check: read the controller decorator path and confirm there
     // is no `:userId` placeholder.
-    const src = require('fs').readFileSync(
-      require('path').resolve(__dirname, '../../src/modules/identity/users.controller.ts'),
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const fs = require('fs') as typeof import('fs');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const path = require('path') as typeof import('path');
+    const src = fs.readFileSync(
+      path.resolve(__dirname, '../../src/modules/identity/users.controller.ts'),
       'utf8',
     );
     expect(src).toMatch(/Put\(['"]me\/preferences['"]\)/);

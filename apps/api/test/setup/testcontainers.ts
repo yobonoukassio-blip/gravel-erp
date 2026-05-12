@@ -115,9 +115,9 @@ export async function stopPostgres(stack: PgTestStack): Promise<void> {
 
 // Legacy exports for Wave 0 callers.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export let pgContainer: any = null;
+export const pgContainer: any = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export let kcContainer: any = null;
+export const kcContainer: any = null;
 export async function startContainers(): Promise<void> {
   throw new Error('Use startPostgres() / startKeycloak() directly. Wave 0 stub retired in W1-P02.');
 }

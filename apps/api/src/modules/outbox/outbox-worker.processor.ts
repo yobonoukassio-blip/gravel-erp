@@ -1,7 +1,6 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { DataSource, EntityManager } from 'typeorm';
-import { OutboxEvent } from './outbox-event.entity';
 
 const MAX_ATTEMPTS = 5;
 const BATCH_SIZE = 50;

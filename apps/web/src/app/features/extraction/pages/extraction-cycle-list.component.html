@@ -1,0 +1,54 @@
+<header class="toolbar">
+  <h1>{{ 'extraction.extraction_cycle' | transloco }}</h1>
+  <span
+    class="estimated-badge"
+    data-testid="estimated-disclaimer"
+    [attr.aria-label]="'extraction.estimated_disclaimer' | transloco"
+  >
+    {{ 'extraction.estimated_disclaimer' | transloco }}
+  </span>
+</header>
+
+<div class="toolbar">
+  <label>
+    Operational day:
+    <input
+      type="text"
+      [value]="operationalDayId()"
+      (change)="onDayChange($any($event.target).value); refresh()"
+      data-testid="filter-operational-day"
+      placeholder="uuid"
+    />
+  </label>
+  <label>
+    {{ 'extraction.equipment' | transloco }}:
+    <input
+      type="text"
+      [value]="equipmentFilter()"
+      (change)="onEquipmentChange($any($event.target).value); refresh()"
+      data-testid="filter-equipment"
+      placeholder="uuid"
+    />
+  </label>
+</div>
+
+<div class="ag-grid-host ag-theme-quartz">
+  <ag-grid-angular
+    style="height: 100%; width: 100%;"
+    data-testid="extraction-cycle-grid"
+    [rowData]="cycles()"
+    [columnDefs]="cycleColumnDefs"
+    [animateRows]="true"
+  ></ag-grid-angular>
+</div>
+
+<div class="ag-grid-host yield-grid ag-theme-quartz" *ngIf="yieldRows().length > 0">
+  <h2>{{ 'extraction.extraction_cycle' | transloco }} — yield (EXT-02)</h2>
+  <ag-grid-angular
+    style="height: 240px; width: 100%;"
+    data-testid="extraction-yield-grid"
+    [rowData]="yieldRows()"
+    [columnDefs]="yieldColumnDefs"
+    [animateRows]="true"
+  ></ag-grid-angular>
+</div>

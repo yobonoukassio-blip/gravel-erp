@@ -56,6 +56,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'extraction',
+        loadChildren: () =>
+          import('./features/extraction/extraction-routes').then(
+            (m) => m.EXTRACTION_ROUTES,
+          ),
+      },
+      {
         path: 'activity-log',
         canActivate: [roleGuard(['DIRECTION_GROUPE', 'DIRECTEUR_SITE'])],
         loadComponent: () =>

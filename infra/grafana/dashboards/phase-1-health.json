@@ -1,0 +1,191 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "name": "Annotations & Alerts",
+        "type": "dashboard",
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "enable": true,
+        "builtIn": 1
+      }
+    ]
+  },
+  "description": "Gravel Ivoire Phase 1 — single-pane status for the 5 invariants: HTTP 5xx, DB latency, sync throughput, audit chain integrity, cross-tenant (rls-leak) alarms. Sources: Mimir (metrics), Loki (logs), Tempo (traces).",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [
+    {
+      "title": "CI gates — GitHub Actions",
+      "url": "https://github.com/gravel-ivoire/gravel/actions/workflows/test.yml",
+      "type": "link",
+      "targetBlank": true
+    }
+  ],
+  "panels": [
+    {
+      "id": 1,
+      "title": "HTTP 5xx rate (per service)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "gravel-mimir" },
+      "targets": [
+        {
+          "expr": "sum(rate(http_request_duration_seconds_count{status_code=~\"5..\",service_name=~\"$service_name\"}[5m])) by (service_name)",
+          "legendFormat": "{{service_name}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 0.1 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "DB query p95 latency",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "gravel-mimir" },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket{tenant_id=~\"$tenant_id\"}[5m])) by (le))",
+          "legendFormat": "p95",
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(db_query_duration_seconds_bucket{tenant_id=~\"$tenant_id\"}[5m])) by (le))",
+          "legendFormat": "p99",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "id": 3,
+      "title": "Sync events processed / sec",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "gravel-mimir" },
+      "targets": [
+        {
+          "expr": "sum(rate(sync_event_processed_total{tenant_id=~\"$tenant_id\"}[5m])) by (tenant_id)",
+          "legendFormat": "{{tenant_id}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "ops" } }
+    },
+    {
+      "id": 4,
+      "title": "CI gate status — rls-leak / chaos / dst / audit-chain",
+      "type": "text",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "options": {
+        "mode": "markdown",
+        "content": "### Phase 1 BLOCKING CI gates\n\n| Gate | Workflow | Decision |\n|------|----------|----------|\n| **rls-leak** | [test.yml security](https://github.com/gravel-ivoire/gravel/actions/workflows/test.yml) | D-08 |\n| **chaos** | [test.yml chaos](https://github.com/gravel-ivoire/gravel/actions/workflows/test.yml) | D-13 |\n| **dst-test** | [test.yml dst-test](https://github.com/gravel-ivoire/gravel/actions/workflows/test.yml) | D-21 |\n| **audit-chain** | [test.yml audit-chain](https://github.com/gravel-ivoire/gravel/actions/workflows/test.yml) | D-29 |\n| **tofu-validate** | [tofu-validate.yml](https://github.com/gravel-ivoire/gravel/actions/workflows/tofu-validate.yml) | D-43 |\n\nGreen PR ⇒ all invariants hold."
+      }
+    },
+    {
+      "id": 5,
+      "title": "Audit chain integrity (chain breaks detected — MUST = 0)",
+      "type": "stat",
+      "gridPos": { "x": 0, "y": 16, "w": 12, "h": 6 },
+      "datasource": { "type": "prometheus", "uid": "gravel-mimir" },
+      "targets": [
+        {
+          "expr": "sum(increase(audit_chain_break_detected_total[1h]))",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          },
+          "color": { "mode": "thresholds" },
+          "mappings": []
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Cross-tenant leak alarms — rls-leak (MUST = 0)",
+      "type": "stat",
+      "gridPos": { "x": 12, "y": 16, "w": 12, "h": 6 },
+      "datasource": { "type": "prometheus", "uid": "gravel-mimir" },
+      "targets": [
+        {
+          "expr": "sum(increase(cross_tenant_leak_attempts_total[1h]))",
+          "legendFormat": "rls-leak",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          },
+          "color": { "mode": "thresholds" }
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      }
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["phase-1", "gravel", "health", "rls-leak", "audit-chain"],
+  "templating": {
+    "list": [
+      {
+        "name": "tenant_id",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "gravel-mimir" },
+        "query": "label_values(http_request_duration_seconds_count, tenant_id)",
+        "refresh": 1,
+        "includeAll": true,
+        "multi": true
+      },
+      {
+        "name": "service_name",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "gravel-mimir" },
+        "query": "label_values(http_request_duration_seconds_count, service_name)",
+        "refresh": 1,
+        "includeAll": true,
+        "multi": true
+      }
+    ]
+  },
+  "time": { "from": "now-6h", "to": "now" },
+  "timezone": "",
+  "title": "Phase 1 Health",
+  "uid": "gravel-phase-1-health",
+  "version": 1,
+  "weekStart": ""
+}

@@ -1,0 +1,47 @@
+# Grafana provisioned datasources for the Gravel Phase-1 observability stack.
+# Loaded by the Grafana sidecar (label grafana_datasource=true).
+# In-cluster DNS names match the Helm release `gravel-lgtm` in `observability`.
+
+apiVersion: 1
+
+datasources:
+  - name: Mimir
+    type: prometheus
+    access: proxy
+    uid: gravel-mimir
+    url: http://gravel-lgtm-mimir-nginx.observability.svc.cluster.local/prometheus
+    isDefault: true
+    jsonData:
+      httpMethod: POST
+      prometheusType: Mimir
+      prometheusVersion: 2.13.0
+
+  - name: Loki
+    type: loki
+    access: proxy
+    uid: gravel-loki
+    url: http://gravel-lgtm-loki-gateway.observability.svc.cluster.local
+    jsonData:
+      maxLines: 1000
+      derivedFields:
+        - datasourceUid: gravel-tempo
+          matcherRegex: "trace[Ii]d=(\\w+)"
+          name: TraceID
+          url: "$${__value.raw}"
+
+  - name: Tempo
+    type: tempo
+    access: proxy
+    uid: gravel-tempo
+    url: http://gravel-lgtm-tempo-query-frontend.observability.svc.cluster.local:3100
+    jsonData:
+      tracesToLogsV2:
+        datasourceUid: gravel-loki
+        tags: [{ key: "service.name", value: "service" }]
+      tracesToMetrics:
+        datasourceUid: gravel-mimir
+        tags: [{ key: "service.name", value: "service" }]
+      serviceMap:
+        datasourceUid: gravel-mimir
+      nodeGraph:
+        enabled: true

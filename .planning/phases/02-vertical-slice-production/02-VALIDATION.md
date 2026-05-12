@@ -91,7 +91,9 @@ created: 2026-05-12
 - [ ] `apps/web/src/app/core/sse/sse-client.service.ts` + `sse-client.service.spec.ts` — SSE wrapper with Last-Event-ID retry
 - [ ] `infra/modules/s3-objectlock/` (OpenTofu) — HSE attachments bucket Governance 7y + tests `infra/modules/s3-objectlock/tests/`
 - [ ] `infra/keycloak/realms/gravel/roles/phase-02.json` — 7 new roles (OPERATOR_DRILLING, OPERATOR_EXCAVATOR, TRUCK_DRIVER, WEIGHING_OPERATOR, HSE_OFFICER, SITE_MANAGER, QUARRY_CHIEF)
-- [ ] `docs/design/phase-02/co-design-workshop-readout.md` — wireframes validated by 5 field operators (BLOCKING for mobile prod code)
+- [ ] `docs/design/phase-02/provisional-wireframes.md` — 6 screen specs derived from CONTEXT.md (co-design workshop = parallel non-blocking track, decision 2026-05-12)
+- [ ] `docs/operations/parallel-tracks.md`, `docs/operations/legal-review-queue.md`, `docs/operations/procurement-queue.md` — operational prerequisites register (none block code execution)
+- [ ] i18n locales = exactly 3 languages (fr/en/ar) × 8 namespaces = 24 JSON files. No Dioula/Baoulé/Wolof/Bambara directories.
 - [ ] `docs/adr/ADR-0006-stockpile-event-sourcing.md` (drafted W0, refined W2)
 - [ ] `docs/adr/ADR-0007-fuel-event-sourcing-reconciliation.md` (drafted W0, refined W3)
 - [ ] `docs/adr/ADR-0008-hse-incident-immutability-capa.md` (drafted W0, refined W3)

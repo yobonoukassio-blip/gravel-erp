@@ -22,20 +22,28 @@ files_modified:
   - apps/api/src/modules/master-data/tests/production-equipment.spec.ts
   - apps/api/src/modules/i18n/locales/fr/foration.json
   - apps/api/src/modules/i18n/locales/en/foration.json
+  - apps/api/src/modules/i18n/locales/ar/foration.json
   - apps/api/src/modules/i18n/locales/fr/extraction.json
   - apps/api/src/modules/i18n/locales/en/extraction.json
+  - apps/api/src/modules/i18n/locales/ar/extraction.json
   - apps/api/src/modules/i18n/locales/fr/transport.json
   - apps/api/src/modules/i18n/locales/en/transport.json
+  - apps/api/src/modules/i18n/locales/ar/transport.json
   - apps/api/src/modules/i18n/locales/fr/stockpile.json
   - apps/api/src/modules/i18n/locales/en/stockpile.json
+  - apps/api/src/modules/i18n/locales/ar/stockpile.json
   - apps/api/src/modules/i18n/locales/fr/fuel.json
   - apps/api/src/modules/i18n/locales/en/fuel.json
+  - apps/api/src/modules/i18n/locales/ar/fuel.json
   - apps/api/src/modules/i18n/locales/fr/hse.json
   - apps/api/src/modules/i18n/locales/en/hse.json
+  - apps/api/src/modules/i18n/locales/ar/hse.json
   - apps/api/src/modules/i18n/locales/fr/dashboard.json
   - apps/api/src/modules/i18n/locales/en/dashboard.json
+  - apps/api/src/modules/i18n/locales/ar/dashboard.json
   - apps/api/src/modules/i18n/locales/fr/alerts.json
   - apps/api/src/modules/i18n/locales/en/alerts.json
+  - apps/api/src/modules/i18n/locales/ar/alerts.json
   - apps/mobile/integration_test/_fixtures/mock_gps.dart
   - apps/mobile/integration_test/_fixtures/mock_operational_day.dart
   - apps/mobile/integration_test/_fixtures/mock_photo_blobs.dart
@@ -47,13 +55,16 @@ files_modified:
   - infra/modules/s3-objectlock/outputs.tf
   - infra/modules/s3-objectlock/tests/s3-objectlock.tftest.hcl
   - infra/keycloak/realms/gravel/roles/phase-02.json
-  - docs/design/phase-02/co-design-workshop-readout.md
+  - docs/design/phase-02/provisional-wireframes.md
+  - docs/operations/parallel-tracks.md
+  - docs/operations/legal-review-queue.md
+  - docs/operations/procurement-queue.md
   - docs/adr/ADR-0006-stockpile-event-sourcing.md
   - docs/adr/ADR-0007-fuel-event-sourcing-reconciliation.md
   - docs/adr/ADR-0008-hse-incident-immutability-capa.md
   - docs/adr/ADR-0009-weighing-ticket-offline-numbering.md
   - docs/adr/ADR-0010-sse-dashboard-push.md
-autonomous: false
+autonomous: true
 requirements: [FOR-05, STK-01, STK-02, CAR-01, HSE-01, HSE-02, DSH-01]
 user_setup:
   - service: aws-s3
@@ -72,7 +83,7 @@ user_setup:
 
 must_haves:
   truths:
-    - "Co-design workshop with 5 field operators is complete and wireframes are archived (BLOCKS W1+ mobile production code)"
+    - "Provisional wireframes derived from CONTEXT.md are documented in docs/design/phase-02/provisional-wireframes.md (co-design workshop tracked as parallel non-blocking track in docs/operations/parallel-tracks.md)"
     - "Generic event-chain verifier exists and detects single-byte corruption on 100-event fixture"
     - "Outbox module accepts events transactionally and BullMQ worker drains them at-least-once"
     - "Alerts module exposes CRUD endpoints and accepts events from EventEmitter2 channels"
@@ -116,7 +127,7 @@ must_haves:
 ---
 
 <objective>
-Establish Phase 2 foundations BEFORE any business module work. This wave is BLOCKING for mobile production code (W1+) due to the co-design workshop requirement (D2-83). Deliver: (1) transactional outbox + worker, (2) alerts module scaffold, (3) generic event-chain verifier reused by 3 event tables, (4) production_equipment master-data, (5) i18n namespaces FR/EN for 8 new domains, (6) mobile fixtures + sync scaffold, (7) SSE web client scaffold, (8) S3 Object Lock bucket via OpenTofu, (9) 7 new Keycloak roles, (10) 5 ADR drafts (ADR-0006..0010), (11) co-design workshop with 5 field operators.
+Establish Phase 2 foundations BEFORE any business module work. This wave is BLOCKING for mobile production code (W1+) due to the co-design workshop requirement (D2-83). Deliver: (1) transactional outbox + worker, (2) alerts module scaffold, (3) generic event-chain verifier reused by 3 event tables, (4) production_equipment master-data, (5) i18n namespaces FR/EN/AR (3 langues exactes — pas de langues locales CI) for 8 new domains, (6) mobile fixtures + sync scaffold, (7) SSE web client scaffold, (8) S3 Object Lock bucket via OpenTofu, (9) 7 new Keycloak roles, (10) 5 ADR drafts (ADR-0006..0010), (11) co-design workshop with 5 field operators.
 
 Purpose: All subsequent waves depend on this scaffolding. Without it, W1 mobile work cannot validate UX, W2 stockpile cannot use outbox, W3 dashboard cannot push via SSE.
 
@@ -162,30 +173,48 @@ To be created in this plan (W0):
 
 <tasks>
 
-<task type="checkpoint:human-action" gate="blocking">
-  <name>Task 1: Co-design workshop with 5 field operators (BLOCKING for W1+ mobile)</name>
-  <files>docs/design/phase-02/co-design-workshop-readout.md, docs/design/phase-02/wireframes/*.png</files>
+<task type="auto" tdd="false">
+  <name>Task 1: Provisional wireframes + parallel-tracks register (co-design non-blocking)</name>
+  <files>
+    docs/design/phase-02/provisional-wireframes.md,
+    docs/operations/parallel-tracks.md,
+    docs/operations/legal-review-queue.md,
+    docs/operations/procurement-queue.md
+  </files>
   <read_first>
-    - .planning/phases/02-vertical-slice-production/02-CONTEXT.md §"D2-83 Co-design"
+    - .planning/phases/02-vertical-slice-production/02-CONTEXT.md §"D2-11", §"D2-20", §"D2-30..D2-33", §"D2-51", §"D2-60", §"D2-81..D2-83"
     - .planning/phases/02-vertical-slice-production/02-VALIDATION.md §"Manual-Only Verifications"
   </read_first>
-  <what-built>
-    Per D2-83, organize a 2-day workshop with 2 drill operators + 1 truck driver + 1 shift chief + 1 HSE officer from the pilot site. Validate wireframes for: foration hole entry, extraction cycle, truck rotation + weighing ticket creation, equipment refuel, HSE incident with photos.
-  </what-built>
-  <how-to-verify>
-    1. Workshop scheduled and held over 2 working days
-    2. 5 participants attend (or escalate as gap if < 4)
-    3. Wireframes annotated by participants (paper sketches scanned OK)
-    4. Readout document `docs/design/phase-02/co-design-workshop-readout.md` written and signed (digital signatures or scanned)
-    5. PNG wireframes archived in `docs/design/phase-02/wireframes/`
-  </how-to-verify>
+  <action>
+    Create `docs/design/phase-02/provisional-wireframes.md` describing in ASCII/markdown the 6 mobile screens derived directly from CONTEXT.md fields (no workshop required). One section per screen with:
+      - Header: screen name (Foration hole entry, Extraction cycle, Truck rotation, Weighing ticket, Equipment refuel, HSE incident)
+      - Fields list: copy field names + types verbatim from CONTEXT.md D2-11 / D2-20 / D2-30 / D2-31 / D2-51 / D2-60
+      - Ergonomics constraints from D2-81 (56dp buttons, sunlight contrast, GPS accuracy indicator red>30m / amber>10m / green)
+      - Explicit marker `> Note: provisional wireframes — to be refined by parallel co-design track (see docs/operations/parallel-tracks.md). Code will be tagged // TODO(co-design): valider en atelier.`
+
+    Create `docs/operations/parallel-tracks.md` with a markdown table:
+      | Track | Status | Owner | Due | Blocks code? | Notes |
+      Rows: co-design-workshop (scheduled, TBD, TBD, NO, "Refine wireframes — generates PR adjustments later"), device-procurement (scheduled, TBD, TBD, NO, "XCover Pro 6 + Tab Active 3 quantities — code targets Android 11+ minimum spec until then"), aggrid-license-decision (n/a, n/a, n/a, NO, "Phase 2 uses Community — Enterprise not on roadmap")
+
+    Create `docs/operations/legal-review-queue.md` with table:
+      | Item | Why | Status | Default applied while pending |
+      Row: s3-object-lock-7y-retention (HSE attachments OHADA audit alignment, pending, "Governance mode applied per D2-61 — switchable to Compliance after legal sign-off")
+
+    Create `docs/operations/procurement-queue.md` with table:
+      | Item | Quantity | Status | Mitigation while pending |
+      Rows: samsung-xcover-pro-6 (TBD, scheduled, "Test emulator Pixel 6 Android 13 + any available Android 11+ device"), samsung-tab-active-3 (TBD, scheduled, "Test emulator Pixel Tablet — weighing screen still developed against documented specs")
+  </action>
   <acceptance_criteria>
-    - File `docs/design/phase-02/co-design-workshop-readout.md` exists and contains section `## Participants (5)`
-    - File contains section `## Validated Wireframes` listing at least 6 screens (foration, extraction, rotation, weighing, refuel, hse-incident)
-    - Directory `docs/design/phase-02/wireframes/` contains at least 6 PNG files
-    - Document contains string `## Sign-off` and 5 named participants
+    - File `docs/design/phase-02/provisional-wireframes.md` exists and contains exactly 6 `## ` headings matching: Foration, Extraction, Truck Rotation, Weighing Ticket, Equipment Refuel, HSE Incident
+    - File contains string `// TODO(co-design)` at least once
+    - File `docs/operations/parallel-tracks.md` contains string `co-design-workshop` and column `Blocks code?` with value `NO`
+    - File `docs/operations/legal-review-queue.md` contains string `s3-object-lock-7y-retention` and `Governance mode applied`
+    - File `docs/operations/procurement-queue.md` contains strings `samsung-xcover-pro-6` and `samsung-tab-active-3`
   </acceptance_criteria>
-  <resume-signal>Type "workshop-complete" after readout signed, OR "escalate-gap" if participants unavailable</resume-signal>
+  <verify>
+    Run: grep -c "^## " docs/design/phase-02/provisional-wireframes.md  → expect ≥ 6
+    Run: grep -c "Blocks code?" docs/operations/parallel-tracks.md  → expect ≥ 1
+  </verify>
 </task>
 
 <task type="auto" tdd="true">
@@ -338,24 +367,32 @@ To be created in this plan (W0):
 </task>
 
 <task type="auto">
-  <name>Task 6: i18n FR/EN namespaces for 8 Phase 2 domains + mobile fixtures + SSE web scaffold</name>
+  <name>Task 6: i18n FR/EN/AR namespaces for 8 Phase 2 domains + mobile fixtures + SSE web scaffold</name>
   <files>
     apps/api/src/modules/i18n/locales/fr/foration.json,
     apps/api/src/modules/i18n/locales/en/foration.json,
+    apps/api/src/modules/i18n/locales/ar/foration.json,
     apps/api/src/modules/i18n/locales/fr/extraction.json,
     apps/api/src/modules/i18n/locales/en/extraction.json,
+    apps/api/src/modules/i18n/locales/ar/extraction.json,
     apps/api/src/modules/i18n/locales/fr/transport.json,
     apps/api/src/modules/i18n/locales/en/transport.json,
+    apps/api/src/modules/i18n/locales/ar/transport.json,
     apps/api/src/modules/i18n/locales/fr/stockpile.json,
     apps/api/src/modules/i18n/locales/en/stockpile.json,
+    apps/api/src/modules/i18n/locales/ar/stockpile.json,
     apps/api/src/modules/i18n/locales/fr/fuel.json,
     apps/api/src/modules/i18n/locales/en/fuel.json,
+    apps/api/src/modules/i18n/locales/ar/fuel.json,
     apps/api/src/modules/i18n/locales/fr/hse.json,
     apps/api/src/modules/i18n/locales/en/hse.json,
+    apps/api/src/modules/i18n/locales/ar/hse.json,
     apps/api/src/modules/i18n/locales/fr/dashboard.json,
     apps/api/src/modules/i18n/locales/en/dashboard.json,
+    apps/api/src/modules/i18n/locales/ar/dashboard.json,
     apps/api/src/modules/i18n/locales/fr/alerts.json,
     apps/api/src/modules/i18n/locales/en/alerts.json,
+    apps/api/src/modules/i18n/locales/ar/alerts.json,
     apps/mobile/integration_test/_fixtures/mock_gps.dart,
     apps/mobile/integration_test/_fixtures/mock_operational_day.dart,
     apps/mobile/integration_test/_fixtures/mock_photo_blobs.dart,
@@ -369,7 +406,7 @@ To be created in this plan (W0):
     - apps/web/src/app/core/auth/auth.service.ts (Phase 1 reactive service pattern)
   </read_first>
   <action>
-    1. Create 16 JSON locale files, each with at least 15 keys covering common terms (e.g., foration: { "drilling_plan": "Plan de forage" / "Drilling plan", "drilled_hole": "Trou foré" / "Drilled hole", "depth": "Profondeur" / "Depth", ... }). Naming pattern `<module>.<feature>.<key>` per Phase 1 convention.
+    1. Create **24 JSON locale files** (8 namespaces × 3 langues exactes : fr/en/ar), each with at least 15 keys covering common terms (e.g., foration: { "drilling_plan": "Plan de forage" / "Drilling plan" / "خطة الحفر", "drilled_hole": "Trou foré" / "Drilled hole" / "حفرة محفورة", "depth": "Profondeur" / "Depth" / "العمق", ... }). Naming pattern `<module>.<feature>.<key>` per Phase 1 convention. **Ne pas créer Dioula/Baoulé ou autres langues locales** (décision utilisateur — feedback memory `feedback_i18n_scope.md`).
     2. Mobile fixtures: mock_gps.dart exports `MockGpsPoint(lat, lng, accuracyM)` factory. mock_operational_day.dart exports `MockOperationalDay(siteId, shiftStartLocal, ianaTz)`. mock_photo_blobs.dart exports `MockPhotoBlob(sha256Hex, sizeKb, content)`.
     3. append_only_repository.dart: abstract `AppendOnlyRepository<T extends SyncEntity>` with method `appendLocal(T entity): Future<void>` that writes to Drift local table with `pending_sync=true`, generates client-side UUID, sets `created_at_local` + IANA TZ, never updates after creation. Used by W1+ entities.
     4. SseClientService: Angular service wrapping native EventSource, with `connect<T>(url: string, opts?: { lastEventId?: string }): Observable<T>` using RxJS Subject, exponential backoff retry on 'error' event, persists `Last-Event-ID` in sessionStorage per channel. Spec: mock EventSource (jest), assert reconnect on error with lastEventId header.
@@ -378,7 +415,8 @@ To be created in this plan (W0):
     <automated>pnpm --filter=@gravel/web test -- sse-client.service.spec &amp;&amp; ls apps/api/src/modules/i18n/locales/fr/foration.json apps/api/src/modules/i18n/locales/en/dashboard.json</automated>
   </verify>
   <acceptance_criteria>
-    - 16 locale files exist (8 namespaces × 2 languages)
+    - 24 locale files exist (8 namespaces × 3 languages: fr/en/ar)
+    - No `dioula/`, `baoule/`, `wolof/` or other local-language directories under `apps/api/src/modules/i18n/locales/`
     - Each locale file is valid JSON with at least 10 keys
     - `apps/mobile/lib/core/sync/append_only_repository.dart` exports class `AppendOnlyRepository`
     - `apps/web/src/app/core/sse/sse-client.service.ts` exports `SseClientService` with method `connect`
@@ -476,10 +514,10 @@ To be created in this plan (W0):
 - `pnpm --filter=@gravel/api test event-chain.verifier outbox-roundtrip alerts production-equipment` exits 0
 - `pnpm --filter=@gravel/web test sse-client` exits 0
 - `cd infra/modules/s3-objectlock && tofu test` exits 0
-- `docs/design/phase-02/co-design-workshop-readout.md` exists with 5 signatures
+- `docs/design/phase-02/provisional-wireframes.md` exists with 6 screen sections (co-design tracked as non-blocking parallel track)
 - Plan committed to git
 </success_criteria>
 
 <output>
-After completion, create `.planning/phases/02-vertical-slice-production/02-W0-P01-SUMMARY.md` listing artifacts, decisions confirmed, ADR statuses (draft), and any blockers surfaced during co-design.
+After completion, create `.planning/phases/02-vertical-slice-production/02-W0-P01-SUMMARY.md` listing artifacts, decisions confirmed, ADR statuses (draft), and any blockers surfaced (operational prerequisites tracked in `docs/operations/parallel-tracks.md` are NOT blockers per user decision 2026-05-12).
 </output>

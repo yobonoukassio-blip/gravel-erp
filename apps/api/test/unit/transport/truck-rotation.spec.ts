@@ -1,4 +1,4 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { DataSource, EntityManager } from 'typeorm';
 import { OutboxEvent } from '../../../src/modules/outbox/outbox-event.entity';
 import { OutboxService } from '../../../src/modules/outbox/outbox.service';

@@ -58,12 +58,12 @@ export function startOtel(): NodeSDK {
     // Cross-package type drift between @opentelemetry/sdk-node and
     // @opentelemetry/sdk-metrics on identical MetricReader interfaces
     // (structural identity, declaration sites differ).
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     metricReader: new PeriodicExportingMetricReader({
       exporter: new OTLPMetricExporter({
         url: `${endpoint}/v1/metrics`,
       }),
       exportIntervalMillis: 10_000,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any,
     instrumentations: [
       getNodeAutoInstrumentations({

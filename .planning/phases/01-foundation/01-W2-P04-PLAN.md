@@ -2,8 +2,8 @@
 phase: 01-foundation
 plan: 04
 type: execute
-wave: 1
-depends_on: [01]
+wave: 2
+depends_on: [01, 02]
 files_modified:
   - infra/keycloak/realm-gravel-dev.json
   - infra/keycloak/keycloak-config-cli.values.yaml
@@ -17,10 +17,14 @@ files_modified:
   - apps/api/src/common/middleware/tenant-context.middleware.ts
   - apps/api/src/modules/identity/role.decorator.ts
   - apps/api/src/modules/identity/entities/user.entity.ts
+  - apps/api/src/modules/identity/users.controller.ts
+  - apps/api/src/modules/identity/users.service.ts
+  - apps/api/src/modules/identity/dto/update-preferences.dto.ts
   - apps/api/src/migrations/1715700000000__create_users.sql
   - apps/api/src/modules/i18n/i18n.module.ts
   - apps/api/src/modules/i18n/locale.resolver.ts
   - apps/api/test/integration/identity.spec.ts
+  - apps/api/test/integration/user-preferences.spec.ts
   - apps/api/test/unit/rbac.spec.ts
   - apps/web/src/app/core/auth/auth.service.ts
   - apps/web/src/app/core/auth/auth.guard.ts
@@ -64,7 +68,7 @@ must_haves:
     - "A user authenticates via Keycloak OIDC (web Auth Code + PKCE, mobile native flow) and the API accepts the resulting JWT"
     - "JWT contains tenant_id, site_ids[], role, group_scope per D-04; tenant-context.middleware injects all of them into ClsService BEFORE any DB query"
     - "A CHEF_CARRIERE user scoped to site-A receives 403 trying to read site-B data"
-    - "A user changes locale from FR to EN; preference persists in user_preferences; both web AND mobile reflect the new locale immediately"
+    - "A user changes locale from FR to EN; preference persists in `users.preferred_locale` via PUT /api/users/me/preferences (canonical, NestJS+TypeORM+audit); both web AND mobile reflect the new locale immediately"
     - "MFA TOTP is optional but enforced for DIRECTION_GROUPE and FINANCE roles per Keycloak realm policy"
   artifacts:
     - path: "infra/keycloak/realm-gravel-dev.json"
@@ -74,8 +78,10 @@ must_haves:
       provides: "Layer 3 of D-07: extracts JWT claims and seeds ClsService BEFORE every request"
     - path: "apps/api/src/common/guards/site-scope.guard.ts"
       provides: "@SiteScope() guard rejecting cross-site reads"
+    - path: "apps/api/src/modules/identity/users.controller.ts"
+      provides: "PUT /api/users/me/preferences canonical endpoint (TypeORM+audit; NOT the sync proxy)"
     - path: "apps/web/src/app/layout/locale-switcher.component.ts"
-      provides: "Header switcher persisting locale to /api/sync/preferences (LWW)"
+      provides: "Header switcher persisting locale to PUT /api/users/me/preferences"
     - path: "packages/i18n/codegen/generate-arb.ts"
       provides: "Codegen: packages/i18n/labels/**/{fr,en}.json → apps/mobile/lib/l10n/intl_*.arb"
   key_links:
@@ -91,14 +97,16 @@ must_haves:
       to: "Keycloak native OIDC"
       via: "flutter_appauth"
       pattern: "FlutterAppAuth"
-    - from: "locale switcher"
-      to: "user_preferences.locale"
-      via: "PUT /api/sync/preferences"
-      pattern: "preferences"
+    - from: "locale switcher (web + mobile)"
+      to: "users.preferred_locale"
+      via: "PUT /api/users/me/preferences (NestJS controller, TypeORM, audit-logged)"
+      pattern: "users/me/preferences"
 ---
 
 <objective>
-Identity + i18n. Deploy Keycloak 26 via Helm; bootstrap realm `gravel-dev` from a checked-in JSON via keycloak-config-cli (auto-applied — no manual UI clicks except first-run admin password verification). Wire the third defense-in-depth layer (D-07 layer 3): NestJS JWT validation → ClsService population BEFORE any DB query. Implement 7 roles per D-04, site-scope guard for RBAC. Web: angular-auth-oidc-client for Auth Code+PKCE, main-layout with sidenav+header+locale switcher, login screen. Mobile: flutter_appauth native flow → secure_storage. I18n: Transloco web + Flutter intl ARB codegen from `packages/i18n/labels/**`, switcher persisted via `user_preferences` (LWW from plan 03). Turns GREEN: FND-01 (Keycloak SSO), FND-03 (role × site scope), FND-09 (FR↔EN per user, propagated).
+Identity + i18n. Deploy Keycloak 26 via Helm; bootstrap realm `gravel-dev` from a checked-in JSON via keycloak-config-cli (auto-applied — no manual UI clicks except first-run admin password verification). Wire the third defense-in-depth layer (D-07 layer 3): NestJS JWT validation → ClsService population BEFORE any DB query. Implement 7 roles per D-04, site-scope guard for RBAC. Web: angular-auth-oidc-client for Auth Code+PKCE, main-layout with sidenav+header+locale switcher, login screen. Mobile: flutter_appauth native flow → secure_storage. I18n: Transloco web + Flutter intl ARB codegen from `packages/i18n/labels/**`. Locale switcher persists via the canonical NestJS endpoint `PUT /api/users/me/preferences` (TypeORM write to `users.preferred_locale` + audit trigger). Turns GREEN: FND-01 (Keycloak SSO), FND-03 (role × site scope), FND-09 (FR↔EN per user, propagated).
+
+Wave + dependency note: this plan runs in Wave 2 in parallel with plan 03. The depended-on artifacts come from plan 02 (data platform: TenantRlsSubscriber, audit triggers, RLS pattern, base schema). The locale write path is intentionally NOT routed through plan 03's sync proxy: this plan owns the `users` table and the canonical `PUT /api/users/me/preferences` endpoint. Plan 03 owns the LWW sync replica `user_preferences` row, which is reconciled via CDC. The two endpoints can coexist; the canonical source-of-truth is `users.preferred_locale`. This eliminates the historical P04 → P03 build-time dependency.
 </objective>
 
 <execution_context>
@@ -124,13 +132,13 @@ export interface JwtClaims {
 ClsService keys from plan W1-P02 task 02 (apps/api/src/common/cls/tenant-context.ts):
 TENANT_ID, USER_ID, REQUEST_ID, SITE_IDS, ROLE.
 
-From plan W1-P03 task 01: `PUT /api/sync/preferences` LWW endpoint persists `user_preferences` with key='locale' and value JSONB.
+This plan defines and owns the canonical `PUT /api/users/me/preferences` endpoint. It writes to `users.preferred_locale` via TypeORM (RLS-enforced, audit-trigger covered). Plan 03's `PUT /api/sync/preferences` is a sync-replica path and is NOT used by the locale switcher in this plan.
 </interfaces>
 </context>
 
 <tasks>
 
-<task type="auto" id="W1-P04-T01">
+<task type="auto" id="W2-P04-T01">
   <name>Keycloak 26 deployment + realm-as-code bootstrap</name>
   <files>infra/helm/keycloak/Chart.yaml, infra/helm/keycloak/values.yaml, infra/keycloak/realm-gravel-dev.json, infra/keycloak/keycloak-config-cli.values.yaml</files>
   <read_first>
@@ -189,7 +197,7 @@ From plan W1-P03 task 01: `PUT /api/sync/preferences` LWW endpoint persists `use
   <done>Keycloak deployable; realm bootstrapped automatically via config-cli; no manual UI clicks needed beyond first admin login verification.</done>
 </task>
 
-<task type="checkpoint:human-verify" id="W1-P04-T02" gate="blocking">
+<task type="checkpoint:human-verify" id="W2-P04-T02" gate="blocking">
   <name>Verify Keycloak deployment and realm import</name>
   <what-built>
     Keycloak 26 instance deployed via Helm; realm `gravel-dev` imported via keycloak-config-cli; 5 dev users created; 7 roles + 2 groups present.
@@ -205,9 +213,9 @@ From plan W1-P03 task 01: `PUT /api/sync/preferences` LWW endpoint persists `use
   <resume-signal>Type "approved" once realm visible and dev user can log in via Keycloak login page</resume-signal>
 </task>
 
-<task type="auto" id="W1-P04-T03" tdd="true">
-  <name>NestJS identity module: JWT strategy, tenant-context middleware, guards, RBAC test</name>
-  <files>apps/api/src/migrations/1715700000000__create_users.sql, apps/api/src/modules/identity/entities/user.entity.ts, apps/api/src/modules/identity/identity.module.ts, apps/api/src/modules/identity/strategies/jwt.strategy.ts, apps/api/src/common/guards/jwt-auth.guard.ts, apps/api/src/common/middleware/tenant-context.middleware.ts, apps/api/src/common/guards/tenant.guard.ts, apps/api/src/common/guards/site-scope.guard.ts, apps/api/src/modules/identity/role.decorator.ts, apps/api/test/integration/identity.spec.ts, apps/api/test/unit/rbac.spec.ts</files>
+<task type="auto" id="W2-P04-T03" tdd="true">
+  <name>NestJS identity module: JWT strategy, tenant-context middleware, guards, users/me/preferences endpoint, RBAC test</name>
+  <files>apps/api/src/migrations/1715700000000__create_users.sql, apps/api/src/modules/identity/entities/user.entity.ts, apps/api/src/modules/identity/identity.module.ts, apps/api/src/modules/identity/strategies/jwt.strategy.ts, apps/api/src/common/guards/jwt-auth.guard.ts, apps/api/src/common/middleware/tenant-context.middleware.ts, apps/api/src/common/guards/tenant.guard.ts, apps/api/src/common/guards/site-scope.guard.ts, apps/api/src/modules/identity/role.decorator.ts, apps/api/src/modules/identity/users.controller.ts, apps/api/src/modules/identity/users.service.ts, apps/api/src/modules/identity/dto/update-preferences.dto.ts, apps/api/test/integration/identity.spec.ts, apps/api/test/integration/user-preferences.spec.ts, apps/api/test/unit/rbac.spec.ts</files>
   <read_first>
     - .planning/phases/01-foundation/01-RESEARCH.md (NestJS JWT Guard with Keycloak JWKS, lines 608-644; Pattern 1 Tenant Context Injection; Pitfall 2 TypeORM connection lifecycle vs CLS, lines 542-547; Pitfall 4 Keycloak token aud/iss)
     - .planning/phases/01-foundation/01-CONTEXT.md (D-04, D-07 layer 3)
@@ -220,6 +228,9 @@ From plan W1-P03 task 01: `PUT /api/sync/preferences` LWW endpoint persists `use
     - Test (FND-03): user with role=CHEF_CARRIERE site_ids=[site-A] hits `GET /api/sites/site-B` → 403 (site-scope guard)
     - Test: user with groupScope='group' bypasses site-scope guard for READ ONLY; mutating actions still require explicit site match
     - Test: @Role('FINANCE') decorator rejects request from non-FINANCE user → 403
+    - Test (FND-09 canonical write path): `PUT /api/users/me/preferences` with body `{key:'locale', value:'en-US'}` writes to `users.preferred_locale`, produces an audit_log entry, returns 200 with updated user. Idempotent: same body twice → still 200, one audit entry per actual change.
+    - Test (FND-09): `GET /api/users/me` returns current user with `preferredLocale` field reflecting the last write
+    - Test: `PUT /api/users/me/preferences` is RLS-scoped — user A cannot mutate user B's preferences (path identifies caller via JWT, not param)
   </behavior>
   <action>
     `1715700000000__create_users.sql`:
@@ -255,27 +266,65 @@ From plan W1-P03 task 01: `PUT /api/sync/preferences` LWW endpoint persists `use
 
     `apps/api/src/modules/identity/role.decorator.ts`: `@Role('FINANCE')` metadata + `RoleGuard` reading roles.
 
+    `apps/api/src/modules/identity/dto/update-preferences.dto.ts`:
+      ```ts
+      import { IsString, IsIn, MaxLength } from 'class-validator';
+      export class UpdatePreferencesDto {
+        @IsString() @IsIn(['locale']) key!: 'locale';
+        @IsString() @MaxLength(20) value!: string;  // e.g. 'fr-CI', 'en-US'
+      }
+      ```
+
+    `apps/api/src/modules/identity/users.service.ts`: uses TenantAwareRepository<User> (from plan 02). Method `updatePreferences(userId, dto)`:
+      - if `dto.key === 'locale'` → update `users.preferred_locale = dto.value` for the calling user (from CLS USER_ID)
+      - returns refreshed User entity
+      - audit triggers from plan 02 emit the audit_log row automatically
+
+    `apps/api/src/modules/identity/users.controller.ts`:
+      ```ts
+      @UseGuards(JwtAuthGuard, TenantGuard)
+      @Controller('api/users')
+      export class UsersController {
+        constructor(private readonly users: UsersService, @InjectCls() private cls: ClsService) {}
+
+        @Get('me')
+        getMe() {
+          return this.users.findById(this.cls.get(USER_ID));
+        }
+
+        @Put('me/preferences')
+        async updateMyPreferences(@Body() dto: UpdatePreferencesDto) {
+          return this.users.updatePreferences(this.cls.get(USER_ID), dto);
+        }
+      }
+      ```
+    Note: the path identifies the caller via JWT — there is no user_id path param. This makes cross-user mutation impossible at the routing layer.
+
     Wire all guards globally in `app.module.ts`. Update `health.controller.ts` to be the only public endpoint.
 
     `apps/api/test/integration/identity.spec.ts` — replace stub. Use testcontainers Keycloak fixture; mint a real JWT via Keycloak admin REST API for a seeded dev user; cover all FND-01 behaviors above.
 
+    `apps/api/test/integration/user-preferences.spec.ts` — new file. Cover the FND-09 canonical write-path behaviors: PUT updates row, audit_log entry created, idempotent re-PUT, cross-user mutation impossible, GET /api/users/me reflects last write.
+
     `apps/api/test/unit/rbac.spec.ts` — replace stub. Mock JWT payloads for each of 7 roles × 2 sites; cover FND-03 behaviors.
   </action>
   <verify>
-    <automated>pnpm --filter @gravel/api test:int -- identity.spec.ts && pnpm --filter @gravel/api test -- rbac.spec.ts</automated>
+    <automated>pnpm --filter @gravel/api test:int -- identity.spec.ts user-preferences.spec.ts && pnpm --filter @gravel/api test -- rbac.spec.ts</automated>
   </verify>
   <acceptance_criteria>
-    - identity.spec.ts and rbac.spec.ts both green
+    - identity.spec.ts, user-preferences.spec.ts, and rbac.spec.ts all green
     - JwtStrategy validates audience=`gravel-api` AND issuer matching realm URL
     - tenant-context.middleware sets all 5 CLS keys (TENANT_ID, USER_ID, SITE_IDS, ROLE, REQUEST_ID)
     - site-scope guard rejects cross-site reads with 403
     - 50-parallel-request concurrency test shows zero CLS leakage
+    - `PUT /api/users/me/preferences` writes to `users.preferred_locale` and produces an audit_log row (via plan 02 audit triggers)
+    - The endpoint route has NO user_id path param — caller identity comes from JWT only
     - FND-01 and FND-03 verification commands in 01-VALIDATION.md flip green
   </acceptance_criteria>
-  <done>Layer 3 of D-07 in place; the trio (RLS + ORM wrapper + JWT→CLS→GUC) now complete.</done>
+  <done>Layer 3 of D-07 in place; the trio (RLS + ORM wrapper + JWT→CLS→GUC) now complete; canonical user-preferences endpoint shipped.</done>
 </task>
 
-<task type="auto" id="W1-P04-T04" tdd="true">
+<task type="auto" id="W2-P04-T04" tdd="true">
   <name>Angular web shell: OIDC auth, main layout, locale switcher, login + i18n E2E</name>
   <files>apps/web/src/app/core/auth/auth.service.ts, apps/web/src/app/core/auth/auth.guard.ts, apps/web/src/app/core/auth/oidc.config.ts, apps/web/src/app/core/i18n/transloco.config.ts, apps/web/src/app/core/i18n/transloco-http.loader.ts, apps/web/src/app/layout/main-layout.component.ts, apps/web/src/app/layout/header.component.ts, apps/web/src/app/layout/locale-switcher.component.ts, apps/web/src/app/layout/sidenav.component.ts, apps/web/src/app/features/login/login.component.ts, apps/web/i18n/fr.json, apps/web/i18n/en.json, apps/web/e2e/i18n.e2e.ts</files>
   <read_first>
@@ -285,8 +334,8 @@ From plan W1-P03 task 01: `PUT /api/sync/preferences` LWW endpoint persists `use
   <behavior>
     - Test: unauthenticated user navigating any non-public route is redirected to /login → Keycloak Auth Code+PKCE flow
     - Test: after successful auth, JWT stored in memory + httpOnly cookie (D-05); access token expires 15 min then refreshed silently
-    - Test (E2E i18n.e2e.ts — FND-09): seed user with `preferred_locale='fr-CI'`; load app → UI shows French strings; click locale switcher → 'EN' → UI updates immediately AND PUT /api/sync/preferences is called with key='locale' value='en-US'
-    - Test: reload page → still in EN (loaded from /api/users/me preferences)
+    - Test (E2E i18n.e2e.ts — FND-09): seed user with `preferred_locale='fr-CI'`; load app → UI shows French strings; click locale switcher → 'EN' → UI updates immediately AND `PUT /api/users/me/preferences` is called with `{key:'locale', value:'en-US'}`
+    - Test: reload page → still in EN (loaded from /api/users/me which reads `users.preferred_locale`)
     - Test (Pitfall 9): unit test asserts that there are NO inline French/English string literals in component templates under `src/app/features/**` (lint rule via custom ESLint plugin or grep gate in CI)
   </behavior>
   <action>
@@ -319,7 +368,7 @@ From plan W1-P03 task 01: `PUT /api/sync/preferences` LWW endpoint persists `use
 
     `layout/header.component.ts`: shows user email, role, current locale; embeds `<gravel-locale-switcher>`; logout button.
 
-    `layout/locale-switcher.component.ts`: dropdown FR/EN. On change: calls `translocoService.setActiveLang()` AND `httpClient.put('/api/sync/preferences', {key:'locale', value: lang})` (uses LWW endpoint from plan 03).
+    `layout/locale-switcher.component.ts`: dropdown FR/EN. On change: calls `translocoService.setActiveLang()` AND `httpClient.put('/api/users/me/preferences', {key:'locale', value: lang})` (canonical NestJS endpoint owned by this plan). NOTE: do NOT call `/api/sync/preferences` here — that's plan 03's sync-replica path. The canonical write is via the users controller; CDC reconciles the sync replica.
 
     `layout/sidenav.component.ts`: nav list with placeholder items (Sites, Zones, Permits, Activity Log) — actual routing wired in plan 05.
 
@@ -327,22 +376,23 @@ From plan W1-P03 task 01: `PUT /api/sync/preferences` LWW endpoint persists `use
 
     `i18n/fr.json` + `i18n/en.json`: minimal UI labels (header, sidenav, login button) — business labels imported from `@gravel/i18n`.
 
-    `e2e/i18n.e2e.ts` — replace stub: scenario described in behavior. Uses Playwright + a mock Keycloak (or hits real one if running locally).
+    `e2e/i18n.e2e.ts` — replace stub: scenario described in behavior. Uses Playwright + a mock Keycloak (or hits real one if running locally). Asserts that the network call after locale switch is `PUT /api/users/me/preferences` (NOT `/api/sync/preferences`).
   </action>
   <verify>
     <automated>pnpm --filter @gravel/web build && pnpm --filter @gravel/web e2e -- i18n.e2e.ts 2>&1 | tail -20</automated>
   </verify>
   <acceptance_criteria>
     - `pnpm --filter @gravel/web build` exits 0
-    - i18n.e2e.ts passes (FR↔EN switch persists across reload, calls /api/sync/preferences)
+    - i18n.e2e.ts passes (FR↔EN switch persists across reload, calls PUT /api/users/me/preferences)
     - No inline French/English literals in `apps/web/src/app/features/**/*.html` (grep gate)
-    - locale-switcher.component.ts calls PUT /api/sync/preferences on change
+    - locale-switcher.component.ts calls `PUT /api/users/me/preferences` on change (grep gate verifies the URL string)
+    - locale-switcher.component.ts does NOT reference `/api/sync/preferences`
     - auth.guard.ts redirects unauthenticated users to /login
   </acceptance_criteria>
-  <done>Web shell live with OIDC auth, locale switching, and a working sidenav skeleton (filled by plan 05).</done>
+  <done>Web shell live with OIDC auth, locale switching via canonical endpoint, and a working sidenav skeleton (filled by plan 05).</done>
 </task>
 
-<task type="auto" id="W1-P04-T05" tdd="true">
+<task type="auto" id="W2-P04-T05" tdd="true">
   <name>Flutter mobile: flutter_appauth OIDC + login + locale switcher + ARB codegen from packages/i18n</name>
   <files>apps/mobile/lib/core/auth/auth_service.dart, apps/mobile/lib/core/auth/oidc_config.dart, apps/mobile/lib/core/i18n/i18n_service.dart, apps/mobile/lib/features/login/login_screen.dart, apps/mobile/lib/features/settings/settings_screen.dart, apps/mobile/test/widget/i18n_test.dart, packages/i18n/labels/auth/fr.json, packages/i18n/labels/auth/en.json, packages/i18n/codegen/generate-arb.ts</files>
   <read_first>
@@ -354,7 +404,7 @@ From plan W1-P03 task 01: `PUT /api/sync/preferences` LWW endpoint persists `use
     - Test: Tapping "Login" triggers flutter_appauth → on success token stored in flutter_secure_storage (Android Keystore)
     - Test (D-05): refresh token persists across app restart; access token re-issued silently
     - Widget test (FND-09): toggle locale FR↔EN in settings_screen → MaterialApp rebuilds with new locale → strings change
-    - Test: locale preference PUT to /api/sync/preferences via Dio (same LWW endpoint as web)
+    - Test: locale preference PUT to `/api/users/me/preferences` via Dio (canonical NestJS endpoint owned by this plan — NOT the sync proxy)
     - Test: ARB codegen generates `apps/mobile/lib/l10n/intl_fr.arb` and `intl_en.arb` from packages/i18n/labels/**/{fr,en}.json
   </behavior>
   <action>
@@ -399,13 +449,13 @@ From plan W1-P03 task 01: `PUT /api/sync/preferences` LWW endpoint persists `use
       ```
     Configure Android: `android/app/build.gradle` `manifestPlaceholders = ['appAuthRedirectScheme': 'ci.gravel.mobile']`.
 
-    `lib/core/i18n/i18n_service.dart`: Riverpod StateNotifier holding current Locale; on change calls `Dio().put('/api/sync/preferences', data: {'key':'locale','value':locale.toString()})`. Loads from `/api/users/me` on app start.
+    `lib/core/i18n/i18n_service.dart`: Riverpod StateNotifier holding current Locale; on change calls `Dio().put('/api/users/me/preferences', data: {'key':'locale','value':locale.toString()})` (canonical endpoint owned by this plan; NOT `/api/sync/preferences`). Loads from `/api/users/me` on app start.
 
     `lib/features/login/login_screen.dart`: button + AuthService.login() call.
 
     `lib/features/settings/settings_screen.dart`: dropdown FR/EN bound to i18n_service.
 
-    `apps/mobile/test/widget/i18n_test.dart` — replace stub: pump MaterialApp, find FR string, change locale, find EN string. Mock Dio.
+    `apps/mobile/test/widget/i18n_test.dart` — replace stub: pump MaterialApp, find FR string, change locale, find EN string. Mock Dio and assert that the PUT URL is `/api/users/me/preferences` (NOT `/api/sync/preferences`).
   </action>
   <verify>
     <automated>node packages/i18n/codegen/generate-arb.ts && cd apps/mobile && flutter pub run intl_utils:generate && flutter test test/widget/i18n_test.dart</automated>
@@ -415,31 +465,34 @@ From plan W1-P03 task 01: `PUT /api/sync/preferences` LWW endpoint persists `use
     - i18n_test.dart passes (FR↔EN toggle)
     - auth_service.dart stores tokens in flutter_secure_storage (NOT SharedPreferences)
     - Refresh token logic checks expiry and re-fetches silently
-    - locale change persists via PUT /api/sync/preferences
+    - locale change persists via PUT /api/users/me/preferences (verified via mocked Dio interceptor in test)
+    - i18n_service.dart does NOT reference `/api/sync/preferences`
     - FND-09 mobile verification command in 01-VALIDATION.md flips green
   </acceptance_criteria>
-  <done>Mobile auth + i18n live; shared single source of truth (packages/i18n) drives BOTH web and mobile.</done>
+  <done>Mobile auth + i18n live; shared single source of truth (packages/i18n) drives BOTH web and mobile; locale write path is the canonical NestJS endpoint owned by this plan.</done>
 </task>
 
 </tasks>
 
 <verification>
 - Helm deploys Keycloak 26 with realm-gravel-dev auto-imported
-- `pnpm --filter @gravel/api test:int -- identity.spec.ts` green (FND-01)
+- `pnpm --filter @gravel/api test:int -- identity.spec.ts user-preferences.spec.ts` green (FND-01 + canonical locale write path)
 - `pnpm --filter @gravel/api test -- rbac.spec.ts` green (FND-03)
 - `pnpm --filter @gravel/web e2e -- i18n.e2e.ts` green (FND-09 web)
 - `cd apps/mobile && flutter test test/widget/i18n_test.dart` green (FND-09 mobile)
 - ARB codegen reproducible from `packages/i18n/labels/**`
 - D-07 three layers all green: RLS (W1-P02) + TenantAwareRepository (W1-P02) + JWT→CLS middleware (this plan)
+- The locale switcher in web and mobile calls `PUT /api/users/me/preferences` (this plan's endpoint); plan 03's `/api/sync/preferences` is reserved for sync-replica writes and is NOT a runtime dependency of this plan
 </verification>
 
 <success_criteria>
 - FND-01, FND-03, FND-09 all backed by green automated tests
 - Single realm `gravel-dev` is the source of truth for users, roles, groups (D-02) — entirely auto-managed
-- Locale preference round-trips: switcher → /api/sync/preferences (LWW) → reload restores it
+- Locale preference round-trips: switcher → PUT /api/users/me/preferences → users.preferred_locale → reload via GET /api/users/me restores it
+- No build-time dependency on plan 03 — both plans run in parallel in Wave 2
 - No hand-rolled JWT validation; no hand-rolled OIDC flows
 </success_criteria>
 
 <output>
-After completion create `.planning/phases/01-foundation/01-W1-P04-SUMMARY.md`.
+After completion create `.planning/phases/01-foundation/01-W2-P04-SUMMARY.md`.
 </output>

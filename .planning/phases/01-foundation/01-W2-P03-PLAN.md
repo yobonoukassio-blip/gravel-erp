@@ -2,8 +2,8 @@
 phase: 01-foundation
 plan: 03
 type: execute
-wave: 1
-depends_on: [01]
+wave: 2
+depends_on: [01, 02]
 files_modified:
   - apps/api/src/modules/sync/sync.module.ts
   - apps/api/src/modules/sync/registry.ts
@@ -59,6 +59,8 @@ must_haves:
 
 <objective>
 Sync framework + mobile shell + the single round-trip feature that proves FND-10/FND-11. Backend: PowerSync server deployed via Helm (depends on RDS wal_level=logical from plan 01); NestJS `sync` module exposes ConflictRegistry (D-11), one real entity `daily_activity_log` with strategy `append_only_event` + `user_preferences` with `last_write_wins`; chaos harness in CI. Mobile: Flutter shell wires Drift schema, PowerSync connector, the journal d'activité quotidien form (date, site_id, shift_id, notes ≤500, optional photo) with offline persistence and sync indicator, integration_test for offline round-trip. Honors D-14 (NO device.now() ordering; uses server_received_at + sequence). NOTE: Keycloak OIDC mobile auth wiring lives in plan 04 — this plan uses a mock token for the round-trip test.
+
+Wave note: this plan depends on plan 02 (data platform) because it (a) uses `apps/api/scripts/generate-audit-triggers.ts` regenerated for new tables, (b) FKs `daily_activity_log` to `sites`/`shifts`/`operational_days` created in plan 02, and (c) extends the RLS pattern established by plan 02's TenantRlsSubscriber. It runs in Wave 2 in parallel with plan 04 (identity + i18n). The locale source-of-truth (`users.preferred_locale`) is owned by plan 04 via `PUT /api/users/me/preferences`; the sync replica row in `user_preferences` (LWW) is reconciled via CDC — both endpoints coexist by design.
 </objective>
 
 <execution_context>
@@ -84,12 +86,14 @@ export type ConflictPolicy =
 Phase-1 sync scope (D-12): only `daily_activity_log` (append_only_event) and `user_preferences` (last_write_wins) are wired end-to-end. Framework supports all 4 strategies; other entities added in their phases.
 
 RDS parameter group from plan 01 already has wal_level=logical, max_replication_slots=20.
+
+From plan 02: `apps/api/scripts/generate-audit-triggers.ts`, the `sites`/`shifts`/`operational_days` tables, and the `TenantRlsSubscriber` + RLS policy pattern.
 </interfaces>
 </context>
 
 <tasks>
 
-<task type="auto" id="W1-P03-T01" tdd="true">
+<task type="auto" id="W2-P03-T01" tdd="true">
   <name>Backend sync module: ConflictRegistry, daily_activity_log entity, PowerSync rules</name>
   <files>apps/api/src/modules/sync/sync.module.ts, apps/api/src/modules/sync/registry.ts, apps/api/src/modules/sync/sync.controller.ts, apps/api/src/modules/sync/daily-activity-log.entity.ts, apps/api/src/modules/sync/powersync-rules.yaml, apps/api/src/migrations/1715600000000__create_daily_activity_log.sql, apps/api/src/migrations/1715600100000__powersync_publication.sql</files>
   <read_first>
@@ -100,7 +104,7 @@ RDS parameter group from plan 01 already has wal_level=logical, max_replication_
     - Test: ConflictRegistry exports 'daily_activity_log' → {strategy: 'append_only_event'} and 'user_preferences' → {strategy: 'last_write_wins'}
     - Test: Inserting a daily_activity_log row triggers an audit_log entry (inherits W1-P02 audit triggers)
     - Test: daily_activity_log carries tenant_id (RLS scoped) AND server_received_at TIMESTAMPTZ DEFAULT now() AND sequence BIGSERIAL (per D-14, NOT device.now())
-    - Test: PUT /api/sync/preferences with same key from two clients in sequence — final value matches last server_received_at order
+    - Test: PUT /api/sync/preferences with same key from two clients in sequence — final value matches last server_received_at order (this is the sync proxy / replica path; canonical user-locale source-of-truth row in `users.preferred_locale` is updated atomically by plan 04's `PUT /api/users/me/preferences`)
     - Test: PowerSync rules file references `current_setting('app.tenant_id')` and `site_ids` from JWT
   </behavior>
   <action>
@@ -129,7 +133,9 @@ RDS parameter group from plan 01 already has wal_level=logical, max_replication_
         WITH CHECK (tenant_id = current_setting('app.tenant_id', true)::uuid);
       CREATE INDEX dal_site_seq_idx ON daily_activity_log (site_id, sequence);
 
-      -- user_preferences (last_write_wins target)
+      -- user_preferences (last_write_wins target — sync replica.
+      -- Canonical source-of-truth for user locale lives in `users.preferred_locale`,
+      -- updated by plan 04 via PUT /api/users/me/preferences; CDC reconciles this row.)
       CREATE TABLE user_preferences (
         user_id UUID NOT NULL,
         tenant_id UUID NOT NULL,
@@ -165,7 +171,7 @@ RDS parameter group from plan 01 already has wal_level=logical, max_replication_
       ```
     `apps/api/src/modules/sync/sync.controller.ts`:
       - `POST /api/sync/activity-log` (server-validates client-pushed envelope, idempotent by (client_id, client_seq))
-      - `PUT /api/sync/preferences` (LWW; replaces by (user_id, key) ordered by server_received_at)
+      - `PUT /api/sync/preferences` (LWW sync proxy; replaces by (user_id, key) ordered by server_received_at). NOTE: this is the sync-replica write path used by mobile/web background sync; the canonical user-locale source-of-truth is `users.preferred_locale`, updated by plan 04's `PUT /api/users/me/preferences` (TypeORM + audit). Both endpoints coexist; the canonical row is propagated to this replica via CDC.
       - `GET /api/sync/registry` returns the ConflictRegistry for documentation/debug
     `apps/api/src/modules/sync/sync.module.ts`: TypeOrmModule.forFeature, controllers, providers.
 
@@ -185,7 +191,7 @@ RDS parameter group from plan 01 already has wal_level=logical, max_replication_
   <done>Backend sync surface live; ConflictRegistry framework in place; only 2 entities wired (Phase-1 scope per D-12).</done>
 </task>
 
-<task type="auto" id="W1-P03-T02" tdd="true">
+<task type="auto" id="W2-P03-T02" tdd="true">
   <name>Mobile Drift schema + PowerSync connector + activity log feature with sync badge</name>
   <files>apps/mobile/lib/core/db/database.dart, apps/mobile/lib/core/db/database.g.dart, apps/mobile/lib/core/sync/powersync_connector.dart, apps/mobile/lib/core/sync/conflict_policy.dart, apps/mobile/lib/features/activity_log/activity_log_repository.dart, apps/mobile/lib/features/activity_log/activity_log_screen.dart, apps/mobile/lib/features/activity_log/activity_log_form.dart, apps/mobile/lib/features/activity_log/sync_status_badge.dart</files>
   <read_first>
@@ -247,7 +253,7 @@ RDS parameter group from plan 01 already has wal_level=logical, max_replication_
   <done>Mobile feature complete; ready for offline integration test in next task.</done>
 </task>
 
-<task type="auto" id="W1-P03-T03" tdd="true">
+<task type="auto" id="W2-P03-T03" tdd="true">
   <name>Integration test: offline round-trip (FND-10) + chaos harness (FND-11)</name>
   <files>apps/mobile/integration_test/sync_offline_test.dart, apps/mobile/test/helpers/sync_harness.dart, apps/api/test/chaos/sync-chaos.spec.ts, infra/helm/powersync/values.yaml, infra/helm/powersync/Chart.yaml</files>
   <read_first>
@@ -322,5 +328,5 @@ RDS parameter group from plan 01 already has wal_level=logical, max_replication_
 </success_criteria>
 
 <output>
-After completion create `.planning/phases/01-foundation/01-W1-P03-SUMMARY.md` listing: sync module files, ConflictRegistry contents, Helm chart values, PowerSync rule scope, mobile screens shipped, and observed sync latency from chaos test.
+After completion create `.planning/phases/01-foundation/01-W2-P03-SUMMARY.md` listing: sync module files, ConflictRegistry contents, Helm chart values, PowerSync rule scope, mobile screens shipped, and observed sync latency from chaos test.
 </output>

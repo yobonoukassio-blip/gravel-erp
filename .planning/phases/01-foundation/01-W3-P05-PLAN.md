@@ -2,8 +2,8 @@
 phase: 01-foundation
 plan: 05
 type: execute
-wave: 2
-depends_on: [02, 04]
+wave: 3
+depends_on: [01, 02, 04]
 files_modified:
   - apps/api/src/modules/master-data/master-data.controller.ts
   - apps/api/src/modules/master-data/dto/site.dto.ts
@@ -297,5 +297,5 @@ Soft-delete convention (D-26): PATCH /api/sites/:id/archive sets status='archive
 </success_criteria>
 
 <output>
-After completion create `.planning/phases/01-foundation/01-W2-P05-SUMMARY.md`.
+After completion create `.planning/phases/01-foundation/01-W3-P05-SUMMARY.md`.
 </output>

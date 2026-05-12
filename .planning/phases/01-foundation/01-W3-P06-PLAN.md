@@ -2,8 +2,8 @@
 phase: 01-foundation
 plan: 06
 type: execute
-wave: 2
-depends_on: [02, 03, 04]
+wave: 3
+depends_on: [01, 02, 03, 04]
 files_modified:
   - apps/api/src/otel/otel.ts
   - apps/api/src/main.ts
@@ -265,5 +265,5 @@ Metric names from D-38: `http_request_duration_seconds`, `db_query_duration_seco
 </success_criteria>
 
 <output>
-After completion create `.planning/phases/01-foundation/01-W2-P06-SUMMARY.md` and update `.planning/phases/01-foundation/01-VALIDATION.md` frontmatter: set `nyquist_compliant: true` and `wave_0_complete: true` (Wave 0 stubs all turned green by upstream plans).
+After completion create `.planning/phases/01-foundation/01-W3-P06-SUMMARY.md` and update `.planning/phases/01-foundation/01-VALIDATION.md` frontmatter: set `nyquist_compliant: true` and `wave_0_complete: true` (Wave 0 stubs all turned green by upstream plans).
 </output>

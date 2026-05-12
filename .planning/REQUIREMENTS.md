@@ -27,7 +27,7 @@ Requirements pour la première release. Chaque exigence est mappée à une phase
 - [ ] **FOR-02**: Un opérateur de foreuse saisit chaque trou foré sur mobile offline (GPS, profondeur réelle, diamètre, inclinaison, durée, opérateur, machine)
 - [ ] **FOR-03**: Le système calcule le rendement de forage (mètres forés / heure machine) par campagne, opérateur et machine
 - [ ] **FOR-04**: Le système enregistre la consommation gasoil par foreuse et par session de forage
-- [ ] **FOR-05**: Une foreuse en panne ou maintenance bloque l'affectation à un nouveau plan de forage
+- [x] **FOR-05**: Une foreuse en panne ou maintenance bloque l'affectation à un nouveau plan de forage
 
 ### Production — Tir de mine & Explosifs
 
@@ -49,8 +49,8 @@ Requirements pour la première release. Chaque exigence est mappée à une phase
 - [ ] **CON-01**: Le tonnage entrant et sortant de chaque concasseur est suivi (primaire, secondaire), avec performance et heures de fonctionnement
 - [ ] **CON-02**: La consommation énergétique des concasseurs est suivie par session
 - [ ] **CRI-01**: Le criblage classe la production en calibres avec contrôle qualité et déclaration de non-conformités
-- [ ] **STK-01**: Chaque stock (par calibre, par site, par zone) est un grand livre event-sourced ; le solde est dérivé d'événements append-only (entrée production, sortie vente, ajustement inventaire)
-- [ ] **STK-02**: Des alertes se déclenchent automatiquement quand un stock franchit un seuil bas/haut configuré
+- [x] **STK-01**: Chaque stock (par calibre, par site, par zone) est un grand livre event-sourced ; le solde est dérivé d'événements append-only (entrée production, sortie vente, ajustement inventaire)
+- [x] **STK-02**: Des alertes se déclenchent automatiquement quand un stock franchit un seuil bas/haut configuré
 - [ ] **STK-03**: Le système valorise les stocks au coût de production (moyenne pondérée) avec conversion devise
 
 ### Maintenance équipements
@@ -63,15 +63,15 @@ Requirements pour la première release. Chaque exigence est mappée à une phase
 
 ### Carburant & Énergie
 
-- [ ] **CAR-01**: Les cuves de carburant ont un solde event-sourced (entrées livraisons, sorties ravitaillements) avec rapprochement quotidien
+- [x] **CAR-01**: Les cuves de carburant ont un solde event-sourced (entrées livraisons, sorties ravitaillements) avec rapprochement quotidien
 - [ ] **CAR-02**: Chaque ravitaillement engin est saisi sur mobile offline (engin, opérateur, litres, compteur heures, photo jauge optionnelle)
 - [ ] **CAR-03**: Un ratio L/h ou L/tonne anormal par engin déclenche une alerte (détection vol / fuite)
 - [ ] **CAR-04**: La consommation électrique site est suivie par usage (concassage, criblage, ateliers)
 
 ### HSE (Hygiène Sécurité Environnement)
 
-- [ ] **HSE-01**: Tout incident/accident est saisi en append-only avec chaîne de hash, photos en object storage immuable, chronologie, gravité, personnes/équipements impactés
-- [ ] **HSE-02**: Un workflow d'actions correctives est créé pour chaque incident et suivi jusqu'à clôture
+- [x] **HSE-01**: Tout incident/accident est saisi en append-only avec chaîne de hash, photos en object storage immuable, chronologie, gravité, personnes/équipements impactés
+- [x] **HSE-02**: Un workflow d'actions correctives est créé pour chaque incident et suivi jusqu'à clôture
 - [ ] **HSE-03**: Les EPI sont gérés par employé (attributions, états, retours) avec contrôle de validité
 - [ ] **HSE-04**: Les habilitations (formation sécurité, permis explosifs, conduite engins) sont temporelles ("as-of") avec date d'obtention et date d'expiration
 - [ ] **HSE-05**: Un audit sécurité périodique est planifié, exécuté avec checklist, et clôturé avec rapport
@@ -104,7 +104,7 @@ Requirements pour la première release. Chaque exigence est mappée à une phase
 
 ### Dashboards, Reporting & Alertes
 
-- [ ] **DSH-01**: Chaque profil (Direction Groupe, Directeur Site, Chef Carrière, Maintenance, HSE, Finance) dispose d'un dashboard temps réel adapté à son rôle
+- [x] **DSH-01**: Chaque profil (Direction Groupe, Directeur Site, Chef Carrière, Maintenance, HSE, Finance) dispose d'un dashboard temps réel adapté à son rôle
 - [ ] **DSH-02**: KPI Production : tonnes produites jour/semaine/mois, rendement forage, rendement concassage, disponibilité équipements, temps d'arrêt
 - [ ] **DSH-03**: KPI Finance : coût/tonne, marge, consommation carburant, coût maintenance
 - [ ] **DSH-04**: KPI HSE : nombre d'incidents, taux fréquence accidents, conformité audits
@@ -184,26 +184,26 @@ Mapping requirement ↔ phase (validé après création du roadmap).
 | FOR-02 | Phase 2 — Vertical Slice Production | Pending |
 | FOR-03 | Phase 2 — Vertical Slice Production | Pending |
 | FOR-04 | Phase 2 — Vertical Slice Production | Pending |
-| FOR-05 | Phase 2 — Vertical Slice Production | Pending |
+| FOR-05 | Phase 2 — Vertical Slice Production | Complete |
 | EXT-01 | Phase 2 — Vertical Slice Production | Pending |
 | EXT-02 | Phase 2 — Vertical Slice Production | Pending |
 | TRP-01 | Phase 2 — Vertical Slice Production | Pending |
 | TRP-02 | Phase 2 — Vertical Slice Production | Pending |
 | TRP-03 | Phase 2 — Vertical Slice Production | Pending |
-| STK-01 | Phase 2 — Vertical Slice Production | Pending |
-| STK-02 | Phase 2 — Vertical Slice Production | Pending |
+| STK-01 | Phase 2 — Vertical Slice Production | Complete |
+| STK-02 | Phase 2 — Vertical Slice Production | Complete |
 | STK-03 | Phase 2 — Vertical Slice Production | Pending |
-| CAR-01 | Phase 2 — Vertical Slice Production | Pending |
+| CAR-01 | Phase 2 — Vertical Slice Production | Complete |
 | CAR-02 | Phase 2 — Vertical Slice Production | Pending |
 | CAR-03 | Phase 2 — Vertical Slice Production | Pending |
 | CAR-04 | Phase 2 — Vertical Slice Production | Pending |
-| HSE-01 | Phase 2 — Vertical Slice Production | Pending |
-| HSE-02 | Phase 2 — Vertical Slice Production | Pending |
+| HSE-01 | Phase 2 — Vertical Slice Production | Complete |
+| HSE-02 | Phase 2 — Vertical Slice Production | Complete |
 | HSE-03 | Phase 2 — Vertical Slice Production | Pending |
 | HSE-04 | Phase 2 — Vertical Slice Production | Pending |
 | HSE-05 | Phase 2 — Vertical Slice Production | Pending |
 | HSE-06 | Phase 2 — Vertical Slice Production | Pending |
-| DSH-01 | Phase 2 — Vertical Slice Production | Pending |
+| DSH-01 | Phase 2 — Vertical Slice Production | Complete |
 | DSH-02 | Phase 2 — Vertical Slice Production | Pending |
 | TIR-01 | Phase 3 — Operational Completeness | Pending |
 | TIR-02 | Phase 3 — Operational Completeness | Pending |

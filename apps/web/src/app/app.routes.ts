@@ -70,6 +70,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'transport',
+        loadChildren: () =>
+          import('./features/transport/transport-routes').then(
+            (m) => m.TRANSPORT_ROUTES,
+          ),
+      },
+      {
         path: 'activity-log',
         canActivate: [roleGuard(['DIRECTION_GROUPE', 'DIRECTEUR_SITE'])],
         loadComponent: () =>

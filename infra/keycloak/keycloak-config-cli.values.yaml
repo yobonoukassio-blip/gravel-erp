@@ -1,0 +1,53 @@
+# keycloak-config-cli sidecar Helm values.
+# Imports `realm-gravel-dev.json` on every Helm upgrade — idempotent.
+# Reference: https://github.com/adorsys/keycloak-config-cli
+#
+# Local bootstrap (dev):
+#   1. Start Keycloak: `docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin
+#      -e KEYCLOAK_ADMIN_PASSWORD=$(openssl rand -base64 24) quay.io/keycloak/keycloak:26.0 start-dev`
+#      (PowerShell: $env:KEYCLOAK_ADMIN_PASSWORD=[Convert]::ToBase64String((1..18 | %{Get-Random -Maximum 256})))
+#   2. Run config-cli: `docker run --rm -v $PWD/infra/keycloak:/config
+#      -e KEYCLOAK_URL=http://host.docker.internal:8080
+#      -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=...
+#      -e IMPORT_FILES_LOCATIONS=/config/realm-gravel-dev.json
+#      adorsys/keycloak-config-cli:v6.1.0-26.0.0`
+#
+# CHECKPOINT: First-run admin password retrieval — see infra/keycloak/CHECKPOINT.md
+
+image:
+  repository: adorsys/keycloak-config-cli
+  tag: v6.1.0-26.0.0
+  pullPolicy: IfNotPresent
+
+env:
+  KEYCLOAK_URL: "http://keycloak-http:8080"
+  KEYCLOAK_USER: admin
+  KEYCLOAK_AVAILABILITYCHECK_ENABLED: "true"
+  KEYCLOAK_AVAILABILITYCHECK_TIMEOUT: "300s"
+  IMPORT_FILES_LOCATIONS: "/config/realm-gravel-dev.json"
+  IMPORT_VARSUBSTITUTION_ENABLED: "true"
+  IMPORT_MANAGED_AUTHENTICATION_FLOW: full
+  IMPORT_MANAGED_GROUP: full
+  IMPORT_MANAGED_ROLE: full
+  IMPORT_MANAGED_CLIENT: full
+  IMPORT_MANAGED_SCOPE: full
+  IMPORT_FORCE: "false"
+
+# Password sourced from the same secret as the bitnami keycloak chart.
+existingSecret: keycloak-admin
+secretKey: admin-password
+
+# Mount the realm JSON as a ConfigMap.
+volumeMounts:
+  - name: realm-config
+    mountPath: /config
+    readOnly: true
+
+volumes:
+  - name: realm-config
+    configMap:
+      name: keycloak-realm-config
+
+# Run once after each Helm upgrade.
+restartPolicy: OnFailure
+backoffLimit: 3

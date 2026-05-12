@@ -1,0 +1,73 @@
+# Keycloak 26 — Gravel Ivoire ERP
+# Source decisions: D-01, D-02, D-03, D-04, D-05.
+# Pitfall 4 (01-RESEARCH.md lines 555-562): KC_HOSTNAME_STRICT=true so audience+issuer
+# match the URL clients use, preventing aud/iss mismatch on JWT validation.
+
+keycloak:
+  image:
+    registry: quay.io
+    repository: keycloak/keycloak
+    tag: "26.0"
+  auth:
+    adminUser: admin
+    existingSecret: keycloak-admin
+    passwordSecretKey: admin-password
+  proxy: edge
+  production: true
+  extraEnvVars:
+    - name: KC_HOSTNAME
+      value: "auth.gravel-dev.local"
+    - name: KC_HOSTNAME_STRICT
+      value: "true"
+    - name: KC_HOSTNAME_STRICT_HTTPS
+      value: "true"
+    - name: KC_DB
+      value: postgres
+    - name: KC_HEALTH_ENABLED
+      value: "true"
+    - name: KC_METRICS_ENABLED
+      value: "true"
+    - name: KC_LOG_LEVEL
+      value: INFO
+  postgresql:
+    enabled: false
+  externalDatabase:
+    host: ${RDS_ENDPOINT}
+    port: 5432
+    user: keycloak
+    database: keycloak
+    existingSecret: keycloak-db
+    existingSecretPasswordKey: password
+  service:
+    type: ClusterIP
+    ports:
+      http: 8080
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hostname: auth.gravel-dev.local
+    tls: true
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+keycloak-config-cli:
+  enabled: true
+  # Imports realm-gravel-dev.json on every Helm upgrade — idempotent.
+  # The realm JSON is mounted via a ConfigMap rendered from infra/keycloak/realm-gravel-dev.json.
+  existingConfigMap: keycloak-realm-config
+  env:
+    KEYCLOAK_URL: "http://keycloak-http"
+    KEYCLOAK_AVAILABILITYCHECK_ENABLED: "true"
+    KEYCLOAK_AVAILABILITYCHECK_TIMEOUT: "300s"
+    IMPORT_FILES_LOCATIONS: "/config/*.json"
+    IMPORT_VARSUBSTITUTION_ENABLED: "true"
+    SPRING_PROFILES_ACTIVE: prod
+  existingSecret: keycloak-admin
+  secretKey: admin-password

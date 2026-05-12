@@ -1,0 +1,398 @@
+{
+  "realm": "gravel-dev",
+  "displayName": "Gravel Ivoire Dev",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "permanentLockout": false,
+  "maxFailureWaitSeconds": 900,
+  "minimumQuickLoginWaitSeconds": 60,
+  "waitIncrementSeconds": 60,
+  "quickLoginCheckMilliSeconds": 1000,
+  "maxDeltaTimeSeconds": 43200,
+  "failureFactor": 5,
+  "accessTokenLifespan": 900,
+  "accessTokenLifespanForImplicitFlow": 900,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "offlineSessionIdleTimeout": 2592000,
+  "offlineSessionMaxLifespan": 5184000,
+  "offlineSessionMaxLifespanEnabled": true,
+  "revokeRefreshToken": true,
+  "refreshTokenMaxReuse": 0,
+  "otpPolicyType": "totp",
+  "otpPolicyAlgorithm": "HmacSHA1",
+  "otpPolicyDigits": 6,
+  "otpPolicyLookAheadWindow": 1,
+  "otpPolicyPeriod": 30,
+
+  "roles": {
+    "realm": [
+      { "name": "DIRECTION_GROUPE", "description": "Direction Groupe — cross-site read on own tenant (groupScope=group)" },
+      { "name": "DIRECTEUR_SITE", "description": "Directeur de site — full access on assigned site(s)" },
+      { "name": "CHEF_CARRIERE", "description": "Chef de carrière — operational lead, site-scoped" },
+      { "name": "MAINTENANCE", "description": "Maintenance — equipment + permits, site-scoped" },
+      { "name": "HSE", "description": "Hygiène Sécurité Environnement — incidents + permits, site-scoped" },
+      { "name": "FINANCE", "description": "Finance — money/transactions, often group-scoped" },
+      { "name": "OPERATEUR_TERRAIN", "description": "Opérateur terrain — mobile field entry, site-scoped" }
+    ]
+  },
+
+  "groups": [
+    {
+      "name": "tenant-dev",
+      "path": "/tenant-dev",
+      "attributes": {
+        "tenant_id": ["00000000-0000-0000-0000-00000000ten1"]
+      },
+      "subGroups": [
+        {
+          "name": "site-ci-abidjan",
+          "path": "/tenant-dev/site-ci-abidjan",
+          "attributes": {
+            "site_id": ["00000000-0000-0000-0000-000000sitea01"]
+          }
+        },
+        {
+          "name": "site-ci-yamoussoukro",
+          "path": "/tenant-dev/site-ci-yamoussoukro",
+          "attributes": {
+            "site_id": ["00000000-0000-0000-0000-000000siteb01"]
+          }
+        }
+      ]
+    }
+  ],
+
+  "clients": [
+    {
+      "clientId": "gravel-api",
+      "name": "Gravel API (bearer-only resource server)",
+      "enabled": true,
+      "bearerOnly": true,
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "access.token.lifespan": "900"
+      },
+      "protocolMappers": [
+        {
+          "name": "audience-gravel-api",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.client.audience": "gravel-api",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "gravel-web",
+      "name": "Gravel Web (Angular SPA — Auth Code + PKCE)",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "frontchannelLogout": true,
+      "rootUrl": "http://localhost:4200",
+      "redirectUris": [
+        "http://localhost:4200/*",
+        "https://app.gravel-dev.local/*"
+      ],
+      "webOrigins": ["+"],
+      "protocol": "openid-connect",
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "access.token.lifespan": "900",
+        "client.session.idle.timeout": "1800"
+      },
+      "fullScopeAllowed": true,
+      "defaultClientScopes": ["web-origins", "profile", "email", "roles", "gravel-claims"],
+      "optionalClientScopes": ["address", "phone", "offline_access"]
+    },
+    {
+      "clientId": "gravel-mobile",
+      "name": "Gravel Mobile (Flutter — native OIDC PKCE)",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["ci.gravel.mobile://oauth/callback"],
+      "webOrigins": [],
+      "protocol": "openid-connect",
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "access.token.lifespan": "3600",
+        "client.session.idle.timeout": "7200"
+      },
+      "fullScopeAllowed": true,
+      "defaultClientScopes": ["profile", "email", "roles", "gravel-claims", "offline_access"]
+    }
+  ],
+
+  "clientScopes": [
+    {
+      "name": "gravel-claims",
+      "description": "Custom Gravel claims: tenant_id, site_ids[], role, group_scope, preferred_locale",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      },
+      "protocolMappers": [
+        {
+          "name": "tenant_id-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "tenant_id",
+            "claim.name": "tenant_id",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "site_ids-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "site_ids",
+            "claim.name": "site_ids",
+            "jsonType.label": "JSON",
+            "multivalued": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "role-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "role",
+            "claim.name": "role",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "group_scope-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "group_scope",
+            "claim.name": "group_scope",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true"
+          }
+        },
+        {
+          "name": "preferred_locale-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "preferred_locale",
+            "claim.name": "preferred_locale",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true"
+          }
+        },
+        {
+          "name": "audience-gravel-api",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.client.audience": "gravel-api",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+
+  "users": [
+    {
+      "username": "direction.groupe",
+      "email": "direction.groupe@gravel-dev.local",
+      "firstName": "Direction",
+      "lastName": "Groupe",
+      "enabled": true,
+      "emailVerified": true,
+      "attributes": {
+        "tenant_id": ["00000000-0000-0000-0000-00000000ten1"],
+        "site_ids": ["00000000-0000-0000-0000-000000sitea01", "00000000-0000-0000-0000-000000siteb01"],
+        "role": ["DIRECTION_GROUPE"],
+        "group_scope": ["group"],
+        "preferred_locale": ["fr-CI"]
+      },
+      "credentials": [{ "type": "password", "value": "dev-only-DG-2026!", "temporary": false }],
+      "realmRoles": ["DIRECTION_GROUPE"],
+      "groups": ["/tenant-dev"]
+    },
+    {
+      "username": "directeur.abidjan",
+      "email": "directeur.abidjan@gravel-dev.local",
+      "firstName": "Directeur",
+      "lastName": "Abidjan",
+      "enabled": true,
+      "emailVerified": true,
+      "attributes": {
+        "tenant_id": ["00000000-0000-0000-0000-00000000ten1"],
+        "site_ids": ["00000000-0000-0000-0000-000000sitea01"],
+        "role": ["DIRECTEUR_SITE"],
+        "preferred_locale": ["fr-CI"]
+      },
+      "credentials": [{ "type": "password", "value": "dev-only-DSA-2026!", "temporary": false }],
+      "realmRoles": ["DIRECTEUR_SITE"],
+      "groups": ["/tenant-dev/site-ci-abidjan"]
+    },
+    {
+      "username": "chef.abidjan",
+      "email": "chef.abidjan@gravel-dev.local",
+      "firstName": "Chef",
+      "lastName": "Abidjan",
+      "enabled": true,
+      "emailVerified": true,
+      "attributes": {
+        "tenant_id": ["00000000-0000-0000-0000-00000000ten1"],
+        "site_ids": ["00000000-0000-0000-0000-000000sitea01"],
+        "role": ["CHEF_CARRIERE"],
+        "preferred_locale": ["fr-CI"]
+      },
+      "credentials": [{ "type": "password", "value": "dev-only-CCA-2026!", "temporary": false }],
+      "realmRoles": ["CHEF_CARRIERE"],
+      "groups": ["/tenant-dev/site-ci-abidjan"]
+    },
+    {
+      "username": "finance.groupe",
+      "email": "finance.groupe@gravel-dev.local",
+      "firstName": "Finance",
+      "lastName": "Groupe",
+      "enabled": true,
+      "emailVerified": true,
+      "attributes": {
+        "tenant_id": ["00000000-0000-0000-0000-00000000ten1"],
+        "site_ids": ["00000000-0000-0000-0000-000000sitea01", "00000000-0000-0000-0000-000000siteb01"],
+        "role": ["FINANCE"],
+        "group_scope": ["group"],
+        "preferred_locale": ["fr-CI"]
+      },
+      "credentials": [{ "type": "password", "value": "dev-only-FIN-2026!", "temporary": false }],
+      "realmRoles": ["FINANCE"],
+      "groups": ["/tenant-dev"]
+    },
+    {
+      "username": "operateur.yamoussoukro",
+      "email": "operateur.yamoussoukro@gravel-dev.local",
+      "firstName": "Opérateur",
+      "lastName": "Yamoussoukro",
+      "enabled": true,
+      "emailVerified": true,
+      "attributes": {
+        "tenant_id": ["00000000-0000-0000-0000-00000000ten1"],
+        "site_ids": ["00000000-0000-0000-0000-000000siteb01"],
+        "role": ["OPERATEUR_TERRAIN"],
+        "preferred_locale": ["fr-CI"]
+      },
+      "credentials": [{ "type": "password", "value": "dev-only-OPY-2026!", "temporary": false }],
+      "realmRoles": ["OPERATEUR_TERRAIN"],
+      "groups": ["/tenant-dev/site-ci-yamoussoukro"]
+    }
+  ],
+
+  "authenticationFlows": [
+    {
+      "alias": "browser-with-conditional-otp",
+      "description": "Browser flow with TOTP required only for DIRECTION_GROUPE + FINANCE roles (D-03).",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        { "authenticator": "auth-cookie", "requirement": "ALTERNATIVE", "priority": 10, "autheticatorFlow": false, "userSetupAllowed": false },
+        { "authenticator": "auth-spnego", "requirement": "DISABLED", "priority": 20, "autheticatorFlow": false, "userSetupAllowed": false },
+        { "authenticator": "identity-provider-redirector", "requirement": "ALTERNATIVE", "priority": 25, "autheticatorFlow": false, "userSetupAllowed": false },
+        {
+          "requirement": "ALTERNATIVE",
+          "priority": 30,
+          "autheticatorFlow": true,
+          "flowAlias": "browser-with-conditional-otp forms",
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "browser-with-conditional-otp forms",
+      "description": "Username + password, then conditional OTP for sensitive roles.",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        { "authenticator": "auth-username-password-form", "requirement": "REQUIRED", "priority": 10, "autheticatorFlow": false, "userSetupAllowed": false },
+        {
+          "requirement": "CONDITIONAL",
+          "priority": 20,
+          "autheticatorFlow": true,
+          "flowAlias": "conditional-otp-by-role",
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "conditional-otp-by-role",
+      "description": "Require OTP for DIRECTION_GROUPE and FINANCE roles only.",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-user-role",
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false,
+          "authenticatorConfig": "otp-roles-config"
+        },
+        { "authenticator": "auth-otp-form", "requirement": "REQUIRED", "priority": 20, "autheticatorFlow": false, "userSetupAllowed": false }
+      ]
+    }
+  ],
+  "authenticatorConfig": [
+    {
+      "alias": "otp-roles-config",
+      "config": {
+        "condUserRole": "DIRECTION_GROUPE,FINANCE"
+      }
+    }
+  ],
+  "browserFlow": "browser-with-conditional-otp",
+
+  "defaultDefaultClientScopes": [
+    "web-origins",
+    "profile",
+    "email",
+    "roles",
+    "gravel-claims"
+  ]
+}

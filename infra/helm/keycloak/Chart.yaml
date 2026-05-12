@@ -1,0 +1,14 @@
+apiVersion: v2
+name: gravel-keycloak
+description: Keycloak 26 deployment for Gravel Ivoire ERP (D-01, D-02, D-03, D-04, D-05).
+type: application
+version: 0.1.0
+appVersion: "26.0"
+dependencies:
+  - name: keycloak
+    version: "~22.2.0"
+    repository: oci://registry-1.docker.io/bitnamicharts
+  - name: keycloak-config-cli
+    version: "~6.1.0"
+    repository: https://codecentric.github.io/helm-charts
+    condition: keycloak-config-cli.enabled

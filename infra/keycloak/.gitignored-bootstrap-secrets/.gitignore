@@ -1,0 +1,4 @@
+# Bootstrap admin passwords are generated locally per environment.
+# Nothing in this directory should ever be committed.
+*
+!.gitignore

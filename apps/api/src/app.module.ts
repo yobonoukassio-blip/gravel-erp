@@ -8,6 +8,7 @@ import { I18nModule } from './modules/i18n/i18n.module';
 import { MasterDataModule } from './modules/master-data/master-data.module';
 import { ExtractionModule } from './modules/extraction/extraction.module';
 import { ForationModule } from './modules/foration/foration.module';
+import { TransportModule } from './modules/transport/transport.module';
 
 /**
  * Root application module.
@@ -38,6 +39,7 @@ import { ForationModule } from './modules/foration/foration.module';
     MasterDataModule,
     ExtractionModule,
     ForationModule,
+    TransportModule,
   ],
 })
 export class AppModule {}

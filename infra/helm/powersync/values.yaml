@@ -1,0 +1,68 @@
+# PowerSync service Helm values — Phase 1.
+# ADR-0002 note: replicaCount=1 is INTENTIONAL — Postgres logical replication
+# slots are pinned 1:1 to a consumer; running 2 PowerSync replicas against the
+# same slot deadlocks the WAL. Multi-replica deferred to Phase 6 with a slot
+# pool (see PITFALLS.md #3).
+
+replicaCount: 1
+
+image:
+  repository: journeyapps/powersync-service
+  tag: "1.9.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+
+# Connection to the primary Postgres. The DSN must include
+# `replication=database` so the service can open a logical-replication slot.
+database:
+  existingSecret: powersync-db
+  secretKey: DATABASE_URL
+
+# Sync rules YAML mounted from a ConfigMap built out of
+# `apps/api/src/modules/sync/powersync-rules.yaml`.
+syncRules:
+  existingConfigMap: powersync-sync-rules
+  configMapKey: rules.yaml
+  mountPath: /etc/powersync/rules.yaml
+
+env:
+  - name: POWERSYNC_SYNC_RULES_PATH
+    value: /etc/powersync/rules.yaml
+  - name: PORT
+    value: "8080"
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: 1
+    memory: 1Gi
+
+readinessProbe:
+  httpGet:
+    path: /probes/readiness
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 5
+
+livenessProbe:
+  httpGet:
+    path: /probes/liveness
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+podDisruptionBudget:
+  # With replicaCount=1, a PDB of minAvailable=1 makes node upgrades a
+  # planned-downtime event. Acceptable for Phase 1 (single-region MVP).
+  enabled: false
+
+# Phase-1 ops contract:
+# - One logical replication slot named `powersync_main`. PowerSync creates it
+#   at boot; do not pre-create.
+# - Publication `powersync` is created by migration 1715600100000.
+# - On scale-up beyond 1, expect WAL deadlock — see PITFALLS.md #3.

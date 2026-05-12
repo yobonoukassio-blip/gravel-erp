@@ -1,0 +1,11 @@
+apiVersion: v2
+name: powersync
+description: |
+  PowerSync sync service for Gravel Ivoire ERP — Phase 1 (D-10, D-12).
+  Bridges Postgres logical-replication slot ↔ mobile clients.
+  Single replica per ADR-0002 (Pitfall #3). Multi-replica deferred to Phase 6.
+type: application
+version: 0.1.0
+appVersion: "1.9.0"
+maintainers:
+  - name: Gravel Ivoire Platform Team

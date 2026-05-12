@@ -1,0 +1,11 @@
+{
+  "@@locale": "en",
+  "appName": "Gravel Ivoire ERP",
+  "login": "Login",
+  "logout": "Logout",
+  "activityLog": "Activity log",
+  "save": "Save",
+  "cancel": "Cancel",
+  "syncPending": "Sync pending",
+  "syncDone": "Synced"
+}

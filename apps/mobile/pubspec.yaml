@@ -1,0 +1,47 @@
+name: gravel_mobile
+description: Gravel Ivoire ERP — Flutter 3.35 Android-first field-entry app.
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.7.0 <4.0.0'
+  flutter: '>=3.35.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.19.0
+
+  # State management — Riverpod (D-34)
+  flutter_riverpod: ^2.5.0
+
+  # Offline-first sync (D-10)
+  powersync: ^1.9.0
+  drift: ^2.20.0
+  drift_sqlite_async: ^0.2.0
+  sqlite_async: ^0.10.0
+
+  # Auth — OIDC native flow (D-36)
+  flutter_appauth: ^7.0.0
+  flutter_secure_storage: ^9.2.0
+
+  # HTTP client for non-sync calls (file upload, signed URL fetch)
+  dio: ^5.7.0
+  path_provider: ^2.1.0
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.13
+  drift_dev: ^2.20.0
+
+flutter:
+  uses-material-design: true
+  generate: true

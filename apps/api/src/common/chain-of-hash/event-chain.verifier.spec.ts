@@ -80,7 +80,7 @@ describe('EventChainVerifier (pure-TS, in-memory)', () => {
       const corrupted = Buffer.from(rows[50].row_hash);
       corrupted[0] = corrupted[0] ^ 0x01;
       rows[50].row_hash = corrupted;
-      let prev = corrupted;
+      let prev: Buffer = corrupted;
       for (let i = 51; i < rows.length; i += 1) {
         rows[i].prev_hash = prev;
         rows[i].row_hash = computeRowHash(prev, rows[i].canonical_payload);

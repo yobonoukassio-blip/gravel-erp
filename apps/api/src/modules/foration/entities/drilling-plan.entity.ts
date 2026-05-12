@@ -17,7 +17,7 @@ export type DrillingPlanStatus = 'draft' | 'active' | 'closed' | 'archived';
  * (Chef Carrière), short edit windows, last-writer-wins is unacceptable for
  * plan parameters (depth/diameter changes mid-shift cause real cost).
  */
-@SyncEntity({ strategy: 'pessimistic_lock' })
+@SyncEntity({ strategy: 'pessimistic_lock', lockTtlSec: 300 })
 @Entity({ name: 'drilling_plan' })
 @Index('drilling_plan_tenant_site_idx', ['tenantId', 'siteId'])
 @Index('drilling_plan_bench_idx', ['benchId'])

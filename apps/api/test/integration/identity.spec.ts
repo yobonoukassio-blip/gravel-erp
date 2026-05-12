@@ -18,7 +18,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ClsService } from 'nestjs-cls';
 import * as request from 'supertest';
 import { sign as jwtSign } from 'jsonwebtoken';
-import { generateKeyPairSync, createPrivateKey } from 'node:crypto';
+import { generateKeyPairSync } from 'node:crypto';
 import { AppModule } from '../../src/app.module';
 import { TenantContextMiddleware } from '../../src/common/middleware/tenant-context.middleware';
 import { CLS_KEYS } from '../../src/common/cls/tenant-context';
@@ -35,7 +35,7 @@ interface MintArgs {
 }
 
 describe('FND-01 — Keycloak JWT validation, tenant-context middleware, CLS isolation', () => {
-  let app: INestApplication;
+  let app: INestApplication | undefined;
   let publicKey: string;
   let privateKey: string;
   const ISSUER = 'http://test-keycloak/realms/gravel-dev';
@@ -44,9 +44,13 @@ describe('FND-01 — Keycloak JWT validation, tenant-context middleware, CLS iso
   beforeAll(async () => {
     // Generate an in-memory RS256 keypair; expose via a mocked JWKS endpoint
     // that JwtStrategy will consume.
-    const kp = generateKeyPairSync('rsa', { modulusLength: 2048 });
-    publicKey = kp.publicKey.export({ type: 'spki', format: 'pem' }).toString();
-    privateKey = createPrivateKey(kp.privateKey).export({ type: 'pkcs8', format: 'pem' }).toString();
+    const kp = generateKeyPairSync('rsa', {
+      modulusLength: 2048,
+      publicKeyEncoding: { type: 'spki', format: 'pem' },
+      privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+    });
+    publicKey = kp.publicKey;
+    privateKey = kp.privateKey;
 
     process.env.KEYCLOAK_URL = 'http://test-keycloak';
     process.env.KEYCLOAK_REALM = 'gravel-dev';

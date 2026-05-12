@@ -3,11 +3,15 @@ import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 
 export const IS_PUBLIC_KEY = 'isPublic';
-export const Public = (): MethodDecorator & ClassDecorator => {
-  return (target, _key, _descriptor) => {
+export const Public =
+  (): MethodDecorator & ClassDecorator =>
+  ((
+    target: object,
+    _key?: string | symbol,
+    _descriptor?: TypedPropertyDescriptor<unknown>,
+  ) => {
     Reflect.defineMetadata(IS_PUBLIC_KEY, true, target);
-  };
-};
+  }) as MethodDecorator & ClassDecorator;
 
 /**
  * Global JWT guard. Runs JwtStrategy from this module unless the route is

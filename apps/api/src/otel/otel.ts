@@ -55,12 +55,15 @@ export function startOtel(): NodeSDK {
     traceExporter: new OTLPTraceExporter({
       url: `${endpoint}/v1/traces`,
     }),
+    // Cast through unknown: cross-package type drift between
+    // @opentelemetry/sdk-node and @opentelemetry/sdk-metrics on identical
+    // MetricReader interfaces (structural identity, declaration sites differ).
     metricReader: new PeriodicExportingMetricReader({
       exporter: new OTLPMetricExporter({
         url: `${endpoint}/v1/metrics`,
       }),
       exportIntervalMillis: 10_000,
-    }),
+    }) as unknown as ConstructorParameters<typeof NodeSDK>[0]['metricReader'],
     instrumentations: [
       getNodeAutoInstrumentations({
         // `fs` instrumentation is high-volume and adds little operational value.

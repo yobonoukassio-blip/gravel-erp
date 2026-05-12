@@ -26,14 +26,21 @@ export class UsersController {
     private readonly cls: ClsService,
   ) {}
 
+  private requireUserId(): string {
+    const userId = this.cls.get<string>(CLS_KEYS.USER_ID);
+    if (!userId) {
+      throw new Error('USER_ID missing from CLS context — JwtAuthGuard must run first.');
+    }
+    return userId;
+  }
+
   @Get('me')
   getMe() {
-    return this.users.findById(this.cls.getOrThrow<string>(CLS_KEYS.USER_ID));
+    return this.users.findById(this.requireUserId());
   }
 
   @Put('me/preferences')
   updateMyPreferences(@Body() dto: UpdatePreferencesDto) {
-    const userId = this.cls.getOrThrow<string>(CLS_KEYS.USER_ID);
-    return this.users.updatePreferences(userId, dto);
+    return this.users.updatePreferences(this.requireUserId(), dto);
   }
 }

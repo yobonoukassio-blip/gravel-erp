@@ -18,7 +18,7 @@ import { randomUUID } from 'crypto';
 import type { DataSource } from 'typeorm';
 import type { ConflictPolicy } from '@gravel/shared-types';
 import { ConflictRegistry, listEntities, listStrategiesInUse } from '../../src/modules/sync/registry';
-import { startPgContainer, stopPgContainer } from '../setup/testcontainers';
+import { startPostgres, stopPostgres, PgTestStack } from '../setup/testcontainers';
 
 const TENANT_A = '11111111-1111-1111-1111-111111111111';
 
@@ -28,16 +28,18 @@ interface SeedRefs {
 }
 
 describe('FND-11: Sync conflict resolution chaos harness', () => {
+  let stack: PgTestStack;
   let ds: DataSource;
   let refs: SeedRefs;
 
   beforeAll(async () => {
-    ds = await startPgContainer();
+    stack = await startPostgres();
+    ds = stack.appDs;
     refs = await seedTenantSiteUser(ds, TENANT_A);
   }, 120_000);
 
   afterAll(async () => {
-    await stopPgContainer();
+    await stopPostgres(stack);
   });
 
   beforeEach(async () => {

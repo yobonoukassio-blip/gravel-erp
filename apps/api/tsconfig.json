@@ -4,12 +4,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "outDir": "./dist",
-    "rootDir": ".",
     "baseUrl": "./",
-    "paths": {
-      "@gravel/shared-types": ["../../packages/shared-types/src/index.ts"],
-      "@gravel/i18n": ["../../packages/i18n/index.js"]
-    },
     "incremental": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

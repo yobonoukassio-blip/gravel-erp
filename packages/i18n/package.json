@@ -1,0 +1,13 @@
+{
+  "name": "@gravel/i18n",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared business labels (FR/EN) consumed by @gravel/api, @gravel/web, and apps/mobile via codegen.",
+  "main": "index.js",
+  "files": ["labels", "index.js"],
+  "scripts": {
+    "test:quick": "echo \"@gravel/i18n: static JSON only\"",
+    "test:ci": "echo \"@gravel/i18n: static JSON only\"",
+    "lint": "echo \"@gravel/i18n: no lint\""
+  }
+}

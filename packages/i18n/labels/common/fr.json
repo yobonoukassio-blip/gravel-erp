@@ -1,0 +1,11 @@
+{
+  "app.name": "Gravel Ivoire ERP",
+  "common.save": "Enregistrer",
+  "common.cancel": "Annuler",
+  "common.delete": "Supprimer",
+  "common.edit": "Modifier",
+  "common.search": "Rechercher",
+  "common.loading": "Chargement…",
+  "common.error": "Erreur",
+  "common.confirm": "Confirmer"
+}

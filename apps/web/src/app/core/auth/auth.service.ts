@@ -22,7 +22,7 @@ const DEV_CLAIMS: JwtClaims = {
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly oidc = inject(OidcSecurityService);
+  private readonly oidc = inject(OidcSecurityService, { optional: true });
 
   login(): void {
     if (environment.mockAuth) return;

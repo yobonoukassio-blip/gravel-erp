@@ -12,6 +12,7 @@ import {
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { AuthModule, authInterceptor } from 'angular-auth-oidc-client';
 import { FormlyModule } from '@ngx-formly/core';
+import { environment } from '../environments/environment';
 import { FormlyMaterialModule } from '@ngx-formly/material';
 import { GpsPickerLeafletType } from './shared/formly/gps-picker-leaflet.type';
 import { PolygonPickerLeafletType } from './shared/formly/polygon-picker-leaflet.type';
@@ -39,7 +40,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withInterceptorsFromDi(), withInterceptors([authInterceptor()])),
     provideAnimationsAsync(),
-    importProvidersFrom(AuthModule.forRoot({ config: oidcConfig })),
+    ...(environment.mockAuth ? [] : [importProvidersFrom(AuthModule.forRoot({ config: oidcConfig }))]),
     importProvidersFrom(
       FormlyModule.forRoot({
         types: [

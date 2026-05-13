@@ -10,6 +10,7 @@ import { ExtractionModule } from './modules/extraction/extraction.module';
 import { ForationModule } from './modules/foration/foration.module';
 import { TransportModule } from './modules/transport/transport.module';
 import { StockpileModule } from './modules/stockpile/stockpile.module';
+import { FuelModule } from './modules/fuel/fuel.module';
 import { HseModule } from './modules/hse/hse.module';
 import { ProductionDashboardModule } from './modules/production-dashboard/production-dashboard.module';
 
@@ -43,6 +44,7 @@ import { ProductionDashboardModule } from './modules/production-dashboard/produc
     ForationModule,
     TransportModule,
     StockpileModule,
+    FuelModule,
     HseModule,
     ProductionDashboardModule,
   ],

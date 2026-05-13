@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft — to be refined in Wave 3 (HSE module). Date: 2026-05-12. Authors: Phase 2 planner.
+Accepted — implemented in Phase 2 W3 P07. Date: 2026-05-13. Authors: Phase 2 planner + executor.
 
 ## Context
 
@@ -90,6 +90,74 @@ Negative:
 - `infra/modules/s3-objectlock/` — bucket module
 - `docs/operations/legal-review-queue.md` — Compliance vs Governance pending
 
+## Implementation Notes
+
+### Chain-of-hash columns
+
+`hse_incident` carries `prev_hash BYTEA` and `row_hash BYTEA` on every row.
+The chain is computed as:
+
+```
+row_hash[n] = sha256(prev_hash[n] || canonical_payload[n])
+prev_hash[n] = row_hash[n-1]   (or 32-zero genesis for n=0)
+```
+
+The canonical payload is defined in `EventChainVerifier.CANONICAL_PAYLOAD_SQL.hse_incident`
+and mirrored in `buildHseIncidentCanonicalPayload()` in `hse-incident.service.ts`.
+
+### Append-only enforcement
+
+Two layers:
+1. **Controller layer**: PATCH, PUT, DELETE return 405 Method Not Allowed via `rejectPatch()`.
+2. **DB trigger layer**: `trg_hse_incident_no_update` and `trg_hse_incident_no_delete` raise
+   exceptions on any UPDATE or DELETE, blocking even privileged DB accounts.
+
+### HSE_INCIDENT_CHRONOLOGY_APPENDED
+
+Corrections to a filed incident are submitted as a new row with a future
+`appends_to_incident_id` FK column. This column is not implemented in Phase 2 (no corrections
+have been required in the pilot). Phase 3 can add the column + new `hse_category` value
+`chronology_amendment` if the pilot mandates it.
+
+### S3 Object Lock — GOVERNANCE mode, 7 years
+
+Pre-signed PUT URLs include:
+- `x-amz-object-lock-mode: GOVERNANCE`
+- `x-amz-object-lock-retain-until-date: <now + 7 years>`
+
+The object key is the SHA-256 hex of the file content (content-addressed storage).
+`confirmUpload()` validates that the received SHA matches the declared SHA before
+persisting the `hse_attachment` row — enforcing `ERR_HASH_MISMATCH` on tampered uploads.
+
+### Severity≥4 closure guard
+
+`HseIncidentService.close()` queries:
+```sql
+SELECT COUNT(*) FROM corrective_action
+ WHERE incident_id = $1 AND tenant_id = $2 AND status != 'verified'
+```
+If the count > 0 and incident.severity >= 4, throws `ERR_CAPA_NOT_VERIFIED` (400).
+
+### Role split
+
+| Operation | Required role |
+|-----------|---------------|
+| Create incident | Any authenticated user (reporter_user_id from JWT) |
+| Create / assign CAPA | HSE_OFFICER or SITE_MANAGER |
+| Transition CAPA status | HSE_OFFICER or SITE_MANAGER |
+| Verify CAPA (done → verified) | Different user from who submitted done |
+| Close incident | Any role (guard enforced by severity rule) |
+
+### Deferred scope cross-reference
+
+HSE-03 (EPI), HSE-04 (Habilitations), HSE-05 (Audit) are explicitly deferred to Phase 3.
+See `docs/phase-03-handoff/hse-rh-deferred-scope.md` and
+`apps/api/src/modules/hse/README.md` for the full deferred scope inventory.
+
 ## Key tokens
 
 - Object Lock retention: GOVERNANCE mode, 7 years (D2-61).
+- Closure guard error code: `ERR_CAPA_NOT_VERIFIED`.
+- Chain genesis: 32 zero bytes (`Buffer.alloc(32, 0)`).
+- Normalization constant (CAPA): `sha256(prev_hash || canonical_payload)` per ADR-0004.
+- TF normalization factor: 1 000 000 (per ILO standard, HSE-06).

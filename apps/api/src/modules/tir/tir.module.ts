@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { EventEmitterModule } from '@nestjs/event-emitter';
 
 // Entities
 // (No TypeORM entities needed — service uses raw queries on managed tables)

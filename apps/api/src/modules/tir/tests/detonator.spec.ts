@@ -1,6 +1,5 @@
 import { NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { DetonatorService } from '../services/detonator.service';
-import { Detonator, DetonatorStatus } from '../entities/detonator.entity';
 
 /**
  * TIR-02 detonator lifecycle spec.

@@ -76,7 +76,7 @@ describe('CrusherSessionService', () => {
   describe('complete()', () => {
     it('publishes outbox event in same transaction as session update', async () => {
       const activeSession = makeSession({ status: 'ACTIVE' });
-      const completedSession = makeSession({
+      const _completedSession = makeSession({
         status: 'COMPLETED',
         inputTonnageKg: 1000,
         outputTonnageKg: 800,

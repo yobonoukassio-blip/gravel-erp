@@ -54,7 +54,7 @@ export class ExplosivesReconciliationService {
   /** Fetch all physical count entries for an operational day. */
   async getPhysicalCount(
     operationalDayId: string,
-    tenantId: string,
+    _tenantId: string,
   ): Promise<ExplosivesBalance> {
     const rows = (await this.ds.query(
       `SELECT product_type, quantity_g
@@ -88,7 +88,7 @@ export class ExplosivesReconciliationService {
   /** Record a manual physical count submission. */
   async recordPhysicalCount(
     input: PhysicalCountInput,
-    tenantId: string,
+    _tenantId: string,
   ): Promise<void> {
     await this.ds.query(
       `INSERT INTO explosives_physical_count (

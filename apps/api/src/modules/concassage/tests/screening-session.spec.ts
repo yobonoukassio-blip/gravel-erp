@@ -11,7 +11,7 @@ import { BadRequestException } from '@nestjs/common';
 import { ScreeningSessionService } from '../services/screening-session.service';
 import { CalibreYield, ScreeningSession } from '../entities/screening-session.entity';
 
-function makeScreeningSession(overrides: Partial<ScreeningSession> = {}): ScreeningSession {
+function _makeScreeningSession(overrides: Partial<ScreeningSession> = {}): ScreeningSession {
   return {
     id: 'screen-001',
     tenantId: 'tenant-001',

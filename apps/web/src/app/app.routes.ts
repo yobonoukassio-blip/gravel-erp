@@ -19,6 +19,7 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./layout/main-layout.component').then((m) => m.MainLayoutComponent),
     children: [
+      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       {
         path: 'sites',
         loadChildren: () =>
@@ -91,6 +92,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'fuel',
+        loadChildren: () =>
+          import('./features/fuel/fuel-routes').then(
+            (m) => m.FUEL_ROUTES,
+          ),
+      },
+      {
         path: 'dashboard',
         loadChildren: () =>
           import('./features/dashboard-site/dashboard-routes').then(
@@ -102,6 +110,13 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./features/alerts-inbox/alerts-routes').then(
             (m) => m.ALERTS_ROUTES,
+          ),
+      },
+      {
+        path: 'finance',
+        loadChildren: () =>
+          import('./features/finance/finance-routes').then(
+            (m) => m.FINANCE_ROUTES,
           ),
       },
       {

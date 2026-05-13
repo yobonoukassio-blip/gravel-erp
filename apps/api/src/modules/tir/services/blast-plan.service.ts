@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { randomUUID } from 'crypto';
 import { DataSource } from 'typeorm';
 import { RhHabilitationService } from '../../rh/services/rh-habilitation.service';
 import { BlastPlan, BlastPlanStatus } from '../entities/blast-plan.entity';

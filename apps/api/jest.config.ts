@@ -21,6 +21,7 @@ const config: Config = {
       testMatch: ['<rootDir>/test/unit/**/*.spec.ts'],
       moduleNameMapper: {
         '^@gravel/shared-types$': '<rootDir>/../../packages/shared-types/src/index.ts',
+        '^(\\.{1,2}/.*)\\.js$': '$1',
       },
     },
     {
@@ -31,6 +32,7 @@ const config: Config = {
       testMatch: ['<rootDir>/test/integration/**/*.spec.ts'],
       moduleNameMapper: {
         '^@gravel/shared-types$': '<rootDir>/../../packages/shared-types/src/index.ts',
+        '^(\\.{1,2}/.*)\\.js$': '$1',
       },
     },
     {
@@ -41,6 +43,7 @@ const config: Config = {
       testMatch: ['<rootDir>/test/security/**/*.spec.ts'],
       moduleNameMapper: {
         '^@gravel/shared-types$': '<rootDir>/../../packages/shared-types/src/index.ts',
+        '^(\\.{1,2}/.*)\\.js$': '$1',
       },
     },
     {
@@ -51,6 +54,7 @@ const config: Config = {
       testMatch: ['<rootDir>/test/chaos/**/*.spec.ts'],
       moduleNameMapper: {
         '^@gravel/shared-types$': '<rootDir>/../../packages/shared-types/src/index.ts',
+        '^(\\.{1,2}/.*)\\.js$': '$1',
       },
     },
   ],

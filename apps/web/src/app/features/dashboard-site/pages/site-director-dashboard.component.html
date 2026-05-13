@@ -1,0 +1,158 @@
+<div class="dashboard-shell" *transloco="let t">
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading()" class="loading-overlay">
+    <mat-progress-spinner mode="indeterminate" diameter="48" />
+  </div>
+
+  <ng-container *ngIf="dashboard() as d">
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- Header row                                                          -->
+    <!-- ------------------------------------------------------------------ -->
+    <div class="dashboard-header">
+      <h1 class="dashboard-title">{{ t('dashboard.site_director.title') }}</h1>
+      <span class="last-updated" *ngIf="lastUpdated()">
+        {{ t('dashboard.last_updated') }} {{ lastUpdated() | date:'HH:mm:ss' }}
+      </span>
+    </div>
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- Tonnage row                                                          -->
+    <!-- ------------------------------------------------------------------ -->
+    <section class="section-title">{{ t('dashboard.section.tonnage') }}</section>
+    <div class="kpi-grid">
+      <gravel-kpi-tile
+        [label]="t('dashboard.tonnage_today')"
+        [value]="tonnageDisplay(d.tonnage_today_kg)"
+        testId="kpi-tonnage-today"
+      />
+      <gravel-kpi-tile
+        [label]="t('dashboard.tonnage_yesterday')"
+        [value]="tonnageDisplay(d.tonnage_yesterday_kg)"
+        testId="kpi-tonnage-yesterday"
+      />
+      <gravel-kpi-tile
+        [label]="t('dashboard.tonnage_week')"
+        [value]="tonnageDisplay(d.tonnage_week_kg)"
+        testId="kpi-tonnage-week"
+      />
+      <gravel-kpi-tile
+        [label]="t('dashboard.tonnage_month')"
+        [value]="tonnageDisplay(d.tonnage_month_kg)"
+        testId="kpi-tonnage-month"
+      />
+    </div>
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- Performance KPIs                                                   -->
+    <!-- ------------------------------------------------------------------ -->
+    <section class="section-title">{{ t('dashboard.section.performance') }}</section>
+    <div class="kpi-grid">
+      <gravel-kpi-tile
+        [label]="t('dashboard.drilling_yield')"
+        [value]="d.drilling_yield_m_per_h_today"
+        unit="m/h"
+        testId="kpi-drilling-yield"
+      />
+      <gravel-kpi-tile
+        [label]="t('dashboard.extraction_yield')"
+        [value]="d.extraction_yield_t_per_h_today"
+        unit="t/h"
+        testId="kpi-extraction-yield"
+      />
+      <gravel-kpi-tile
+        [label]="t('dashboard.tf_rolling_12m')"
+        [value]="d.tf_rolling_12m"
+        testId="kpi-tf"
+      />
+    </div>
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- Cost per ton provisional (D2-100 mandatory tile)                   -->
+    <!-- ------------------------------------------------------------------ -->
+    <section class="section-title">{{ t('dashboard.section.cost') }}</section>
+    <div class="provisional-row">
+      <gravel-cost-per-ton-provisional-tile
+        [value]="costValue()"
+        [currency]="costCurrency()"
+      />
+    </div>
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- Open incidents by severity                                         -->
+    <!-- ------------------------------------------------------------------ -->
+    <section class="section-title">{{ t('dashboard.section.incidents') }}</section>
+    <div class="kpi-grid">
+      <gravel-kpi-tile label="Critical" [value]="incidentCount('critical')" testId="kpi-incident-critical" />
+      <gravel-kpi-tile label="High"     [value]="incidentCount('high')"     testId="kpi-incident-high" />
+      <gravel-kpi-tile label="Medium"   [value]="incidentCount('medium')"   testId="kpi-incident-medium" />
+      <gravel-kpi-tile label="Low"      [value]="incidentCount('low')"      testId="kpi-incident-low" />
+    </div>
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- Fuel tanks                                                          -->
+    <!-- ------------------------------------------------------------------ -->
+    <section class="section-title">{{ t('dashboard.section.fuel_tanks') }}</section>
+    <div class="gauge-row" *ngIf="d.fuel_tanks.length > 0; else noFuelTanks">
+      <gravel-stockpile-gauge
+        *ngFor="let tank of d.fuel_tanks"
+        [label]="tank.label"
+        [balanceValue]="tank.balance_liters"
+        balanceUnit="L"
+        [pct]="tank.pct_filled"
+        [status]="tank.pct_filled < 20 ? 'critical' : tank.pct_filled < 40 ? 'warning' : 'ok'"
+      />
+    </div>
+    <ng-template #noFuelTanks>
+      <p class="empty-state">{{ t('dashboard.no_fuel_tanks') }}</p>
+    </ng-template>
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- Stockpiles                                                          -->
+    <!-- ------------------------------------------------------------------ -->
+    <section class="section-title">{{ t('dashboard.section.stockpiles') }}</section>
+    <div class="gauge-row" *ngIf="d.stockpiles.length > 0; else noStockpiles">
+      <gravel-stockpile-gauge
+        *ngFor="let sp of d.stockpiles"
+        [label]="sp.label"
+        [balanceValue]="+sp.balance_kg / 1000"
+        balanceUnit="t"
+        [pct]="0"
+        [status]="sp.threshold_status"
+      />
+    </div>
+    <ng-template #noStockpiles>
+      <p class="empty-state">{{ t('dashboard.no_stockpiles') }}</p>
+    </ng-template>
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- Equipment out of service                                           -->
+    <!-- ------------------------------------------------------------------ -->
+    <ng-container *ngIf="d.equipment_out_of_service.length > 0">
+      <section class="section-title oos-title">
+        {{ t('dashboard.section.equipment_oos') }}
+        <span class="oos-badge">{{ d.equipment_out_of_service.length }}</span>
+      </section>
+      <ul class="oos-list">
+        <li *ngFor="let eq of d.equipment_out_of_service" class="oos-item">
+          <span class="oos-label">{{ eq.label }}</span>
+          <span class="oos-since" *ngIf="eq.out_of_service_since_utc">
+            {{ t('dashboard.oos_since') }} {{ eq.out_of_service_since_utc | date:'dd/MM HH:mm' }}
+          </span>
+        </li>
+      </ul>
+    </ng-container>
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- Site map                                                            -->
+    <!-- ------------------------------------------------------------------ -->
+    <section class="section-title">{{ t('dashboard.section.site_map') }}</section>
+    <gravel-site-map
+      [zones]="mapZones()"
+      [markers]="mapMarkers()"
+    />
+
+  </ng-container>
+
+</div>

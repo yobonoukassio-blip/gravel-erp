@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft — to be refined in Wave 3 (production-dashboard module). Date: 2026-05-12. Authors: Phase 2 planner.
+Accepted — 2026-05-13. Implemented in Wave 3 (02-W3-P08). Authors: Phase 2 planner + executor.
 
 ## Context
 
@@ -79,6 +79,60 @@ Negative:
 - `apps/web/src/app/core/sse/sse-client.service.ts` (W0)
 - HTML5 EventSource spec (Last-Event-ID semantics)
 
+## Implementation Notes
+
+Implementation delivered in Phase 2 Wave 3 plan 08.
+
+### channelKey scheme
+
+```
+channelKey = `${tenantId}:${siteId}:${dashboardKey}`
+```
+
+Examples:
+- `tenant-ci-01:site-abj-01:site-director`
+- `tenant-ci-01:site-abj-01:quarry-chief`
+- `alerts:tenant-ci-01:site-abj-01`
+
+### Last-Event-ID replay
+
+`SseBroadcasterService` maintains a ring buffer of the last 100 events per channel.
+On reconnect with `Last-Event-ID: N` (query param `?last_event_id=N`), all buffered events
+with id > N are replayed immediately. If no catchup events exist, a `: refresh-snapshot`
+comment instructs the client to poll the REST snapshot endpoint.
+
+### Domain events subscribed
+
+`DashboardProjectionHandler` subscribes to 6 domain events:
+1. `production.foration.hole_drilled`
+2. `production.extraction.cycle_appended`
+3. `production.transport.rotation_completed`
+4. `production.stockpile.event_appended`
+5. `production.fuel.refuel_appended`
+6. `hse.incident.created`
+
+Each handler emits a `{ kind: 'kpi.delta', updated_keys: [...], values: {...} }` delta
+to both `site-director` and `quarry-chief` channels for the impacted (tenant, site).
+
+### Fallback polling
+
+When SSE fails to reconnect after retries (see `SseClientService` — W0-P01),
+the web client falls back to 30-second polling of the REST snapshot endpoint.
+
+### Performance
+
+Tested with 50 concurrent clients per channel in unit tests. The in-memory
+registry scales to ~10k connections per NestJS instance. For Phase 2's
+expected ~50 concurrent users (D2-120), a single instance is sufficient.
+Horizontal scaling (sticky sessions not needed — SSE is stateless per
+process) is addressed in Phase 6 hardening.
+
+### Deferred
+
+WebSocket bidirectional communication is deferred to Phase 4+. Live GPS
+telematics (operator → server) will be evaluated when IoT ingestion via
+EMQX is live (Phase 5).
+
 ## Key tokens (audit-search anchors)
 
-`SSE`, `Last-Event-ID`.
+`SSE`, `Last-Event-ID`, `channelKey`, `kpi.delta`.

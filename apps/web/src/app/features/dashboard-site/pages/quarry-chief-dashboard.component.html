@@ -1,0 +1,79 @@
+<div class="qc-dashboard-shell" *transloco="let t">
+
+  <div *ngIf="loading()" class="loading-overlay">
+    <mat-progress-spinner mode="indeterminate" diameter="48" />
+  </div>
+
+  <ng-container *ngIf="dashboard() as d">
+
+    <div class="dashboard-header">
+      <h1 class="dashboard-title">{{ t('dashboard.quarry_chief.title') }}</h1>
+      <span class="last-updated" *ngIf="lastUpdated()">
+        {{ t('dashboard.last_updated') }} {{ lastUpdated() | date:'HH:mm:ss' }}
+      </span>
+    </div>
+
+    <!-- KPI summary row -->
+    <div class="kpi-grid">
+      <gravel-kpi-tile
+        [label]="t('dashboard.qc.crews_today')"
+        [value]="d.crews_assigned_today"
+        testId="kpi-crews"
+      />
+      <gravel-kpi-tile
+        [label]="t('dashboard.qc.tolerance_violations')"
+        [value]="d.tolerance_violations_today"
+        testId="kpi-tolerance-violations"
+      />
+      <gravel-kpi-tile
+        [label]="t('dashboard.qc.rotations_total')"
+        [value]="d.truck_rotations_today.total"
+        testId="kpi-rotations-total"
+      />
+      <gravel-kpi-tile
+        [label]="t('dashboard.qc.rotations_completed')"
+        [value]="d.truck_rotations_today.completed"
+        testId="kpi-rotations-completed"
+      />
+      <gravel-kpi-tile
+        [label]="t('dashboard.qc.weighing_queue')"
+        [value]="d.weighing_queue_size"
+        testId="kpi-weighing-queue"
+      />
+    </div>
+
+    <!-- Active drilling plans table -->
+    <section class="section-title">{{ t('dashboard.qc.active_plans') }}</section>
+    <div class="plans-table">
+      <table class="plans-grid" *ngIf="d.active_drilling_plans.length > 0; else noPlans">
+        <thead>
+          <tr>
+            <th>{{ t('dashboard.qc.plan_label') }}</th>
+            <th>{{ t('dashboard.qc.planned') }}</th>
+            <th>{{ t('dashboard.qc.drilled') }}</th>
+            <th>{{ t('dashboard.qc.progress') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let plan of d.active_drilling_plans" [attr.data-plan-id]="plan.id">
+            <td class="plan-label">{{ plan.label }}</td>
+            <td>{{ plan.planned }}</td>
+            <td>{{ plan.drilled }}</td>
+            <td class="progress-cell">
+              <mat-progress-bar
+                mode="determinate"
+                [value]="plan.progress_pct"
+                [color]="plan.progress_pct >= 80 ? 'primary' : 'accent'"
+              />
+              <span class="progress-pct">{{ plan.progress_pct | number:'1.0-1' }}%</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-template #noPlans>
+        <p class="empty-state">{{ t('dashboard.qc.no_active_plans') }}</p>
+      </ng-template>
+    </div>
+
+  </ng-container>
+</div>

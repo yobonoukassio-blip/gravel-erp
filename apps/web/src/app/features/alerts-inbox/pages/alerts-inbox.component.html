@@ -1,0 +1,19 @@
+<div class="alerts-shell" *transloco="let t">
+
+  <div class="toolbar">
+    <h2>{{ t('alerts.inbox.title') }}</h2>
+  </div>
+
+  <ag-grid-angular
+    class="ag-theme-material"
+    style="height: 520px; width: 100%;"
+    data-testid="alerts-grid"
+    [rowData]="rows()"
+    [columnDefs]="columnDefs"
+    [pagination]="true"
+    [paginationPageSize]="20"
+    (gridReady)="onGridReady($event)"
+    (cellClicked)="onCellClicked($event)"
+  />
+
+</div>

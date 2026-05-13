@@ -1,5 +1,6 @@
 // Force IPv4 DNS resolution globally — Railway US West resolves Supabase hostnames
 // to IPv6 addresses which are unreachable. Must run before any network call.
+// Deploy: 2026-05-13 — TYPEORM_SYNCHRONIZE=true activé sur Railway
 import { setDefaultResultOrder } from 'node:dns';
 setDefaultResultOrder('ipv4first');
 

@@ -28,7 +28,7 @@ export interface PgTestStack {
 const MIGRATIONS_DIR = path.resolve(__dirname, '..', '..', 'src', 'migrations');
 
 export async function startPostgres(): Promise<PgTestStack> {
-  const container = await new GenericContainer('postgis/postgis:18-3.5')
+  const container = await new GenericContainer('postgis/postgis:17-3.5')
     .withEnvironment({
       POSTGRES_USER: 'postgres',
       POSTGRES_PASSWORD: 'postgres',

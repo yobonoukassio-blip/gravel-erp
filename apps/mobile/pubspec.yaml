@@ -21,7 +21,7 @@ dependencies:
   powersync: ^1.9.0
   drift: ^2.20.0
   drift_sqlite_async: ^0.2.0
-  sqlite_async: ^0.10.0
+  sqlite_async: ^0.13.0
 
   # Auth — OIDC native flow (D-36)
   flutter_appauth: ^7.0.0

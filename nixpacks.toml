@@ -2,6 +2,8 @@
 # La phase build est gérée par Railway UI (Custom Build Command)
 
 [phases.install]
-# On active juste corepack — pnpm install est fait dans la phase build
-# avec NODE_ENV=development pour inclure devDeps (TypeScript, NestJS CLI...)
-cmds = ["npm install -g corepack@0.24.1 && corepack enable && corepack prepare pnpm@9.12.0 --activate"]
+# Install phase : NODE_ENV=development pour inclure devDeps (TypeScript, NestJS CLI...)
+cmds = [
+  "npm install -g corepack@0.24.1 && corepack enable",
+  "NODE_ENV=development pnpm install"
+]

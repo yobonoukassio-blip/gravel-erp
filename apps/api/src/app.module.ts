@@ -17,6 +17,7 @@ import { ProductionDashboardModule } from './modules/production-dashboard/produc
 import { OutboxModule } from './modules/outbox/outbox.module';
 import { AlertsModule } from './modules/alerts/alerts.module';
 import { RhModule } from './modules/rh/rh.module';
+import { ConcassageModule } from './modules/concassage/concassage.module';
 
 /**
  * Root application module.
@@ -66,6 +67,7 @@ import { RhModule } from './modules/rh/rh.module';
     OutboxModule,
     AlertsModule,
     RhModule,
+    ConcassageModule,
   ],
 })
 export class AppModule {}

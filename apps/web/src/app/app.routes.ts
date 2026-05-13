@@ -110,6 +110,11 @@ export const routes: Routes = [
           import('./features/rh/rh-routes').then((m) => m.RH_ROUTES),
       },
       {
+        path: 'concassage',
+        loadChildren: () =>
+          import('./features/concassage/concassage-routes').then((m) => m.CONCASSAGE_ROUTES),
+      },
+      {
         path: 'activity-log',
         canActivate: [roleGuard(['DIRECTION_GROUPE', 'DIRECTEUR_SITE'])],
         loadComponent: () =>

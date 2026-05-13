@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 03-W0-P01-PLAN.md (RH Foundations — Wave 0 blocking plan)
-last_updated: "2026-05-13T12:00:00.000Z"
+stopped_at: Completed 03-W1-P03-PLAN.md (Concassage + Criblage — CON-01, CON-02, CRI-01)
+last_updated: "2026-05-13T14:00:00.000Z"
 progress:
   total_phases: 6
   completed_phases: 2
@@ -28,10 +28,10 @@ Phase: 03 (operational-completeness) — EXECUTING
 Plan: W0-P01 of many
 
 - **Phase:** 03
-- **Plan:** W0-P01 complete (Wave 0 DONE — unblocks all Wave 1 plans)
+- **Plan:** W1-P03 complete (Wave 1 Concassage+Criblage DONE)
 - **Status:** Executing
-- **Progress:** [█████░░░░░] Phase 3 Wave 0 complete
-- **Phase 3 wave progress:** Wave 0 (1/1) ✓ ; Wave 1 (0/2) ; Wave 2 (0/2) ; Wave 3 (0/2)
+- **Progress:** [██████░░░░] Phase 3 Wave 0 + W1-P03 complete
+- **Phase 3 wave progress:** Wave 0 (1/1) ✓ ; Wave 1 (1/2 — W1-P03 ✓, W1-P02 in flight) ; Wave 2 (0/2) ; Wave 3 (0/2)
 
 ## Phase Map
 
@@ -57,6 +57,9 @@ Plan: W0-P01 of many
 
 | Decision | Status |
 |----------|--------|
+| CON/CRI sessions publish outbox event post same-tx; energy upsert post-commit (non-blocking) | ✓ Validated Phase 3 (CON-02) |
+| Compound idempotency key session_id_calibre_code for screening calibres (Pitfall 3, ADR-0013) | ✓ Validated Phase 3 (CRI-01) |
+| crusher_session_status enum reused for screening_session | ✓ Validated Phase 3 |
 | Modular monolith NestJS 11 + Node 24 | ✓ Validated Phase 1 |
 | PostgreSQL 18 + PostGIS 3.5 + TimescaleDB (en image postgis/postgis:18-3.5) | ✓ Validated Phase 1 |
 | Flutter 3.35 + PowerSync 1.9 + Drift 2.20 mobile | ✓ Validated Phase 1 |
@@ -85,6 +88,7 @@ Plan: W0-P01 of many
 | Phase 02 PW2-P05 | 60min | 5 tasks | 30 files |
 | Phase 02 PW3-P07 | 45min | 6 tasks | 35 files |
 | Phase 03 PW0-P01 | ~90min | 4 tasks | 65 files |
+| Phase 03 PW1-P03 | ~60min | 3 tasks | 25 files |
 
 ### Open TODOs
 
@@ -110,9 +114,9 @@ Plan: W0-P01 of many
 
 ## Session Continuity
 
-- **Last session:** 2026-05-13T12:00:00.000Z
-- **Stopped at:** Completed 03-W0-P01-PLAN.md (RH Foundations — Wave 0 blocking plan)
-- **Next action:** `/gsd:execute-phase 3` to continue with Wave 1 plans (W1-P02 TIR, W1-P03)
+- **Last session:** 2026-05-13T14:00:00.000Z
+- **Stopped at:** Completed 03-W1-P03-PLAN.md (Concassage + Criblage — CON-01, CON-02, CRI-01)
+- **Next action:** `/gsd:execute-phase 3` to continue with remaining Wave 1 plan (W1-P02 TIR) then Wave 2
 - **Resume file:** None
 - **Files:**
   - `.planning/PROJECT.md` — project vision + constraints

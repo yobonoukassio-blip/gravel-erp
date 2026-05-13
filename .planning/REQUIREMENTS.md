@@ -46,9 +46,9 @@ Requirements pour la première release. Chaque exigence est mappée à une phase
 - [x] **TRP-01**: Chaque rotation camion est enregistrée avec point de chargement, point de déchargement, tonnage pesé, temps de cycle
 - [x] **TRP-02**: Le pesage produit un ticket de pesée numérique avec signature ; le ticket peut être généré offline et synchronisé après
 - [x] **TRP-03**: Le dispatching affecte les camions disponibles aux rotations selon priorités définies
-- [ ] **CON-01**: Le tonnage entrant et sortant de chaque concasseur est suivi (primaire, secondaire), avec performance et heures de fonctionnement
-- [ ] **CON-02**: La consommation énergétique des concasseurs est suivie par session
-- [ ] **CRI-01**: Le criblage classe la production en calibres avec contrôle qualité et déclaration de non-conformités
+- [x] **CON-01**: Le tonnage entrant et sortant de chaque concasseur est suivi (primaire, secondaire), avec performance et heures de fonctionnement
+- [x] **CON-02**: La consommation énergétique des concasseurs est suivie par session
+- [x] **CRI-01**: Le criblage classe la production en calibres avec contrôle qualité et déclaration de non-conformités
 - [x] **STK-01**: Chaque stock (par calibre, par site, par zone) est un grand livre event-sourced ; le solde est dérivé d'événements append-only (entrée production, sortie vente, ajustement inventaire)
 - [x] **STK-02**: Des alertes se déclenchent automatiquement quand un stock franchit un seuil bas/haut configuré
 - [x] **STK-03**: Le système valorise les stocks au coût de production (moyenne pondérée) avec conversion devise
@@ -212,9 +212,9 @@ Mapping requirement ↔ phase (validé après création du roadmap).
 | TIR-05 | Phase 3 — Operational Completeness | Pending |
 | TIR-06 | Phase 3 — Operational Completeness | Pending |
 | TIR-07 | Phase 3 — Operational Completeness | Pending |
-| CON-01 | Phase 3 — Operational Completeness | Pending |
-| CON-02 | Phase 3 — Operational Completeness | Pending |
-| CRI-01 | Phase 3 — Operational Completeness | Pending |
+| CON-01 | Phase 3 — Operational Completeness | Complete (03-W1-P03) |
+| CON-02 | Phase 3 — Operational Completeness | Complete (03-W1-P03) |
+| CRI-01 | Phase 3 — Operational Completeness | Complete (03-W1-P03) |
 | MNT-01 | Phase 3 — Operational Completeness | Pending |
 | MNT-02 | Phase 3 — Operational Completeness | Pending |
 | MNT-03 | Phase 3 — Operational Completeness | Pending |

@@ -71,7 +71,14 @@ Donner à un groupe minier une visibilité temps réel consolidée sur la produc
   4. Une habilitation employé (permis explosifs, conduite engin, formation HSE) est requêtable "as-of" à une date donnée et bloque l'affectation à un poste si expirée ; les sous-traitants sont gérés comme entités first-class avec leur personnel
   5. Un bon de livraison numérique signé client/chauffeur (généré offline si nécessaire) produit une facture multi-devise avec taux FX figé du jour, lié au contrat et au transporteur ; les ventes export attachent un dossier douane par pays
   6. Le tonnage entrant/sortant des concasseurs (primaire/secondaire) et la classification calibre + non-conformités au criblage alimentent automatiquement le stockpile event-sourced
-**Plans**: TBD
+**Plans:** 7 plans across 4 waves (W0=P01, W1=P02+P03 parallel, W2=P04+P05 parallel, W3=P06+P07 parallel)
+  - [ ] 03-W0-P01-PLAN.md (Wave 0) — RH module + habilitation as-of gate + operational_day.closure_blockers + i18n 6 namespaces + Keycloak 8 roles + EventChainVerifier +2 + 5 ADR drafts (RH-01..04, HSE-04) [BLOCKING]
+  - [ ] 03-W1-P02-PLAN.md (Wave 1) — TIR module: explosives ledger append-only + detonator serial + blast plan saga + blast charge offline + reconciliation job (TIR-01..07)
+  - [ ] 03-W1-P03-PLAN.md (Wave 1) — Concassage + Criblage: crusher/screening sessions + outbox→stockpile consumers + web UI (CON-01, CON-02, CRI-01)
+  - [ ] 03-W2-P04-PLAN.md (Wave 2) — Maintenance: equipment extension + PM plans + work orders + spare parts stock + MTBF/MTTR + mobile WO form (MNT-01..05)
+  - [ ] 03-W2-P05-PLAN.md (Wave 2) — Ventes Part 1: customer + sale contract + BL offline dual-sign + STOCKPILE_OUTFLOW_SALE + customs dossier + FX snapshot (VTE-01..03, VTE-05, VTE-06)
+  - [ ] 03-W3-P06-PLAN.md (Wave 3) — Ventes Part 2: invoice generation + FX freeze + dinero.js multi-currency + pre-flight validation + invoice UI (VTE-04)
+  - [ ] 03-W3-P07-PLAN.md (Wave 3) — Dashboard extensions: MTBF/MTTR widget + TIR KPIs + VTE revenue widget + processing throughput + SSE +6 channels + ADR-0011..15 Accepted (MNT-05, DSH-02)
 **UI hint**: yes
 
 ### Phase 4: Analytics, Consolidation & Finance
@@ -116,8 +123,8 @@ Donner à un groupe minier une visibilité temps réel consolidée sur la produc
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 0/6 | Planned | - |
-| 2. Vertical Slice Production | 0/0 | Not started | - |
-| 3. Operational Completeness | 0/0 | Not started | - |
+| 2. Vertical Slice Production | 0/8 | Planned | - |
+| 3. Operational Completeness | 0/7 | Planned | - |
 | 4. Analytics, Consolidation & Finance | 0/0 | Not started | - |
 | 5. IoT Integration | 0/0 | Not started | - |
 | 6. Hardening, Scale & Multi-Country Rollout | 0/0 | Deferred (v2) | - |
@@ -138,3 +145,4 @@ Donner à un groupe minier une visibilité temps réel consolidée sur la produc
 
 ---
 *Roadmap created: 2026-05-12*
+*Last updated: 2026-05-13 — Phase 3 plans defined (7 plans, 4 waves)*

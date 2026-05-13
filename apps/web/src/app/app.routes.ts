@@ -84,6 +84,27 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'hse',
+        loadChildren: () =>
+          import('./features/hse/hse-routes').then(
+            (m) => m.HSE_ROUTES,
+          ),
+      },
+      {
+        path: 'dashboard',
+        loadChildren: () =>
+          import('./features/dashboard-site/dashboard-routes').then(
+            (m) => m.DASHBOARD_ROUTES,
+          ),
+      },
+      {
+        path: 'alerts-inbox',
+        loadChildren: () =>
+          import('./features/alerts-inbox/alerts-routes').then(
+            (m) => m.ALERTS_ROUTES,
+          ),
+      },
+      {
         path: 'activity-log',
         canActivate: [roleGuard(['DIRECTION_GROUPE', 'DIRECTEUR_SITE'])],
         loadComponent: () =>

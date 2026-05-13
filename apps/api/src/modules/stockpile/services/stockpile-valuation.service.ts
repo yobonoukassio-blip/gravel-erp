@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Optional } from '@nestjs/common';
+import { FuelCostAllocatorService } from '../../fuel/services/fuel-cost-allocator.service';
 
 export interface InflowCostInput {
   tenantId: string;
   rotationId: string;
   operationalDayId: string;
+  siteId?: string;
   /** Loaded tonnage in kg (signed bigint, positive for inflow). */
   loadedTonnageKg: bigint;
 }
@@ -33,14 +35,29 @@ export interface InflowCost {
  */
 @Injectable()
 export class StockpileValuationService {
-  async computeInflowCost(_input: InflowCostInput): Promise<InflowCost> {
-    // Phase 2 stub — final wiring lands W3-P06 fuel module.
-    // Returning XOF (UEMOA default currency) with zero cost keeps the
-    // projection math well-defined while real attribution is unwired.
-    return Promise.resolve({
-      costPerTonMinorUnits: 0n,
-      currency: 'XOF',
+  constructor(
+    @Optional()
+    @Inject(FuelCostAllocatorService)
+    private readonly fuelAllocator?: FuelCostAllocatorService,
+  ) {}
+
+  async computeInflowCost(input: InflowCostInput): Promise<InflowCost> {
+    // W3-P06 wiring: delegate to FuelCostAllocatorService when wired
+    // (FuelModule imports). Falls back to XOF/0 when running in test
+    // contexts that do not provide the fuel module.
+    if (!this.fuelAllocator) {
+      return { costPerTonMinorUnits: 0n, currency: 'XOF' };
+    }
+    const result = await this.fuelAllocator.allocateFuelCostForOperationalDay({
+      tenantId: input.tenantId,
+      siteId: input.siteId ?? '',
+      operationalDayId: input.operationalDayId,
+      tonnageKg: input.loadedTonnageKg,
     });
+    return {
+      costPerTonMinorUnits: result.costPerTonMinorUnits,
+      currency: result.currency,
+    };
   }
 
   /**

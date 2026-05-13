@@ -55,9 +55,9 @@ Donner à un groupe minier une visibilité temps réel consolidée sur la produc
   - [x] 02-W1-P03-PLAN.md (Wave 1) — Extraction backend + web + mobile (EXT-01, EXT-02)
   - [x] 02-W2-P04-PLAN.md (Wave 2) — Transport + Pesage (TRP-01..03) + ADR-0009
   - [x] 02-W2-P05-PLAN.md (Wave 2) — Stockpile event-sourced + chain-of-hash + outbox consumer (STK-01..03) + ADR-0006
-  - [ ] 02-W3-P06-PLAN.md (Wave 3) — Carburant + Énergie (CAR-01..04) + ADR-0007
-  - [ ] 02-W3-P07-PLAN.md (Wave 3) — HSE (HSE-01, HSE-02, HSE-06 + deferred stubs HSE-03/04/05) + ADR-0008
-  - [ ] 02-W3-P08-PLAN.md (Wave 3) — Dashboards + Alertes + SSE (DSH-01, DSH-02) + ADR-0010
+  - [x] 02-W3-P06-PLAN.md (Wave 3) — Carburant + Énergie (CAR-01..04) + ADR-0007
+  - [x] 02-W3-P07-PLAN.md (Wave 3) — HSE (HSE-01, HSE-02, HSE-06 + deferred stubs HSE-03/04/05) + ADR-0008
+  - [x] 02-W3-P08-PLAN.md (Wave 3) — Dashboards + Alertes + SSE (DSH-01, DSH-02) + ADR-0010
 **UI hint**: yes
 
 ### Phase 3: Operational Completeness

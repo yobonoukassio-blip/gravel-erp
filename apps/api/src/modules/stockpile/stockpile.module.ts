@@ -14,6 +14,7 @@ import { StockpileController } from './controllers/stockpile.controller';
 import { RotationCompletedHandler } from './event-handlers/rotation-completed.handler';
 import { BalanceProjectionHandler } from './event-handlers/balance-projection.handler';
 import { BalanceRecomputeJob } from './jobs/balance-recompute.job';
+import { FuelModule } from '../fuel/fuel.module';
 
 /**
  * StockpileModule (Phase 2 W2 P05).
@@ -32,6 +33,7 @@ import { BalanceRecomputeJob } from './jobs/balance-recompute.job';
     TypeOrmModule.forFeature([Stockpile, StockpileEvent, StockpileBalance, StockpileThreshold]),
     EventEmitterModule,
     ScheduleModule.forRoot(),
+    FuelModule,
   ],
   controllers: [StockpileController],
   providers: [

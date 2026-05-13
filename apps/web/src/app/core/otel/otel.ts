@@ -32,7 +32,10 @@ export function startWebOtel(): void {
   started = true;
 
   const endpoint =
-    environment.otelEndpoint ?? 'http://otel-collector.observability:4318';
+    environment.otelEndpoint || 'http://otel-collector.observability:4318';
+
+  // Skip OTel if endpoint is still the placeholder (relative URL would crash).
+  if (!endpoint.startsWith('http')) return;
 
   const provider = new WebTracerProvider({
     resource: new Resource({

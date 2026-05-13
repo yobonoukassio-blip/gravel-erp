@@ -19,6 +19,10 @@ import { AlertsModule } from './modules/alerts/alerts.module';
 import { RhModule } from './modules/rh/rh.module';
 import { TirModule } from './modules/tir/tir.module';
 import { ConcassageModule } from './modules/concassage/concassage.module';
+import { MaintenanceModule } from './modules/maintenance/maintenance.module';
+import { VentesModule } from './modules/ventes/ventes.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { IotModule } from './modules/iot/iot.module';
 
 /**
  * Root application module.
@@ -70,6 +74,10 @@ import { ConcassageModule } from './modules/concassage/concassage.module';
     RhModule,
     TirModule,
     ConcassageModule,
+    MaintenanceModule,
+    VentesModule,
+    AnalyticsModule,
+    IotModule,
   ],
 })
 export class AppModule {}

@@ -81,6 +81,7 @@ export class SiteDirectorDashboardComponent implements OnInit, OnDestroy {
   private readonly sseClient = inject(SseClientService);
 
   readonly loading = signal(true);
+  readonly apiError = signal<string | null>(null);
   readonly dashboard = signal<SiteDirectorDashboardPayload | null>(null);
   readonly lastUpdated = signal<Date | null>(null);
 
@@ -114,9 +115,10 @@ export class SiteDirectorDashboardComponent implements OnInit, OnDestroy {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = (await res.json()) as SiteDirectorDashboardPayload;
       this.dashboard.set(data);
+      this.apiError.set(null);
       this.lastUpdated.set(new Date());
-    } catch {
-      // Keep previous data; error logged server-side
+    } catch (err) {
+      this.apiError.set((err as Error).message ?? 'Erreur réseau');
     } finally {
       this.loading.set(false);
     }

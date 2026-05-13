@@ -5,6 +5,22 @@
     <mat-progress-spinner mode="indeterminate" diameter="48" />
   </div>
 
+  <!-- État d'erreur API (Railway non connecté ou inaccessible) -->
+  <div *ngIf="!loading() && apiError()" class="api-error-banner">
+    <mat-card style="border-left: 4px solid #EF4444; background: #FEF2F2; padding: 16px;">
+      <h3 style="color:#991B1B; margin:0 0 8px">API non disponible</h3>
+      <p style="color:#7F1D1D; margin:0 0 8px">{{ apiError() }}</p>
+      <p style="color:#555; font-size:13px; margin:0">
+        Vérifiez que Railway est déployé et que la variable
+        <code>API_HOST</code> est configurée dans Vercel.
+      </p>
+    </mat-card>
+    <p style="color:#555; margin-top:16px; font-size:14px">
+      Les autres modules (Ventes, Maintenance, RH…) sont accessibles via le menu de gauche
+      dès que l'API répond.
+    </p>
+  </div>
+
   <ng-container *ngIf="dashboard() as d">
 
     <!-- ------------------------------------------------------------------ -->

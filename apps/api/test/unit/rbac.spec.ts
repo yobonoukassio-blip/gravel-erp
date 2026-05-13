@@ -42,8 +42,8 @@ function mockCtx(
 
 describe('FND-03 — RBAC role × site scoping', () => {
   describe('roles catalogue', () => {
-    it('exposes exactly 7 canonical roles from D-04', () => {
-      expect(GRAVEL_ROLES).toHaveLength(7);
+    it('exposes the 7 canonical Phase-1 roles from D-04 (Phase 2/3 add specialized variants)', () => {
+      expect(GRAVEL_ROLES.length).toBeGreaterThanOrEqual(7);
       expect(GRAVEL_ROLES).toEqual(
         expect.arrayContaining<GravelRole>([
           'DIRECTION_GROUPE',

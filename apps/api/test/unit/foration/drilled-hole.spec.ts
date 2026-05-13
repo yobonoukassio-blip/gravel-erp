@@ -154,7 +154,7 @@ describe('DrilledHoleService.append (FOR-02)', () => {
   it('rejects out-of-tolerance hole without reason text', async () => {
     await expect(
       service.append(makeInput({ actualDepthM: 16, holeIndexInPlan: 2 })),
-    ).rejects.toThrow(/TOLERANCE_REASON_REQUIRED/);
+    ).rejects.toMatchObject({ response: { code: 'TOLERANCE_REASON_REQUIRED' } });
   });
 
   it('stores out-of-tolerance hole with tolerance_violation=true when reason provided', async () => {
@@ -173,9 +173,9 @@ describe('DrilledHoleService.append (FOR-02)', () => {
     const plan = await planRepo.findOne({ where: { id: planId } });
     plan!.status = 'draft';
     await planRepo.save(plan!);
-    await expect(service.append(makeInput())).rejects.toThrow(
-      /PLAN_NOT_ACTIVE/,
-    );
+    await expect(service.append(makeInput())).rejects.toMatchObject({
+      response: { code: 'PLAN_NOT_ACTIVE' },
+    });
   });
 
   it('rejects append on missing plan', async () => {

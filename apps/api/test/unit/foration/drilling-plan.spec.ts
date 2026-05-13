@@ -171,7 +171,7 @@ describe('DrillingPlanService (FOR-01, FOR-05)', () => {
     const plan = await service.create(baseInput());
     await expect(
       service.closePlan(plan.id, tenantId, userId, true),
-    ).rejects.toThrow(/INVALID_STATUS_TRANSITION/);
+    ).rejects.toMatchObject({ response: { code: 'INVALID_STATUS_TRANSITION' } });
   });
 
   it('archive transitions closed → archived', async () => {

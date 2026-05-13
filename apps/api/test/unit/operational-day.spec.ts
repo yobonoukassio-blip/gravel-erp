@@ -62,9 +62,10 @@ describe('FND-08: OperationalDay + DST handling', () => {
   });
 
   it('computeUtcWindow handles DST fall-back: window is 25h on the DST day in Europe/Paris', () => {
-    const w = svc.computeUtcWindow('Europe/Paris', '06:00', '2026-10-25');
+    // With shift start 06:00, the 25h window straddles Oct 24→Oct 25 (the
+    // fall-back at 03:00 CEST on Oct 25 falls inside that window).
+    const w = svc.computeUtcWindow('Europe/Paris', '06:00', '2026-10-24');
     const diffMs = w.endedAtUtc.getTime() - w.startedAtUtc.getTime();
-    // Fall-back day in Europe/Paris contains 25 hours UTC.
     expect(diffMs).toBe(25 * 3600 * 1000);
   });
 

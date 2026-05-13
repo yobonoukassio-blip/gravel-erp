@@ -21,12 +21,20 @@ class I18nService extends StateNotifier<Locale> {
   /// Setter used by the settings screen. Persists locally and to the API.
   Future<void> setLocale(Locale next) async {
     state = next;
-    final tag = next.languageCode == 'en' ? 'en-CI' : 'fr-CI';
+    const tagMap = {'en': 'en-CI', 'fr': 'fr-CI', 'ar': 'ar'};
+    final tag = tagMap[next.languageCode] ?? 'fr-CI';
     await _dio.put(
       '/api/users/me/preferences',
       data: {'key': 'locale', 'value': tag},
     );
   }
+
+  /// Supported locales — FR, EN, AR only (no local CI languages per project decision).
+  static const List<Locale> supportedLocales = [
+    Locale('fr'),
+    Locale('en'),
+    Locale('ar'),
+  ];
 }
 
 /// Riverpod provider — overridden in tests with a mock Dio.

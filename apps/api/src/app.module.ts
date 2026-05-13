@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClsModule } from 'nestjs-cls';
 import { HealthModule } from './modules/health/health.module';
 import { SyncModule } from './modules/sync/sync.module';
@@ -13,6 +14,8 @@ import { StockpileModule } from './modules/stockpile/stockpile.module';
 import { FuelModule } from './modules/fuel/fuel.module';
 import { HseModule } from './modules/hse/hse.module';
 import { ProductionDashboardModule } from './modules/production-dashboard/production-dashboard.module';
+import { OutboxModule } from './modules/outbox/outbox.module';
+import { AlertsModule } from './modules/alerts/alerts.module';
 
 /**
  * Root application module.
@@ -31,6 +34,18 @@ import { ProductionDashboardModule } from './modules/production-dashboard/produc
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (cfg: ConfigService) => ({
+        type: 'postgres',
+        url: cfg.getOrThrow<string>('DATABASE_URL'),
+        autoLoadEntities: true,
+        // synchronize=true only in dev — auto-creates tables from entities
+        synchronize: cfg.get('NODE_ENV') !== 'production',
+        logging: cfg.get('TYPEORM_LOGGING') === 'true',
+        extra: { application_name: 'gravel-api' },
+      }),
+    }),
     ClsModule.forRoot({
       global: true,
       middleware: { mount: true },
@@ -47,6 +62,8 @@ import { ProductionDashboardModule } from './modules/production-dashboard/produc
     FuelModule,
     HseModule,
     ProductionDashboardModule,
+    OutboxModule,
+    AlertsModule,
   ],
 })
 export class AppModule {}

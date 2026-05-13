@@ -46,6 +46,7 @@ export interface SiteDirectorDashboard {
   stockpiles: StockpileSummary[];
   equipment_out_of_service: EquipmentOutOfService[];
   cost_per_ton_provisional: CostPerTonProvisionalResult;
+  downtime_today_minutes: number;
 }
 
 export interface ActiveDrillingPlan {
@@ -106,6 +107,7 @@ export class DashboardAggregatorService {
       stockpiles,
       outOfService,
       costPerTonProv,
+      downtimeMinutes,
     ] = await Promise.all([
       this.fetchTonnages(tenantId, siteId, operationalDayId),
       this.fetchDrillingYield(tenantId, siteId, operationalDayId),
@@ -116,6 +118,7 @@ export class DashboardAggregatorService {
       this.fetchStockpiles(tenantId, siteId),
       this.fetchEquipmentOutOfService(tenantId, siteId),
       this.costPerTon.compute(tenantId, siteId, operationalDayId),
+      this.fetchDowntimeMinutes(tenantId, siteId, operationalDayId),
     ]);
 
     return {
@@ -128,6 +131,7 @@ export class DashboardAggregatorService {
       stockpiles,
       equipment_out_of_service: outOfService,
       cost_per_ton_provisional: costPerTonProv,
+      downtime_today_minutes: downtimeMinutes,
     };
   }
 
@@ -246,6 +250,20 @@ export class DashboardAggregatorService {
     // siteId used for future multi-site join; mark used
     void siteId;
     return Math.round((rows[0]?.avg_yield ?? 0) * 100) / 100;
+  }
+
+  private async fetchDowntimeMinutes(
+    tenantId: string,
+    siteId: string,
+    operationalDayId: string,
+  ): Promise<number> {
+    const rows = (await this.ds.query(
+      `SELECT COALESCE(SUM(downtime_minutes), 0)::int AS total
+       FROM extraction_cycle
+       WHERE tenant_id = $1 AND site_id = $2 AND operational_day_id = $3`,
+      [tenantId, siteId, operationalDayId],
+    )) as Array<{ total: number }>;
+    return rows[0]?.total ?? 0;
   }
 
   private async fetchExtractionYield(

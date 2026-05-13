@@ -35,6 +35,9 @@ import { environment } from '../../environments/environment';
       <button mat-menu-item type="button" (click)="set('en')">
         {{ 'common.locale.en' | transloco }}
       </button>
+      <button mat-menu-item type="button" (click)="set('ar')">
+        {{ 'common.locale.ar' | transloco }}
+      </button>
     </mat-menu>
   `,
 })
@@ -46,13 +49,15 @@ export class LocaleSwitcherComponent {
     return this.transloco.getActiveLang();
   }
 
-  async set(lang: 'fr' | 'en'): Promise<void> {
+  async set(lang: 'fr' | 'en' | 'ar'): Promise<void> {
     this.transloco.setActiveLang(lang);
-    const value = lang === 'fr' ? 'fr-CI' : 'en-CI';
+    // RTL support: toggle dir attribute on document root for Arabic
+    document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+    const localeMap: Record<string, string> = { fr: 'fr-CI', en: 'en-CI', ar: 'ar' };
     await firstValueFrom(
       this.http.put(`${environment.apiBaseUrl}/api/users/me/preferences`, {
         key: 'locale',
-        value,
+        value: localeMap[lang],
       }),
     );
   }

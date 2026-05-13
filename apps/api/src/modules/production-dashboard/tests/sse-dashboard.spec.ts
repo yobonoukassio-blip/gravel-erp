@@ -39,7 +39,7 @@ describe('SseBroadcasterService', () => {
     expect(chunk).toMatch(/^id: 1\n/);
     expect(chunk).toContain('data: ');
     expect(chunk).toContain('kpi.delta');
-    expect(chunk).toEndWith('\n\n');
+    expect(chunk).toMatch(/\n\n$/);
   });
 
   it('broadcasts to multiple subscribers on same channel', () => {

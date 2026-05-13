@@ -9,7 +9,7 @@
 
 import { createHash, randomUUID } from 'crypto';
 import { GENESIS_PREV_HASH, sha256, buildHseIncidentCanonicalPayload } from '../services/hse-incident.service';
-import { verifyChain } from '../../../../common/chain-of-hash/event-chain.verifier';
+import { verifyChain } from '../../../common/chain-of-hash/event-chain.verifier';
 
 type ChainRow = {
   id: string;

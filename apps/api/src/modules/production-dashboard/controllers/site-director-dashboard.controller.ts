@@ -5,6 +5,7 @@ import { SseBroadcasterService } from '../services/sse-broadcaster.service';
 
 interface AuthedRequest {
   user: { sub: string; tenantId: string; siteId?: string };
+  on?: (event: string, listener: () => void) => void;
 }
 
 /**

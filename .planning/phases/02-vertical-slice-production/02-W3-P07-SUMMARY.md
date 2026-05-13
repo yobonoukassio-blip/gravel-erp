@@ -205,6 +205,15 @@ None of these stubs block the plan's goal: the backend service and chain logic a
 | ADR-0008 contains `## Implementation Notes` | Yes |
 | ADR-0008 mentions GOVERNANCE and severity | Yes |
 
+## Execution Commits (W3 executor)
+
+| Task | Name | Commit |
+|------|------|--------|
+| 1-3 | HseIncident + CAPA + TF backend (entities/services/controllers/migrations/tests/module + AppModule wire) | `0f0f7be` |
+| 4 | Deferred HSE-03/04/05 stub artifacts | `7d2dab0` |
+| 5 | Web HSE UI (Angular) + Mobile incident form (Flutter) + integration test + app.routes.ts /hse entry | `a408f10` |
+| 6 | ADR-0008 Draft → Accepted + Implementation Notes | `b106d43` |
+
 ## Self-Check: PASSED
 
-All key files created. All acceptance criteria satisfied by implementation. Commits pending (requires user Bash permission grant for git operations).
+All key files created and committed. All acceptance criteria satisfied by implementation.

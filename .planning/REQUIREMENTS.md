@@ -72,10 +72,10 @@ Requirements pour la première release. Chaque exigence est mappée à une phase
 
 - [x] **HSE-01**: Tout incident/accident est saisi en append-only avec chaîne de hash, photos en object storage immuable, chronologie, gravité, personnes/équipements impactés
 - [x] **HSE-02**: Un workflow d'actions correctives est créé pour chaque incident et suivi jusqu'à clôture
-- [ ] **HSE-03**: Les EPI sont gérés par employé (attributions, états, retours) avec contrôle de validité
-- [ ] **HSE-04**: Les habilitations (formation sécurité, permis explosifs, conduite engins) sont temporelles ("as-of") avec date d'obtention et date d'expiration
-- [ ] **HSE-05**: Un audit sécurité périodique est planifié, exécuté avec checklist, et clôturé avec rapport
-- [ ] **HSE-06**: Le KPI taux de fréquence des accidents (TF) est calculé en temps réel par site et consolidé groupe
+- [ ] **HSE-03**: Les EPI sont gérés par employé (attributions, états, retours) avec contrôle de validité *(DEFERRED Phase 3 — stub artifact in docs/phase-03-handoff/hse-rh-deferred-scope.md)*
+- [ ] **HSE-04**: Les habilitations (formation sécurité, permis explosifs, conduite engins) sont temporelles ("as-of") avec date d'obtention et date d'expiration *(DEFERRED Phase 3 — stub artifact in docs/phase-03-handoff/hse-rh-deferred-scope.md)*
+- [ ] **HSE-05**: Un audit sécurité périodique est planifié, exécuté avec checklist, et clôturé avec rapport *(DEFERRED Phase 3 — stub artifact in docs/phase-03-handoff/hse-rh-deferred-scope.md)*
+- [x] **HSE-06**: Le KPI taux de fréquence des accidents (TF) est calculé en temps réel par site et consolidé groupe
 
 ### RH (light)
 
@@ -199,10 +199,10 @@ Mapping requirement ↔ phase (validé après création du roadmap).
 | CAR-04 | Phase 2 — Vertical Slice Production | Pending |
 | HSE-01 | Phase 2 — Vertical Slice Production | Complete |
 | HSE-02 | Phase 2 — Vertical Slice Production | Complete |
-| HSE-03 | Phase 2 — Vertical Slice Production | Pending |
-| HSE-04 | Phase 2 — Vertical Slice Production | Pending |
-| HSE-05 | Phase 2 — Vertical Slice Production | Pending |
-| HSE-06 | Phase 2 — Vertical Slice Production | Pending |
+| HSE-03 | Phase 3 — RH module (DEFERRED) | Deferred — stub in docs/phase-03-handoff/hse-rh-deferred-scope.md |
+| HSE-04 | Phase 3 — RH module (DEFERRED) | Deferred — stub in docs/phase-03-handoff/hse-rh-deferred-scope.md |
+| HSE-05 | Phase 3 — Audit module (DEFERRED) | Deferred — stub in docs/phase-03-handoff/hse-rh-deferred-scope.md |
+| HSE-06 | Phase 2 — Vertical Slice Production | Complete |
 | DSH-01 | Phase 2 — Vertical Slice Production | Complete |
 | DSH-02 | Phase 2 — Vertical Slice Production | Pending |
 | TIR-01 | Phase 3 — Operational Completeness | Pending |

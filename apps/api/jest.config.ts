@@ -32,7 +32,6 @@ const config: Config = {
       moduleNameMapper: {
         '^@gravel/shared-types$': '<rootDir>/../../packages/shared-types/src/index.ts',
       },
-      testTimeout: 60000,
     },
     {
       displayName: 'security',
@@ -43,7 +42,6 @@ const config: Config = {
       moduleNameMapper: {
         '^@gravel/shared-types$': '<rootDir>/../../packages/shared-types/src/index.ts',
       },
-      testTimeout: 120000,
     },
     {
       displayName: 'chaos',
@@ -54,9 +52,9 @@ const config: Config = {
       moduleNameMapper: {
         '^@gravel/shared-types$': '<rootDir>/../../packages/shared-types/src/index.ts',
       },
-      testTimeout: 120000,
     },
   ],
+  testTimeout: 120000,
   verbose: true,
 };
 

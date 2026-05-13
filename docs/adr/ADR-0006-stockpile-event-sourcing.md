@@ -2,7 +2,8 @@
 
 ## Status
 
-Draft — to be refined in Wave 2 (stockpile module). Date: 2026-05-12. Authors: Phase 2 planner.
+Accepted — refined and implemented in Phase 2 W2 P05 (2026-05-12).
+Original draft: W0-P01. Authors: Phase 2 planner + W2 implementor.
 
 ## Context
 

@@ -77,6 +77,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'stockpile',
+        loadChildren: () =>
+          import('./features/stockpile/stockpile-routes').then(
+            (m) => m.STOCKPILE_ROUTES,
+          ),
+      },
+      {
         path: 'activity-log',
         canActivate: [roleGuard(['DIRECTION_GROUPE', 'DIRECTEUR_SITE'])],
         loadComponent: () =>

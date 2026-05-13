@@ -27,6 +27,7 @@
     "@nestjs/passport": "^11.0.0",
     "@nestjs/terminus": "^11.0.0",
     "@nestjs/event-emitter": "^3.0.0",
+    "@nestjs/schedule": "^5.0.0",
     "jsonwebtoken": "^9.0.2",
     "nestjs-cls": "^5.0.0",
     "nestjs-pino": "^4.1.0",

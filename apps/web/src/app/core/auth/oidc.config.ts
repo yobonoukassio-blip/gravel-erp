@@ -23,7 +23,5 @@ export const oidcConfig: OpenIdConfiguration = {
   ignoreNonceAfterRefresh: true,
   secureRoutes: ['/api'],
   silentRenew: false,
-  // Prevent eager fetch of OIDC discovery doc on startup (allows mockAuth mode).
-  eagerLoadAuthWellKnownEndpoints: false,
   logLevel: environment.production ? 3 : 1, // 1=debug, 3=warn
 };

@@ -1,0 +1,15 @@
+{
+  "crusher_session": "جلسة التكسير",
+  "crusher": "كسارة",
+  "input_tonnage": "طنّاج الإدخال",
+  "output_tonnage": "طنّاج الإخراج",
+  "performance_pct": "الأداء (%)",
+  "energy_kwh": "الطاقة (كيلوواط/ساعة)",
+  "session_start": "بداية الجلسة",
+  "session_end": "نهاية الجلسة",
+  "operating_hours": "ساعات التشغيل",
+  "crusher_not_found": "الكسارة غير موجودة",
+  "session_not_found": "جلسة التكسير غير موجودة",
+  "session_in_progress": "جلسة جارية",
+  "no_active_session": "لا توجد جلسة نشطة"
+}

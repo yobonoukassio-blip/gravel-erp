@@ -1,0 +1,18 @@
+{
+  "screening_session": "Session de criblage",
+  "screen": "Crible",
+  "calibre_yield": "Rendement par calibre",
+  "is_nonconforming": "Non conforme",
+  "nonconformity_reason": "Motif de non-conformité",
+  "calibre_code": "Code calibre",
+  "session_start": "Début de session",
+  "session_end": "Fin de session",
+  "calibre_0_5": "0-5 mm",
+  "calibre_5_15": "5-15 mm",
+  "calibre_15_25": "15-25 mm",
+  "calibre_25_plus": "25 mm et plus",
+  "granulometry": "Granulométrie",
+  "fine_content_pct": "Teneur en fines (%)",
+  "screen_not_found": "Crible introuvable",
+  "session_not_found": "Session de criblage introuvable"
+}

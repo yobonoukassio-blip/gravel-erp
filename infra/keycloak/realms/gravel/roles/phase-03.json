@@ -1,0 +1,53 @@
+[
+  {
+    "name": "TIR_OPERATOR",
+    "description": "Blast field operator. Can enter blast_charge events and scan detonator serials (D3-21). Site-scoped via Keycloak group. Requires PERMIS_EXPLOSIFS habilitation checked via RhHabilitationService.isValidAt at blast loading time.",
+    "composite": false,
+    "clientRole": false
+  },
+  {
+    "name": "TIR_SUPERVISOR",
+    "description": "Blast supervisor. Can create and request-fire blast_plan, validate HSE clearance (D3-22). Composite: includes TIR_OPERATOR privileges. Site-scoped.",
+    "composite": true,
+    "composites": {
+      "realm": ["TIR_OPERATOR"]
+    },
+    "clientRole": false
+  },
+  {
+    "name": "HR_MANAGER",
+    "description": "HR manager. Full CRUD on employees, certifications, shift rosters (RH-01, RH-02, RH-03, RH-04). Tenant-scoped (not site-scoped — can see all sites within the tenant).",
+    "composite": false,
+    "clientRole": false
+  },
+  {
+    "name": "SHIFT_SUPERVISOR",
+    "description": "Shift supervisor. Can record shift_entry for their site only (RH-02). Site-scoped via Keycloak group.",
+    "composite": false,
+    "clientRole": false
+  },
+  {
+    "name": "PROCESSING_OPERATOR",
+    "description": "Processing operator. Can open and close crusher_session and screening_session (CON-01, CRI-01). Site-scoped.",
+    "composite": false,
+    "clientRole": false
+  },
+  {
+    "name": "SALES_MANAGER",
+    "description": "Sales manager. Full CRUD on customers, contracts; can generate invoices and bon de livraison (VTE-01, VTE-02). Tenant-scoped.",
+    "composite": false,
+    "clientRole": false
+  },
+  {
+    "name": "FINANCE_OFFICER",
+    "description": "Finance officer. Can enter FX rates and trigger invoice batch processing (VTE-03, FIN-01). Tenant-scoped.",
+    "composite": false,
+    "clientRole": false
+  },
+  {
+    "name": "MAINTENANCE_TECH",
+    "description": "Maintenance technician. Can open/close work_orders, record spare part consumption (MNT-01, MNT-02). Site-scoped. Requires FORMATION_HSE habilitation for hazardous equipment.",
+    "composite": false,
+    "clientRole": false
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "crusher_session": "Crusher session",
+  "crusher": "Crusher",
+  "input_tonnage": "Input tonnage",
+  "output_tonnage": "Output tonnage",
+  "performance_pct": "Performance (%)",
+  "energy_kwh": "Energy (kWh)",
+  "session_start": "Session start",
+  "session_end": "Session end",
+  "operating_hours": "Operating hours",
+  "crusher_not_found": "Crusher not found",
+  "session_not_found": "Crusher session not found",
+  "session_in_progress": "Session in progress",
+  "no_active_session": "No active session"
+}

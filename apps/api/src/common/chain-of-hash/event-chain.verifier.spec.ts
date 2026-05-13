@@ -1,4 +1,4 @@
-import { computeRowHash, GENESIS_PREV_HASH, verifyChain } from './event-chain.verifier';
+import { computeRowHash, GENESIS_PREV_HASH, verifyChain, EventChainVerifier } from './event-chain.verifier';
 import { randomUUID } from 'crypto';
 
 /**
@@ -120,5 +120,41 @@ describe('EventChainVerifier (pure-TS, in-memory)', () => {
       expect(result.brokenAt?.id).toBe(rows[31].id);
       expect(result.brokenAt?.reason).toBe('phantom_event_inserted');
     });
+  });
+});
+
+/**
+ * Phase 3 W0-P01: Verify that explosives_event and blast_report are registered
+ * in CANONICAL_PAYLOAD_SQL (required by TIR W1-P02).
+ */
+describe('EventChainVerifier — Phase 3 table registrations', () => {
+  it('includes explosives_event in CANONICAL_PAYLOAD_SQL', () => {
+    const mockDs = {
+      query: jest.fn().mockImplementation((sql: string) => {
+        if (sql.includes('information_schema')) {
+          return Promise.resolve([{ exists: false }]);
+        }
+        return Promise.resolve([]);
+      }),
+    };
+    const verifier = new EventChainVerifier(mockDs as never);
+    return expect(
+      verifier.verifyChain('explosives_event', 'tenant-1'),
+    ).resolves.toMatchObject({ valid: true, eventsChecked: 0 });
+  });
+
+  it('includes blast_report in CANONICAL_PAYLOAD_SQL', () => {
+    const mockDs = {
+      query: jest.fn().mockImplementation((sql: string) => {
+        if (sql.includes('information_schema')) {
+          return Promise.resolve([{ exists: false }]);
+        }
+        return Promise.resolve([]);
+      }),
+    };
+    const verifier = new EventChainVerifier(mockDs as never);
+    return expect(
+      verifier.verifyChain('blast_report', 'tenant-1'),
+    ).resolves.toMatchObject({ valid: true, eventsChecked: 0 });
   });
 });

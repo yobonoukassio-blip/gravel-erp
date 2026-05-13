@@ -1,0 +1,18 @@
+{
+  "screening_session": "Screening session",
+  "screen": "Screen",
+  "calibre_yield": "Yield per calibre",
+  "is_nonconforming": "Non-conforming",
+  "nonconformity_reason": "Non-conformity reason",
+  "calibre_code": "Calibre code",
+  "session_start": "Session start",
+  "session_end": "Session end",
+  "calibre_0_5": "0-5 mm",
+  "calibre_5_15": "5-15 mm",
+  "calibre_15_25": "15-25 mm",
+  "calibre_25_plus": "25 mm and above",
+  "granulometry": "Granulometry",
+  "fine_content_pct": "Fine content (%)",
+  "screen_not_found": "Screen not found",
+  "session_not_found": "Screening session not found"
+}

@@ -23,7 +23,12 @@ import { DataSource } from 'typeorm';
  * authenticated request (CLS) — RLS would also enforce it, but the verifier
  * executes directly via `ds.query` so we filter explicitly.
  */
-export type ChainTableName = 'stockpile_event' | 'fuel_tank_event' | 'hse_incident';
+export type ChainTableName =
+  | 'stockpile_event'
+  | 'fuel_tank_event'
+  | 'hse_incident'
+  | 'explosives_event'
+  | 'blast_report';
 
 export interface ChainBrokenAt {
   id: string;
@@ -46,6 +51,16 @@ export interface VerifyChainOptions {
   /** Restrict verification to events at or after this instant. */
   since?: Date;
 }
+
+/**
+ * Phase 3 callers: `explosives_event`, `blast_report` (W1-P02).
+ * These tables will be created by TIR W1-P02; the verifier pre-registers them
+ * here so Wave 1 can simply append rows without touching this file.
+ * If a table does not yet exist, verifyChain returns { valid: true, eventsChecked: 0 }.
+ *
+ * CANONICAL PAYLOAD FIELD ORDER IS FROZEN — changing it breaks chain verification
+ * for existing rows. See ADR-0012-tir-blast-plan-saga.md.
+ */
 
 /** 32 zero bytes — genesis sentinel. */
 export const GENESIS_PREV_HASH: Buffer = Buffer.alloc(32, 0);
@@ -74,6 +89,31 @@ export function computeRowHash(prevHash: Buffer, canonicalPayload: Buffer): Buff
  * eventsChecked: 0 }` (caller can treat as "no events to verify yet").
  */
 const CANONICAL_PAYLOAD_SQL: Readonly<Record<ChainTableName, string>> = Object.freeze({
+  explosives_event: `
+    convert_to(
+      jsonb_build_object(
+        'event_type', event_type,
+        'product_type', product_type,
+        'quantity_g', quantity_g::text,
+        'site_id', site_id::text,
+        'occurred_at_utc', occurred_at_utc::text,
+        'source_reference', source_reference
+      )::text,
+      'UTF8'
+    )
+  `,
+  blast_report: `
+    convert_to(
+      jsonb_build_object(
+        'blast_plan_id', blast_plan_id::text,
+        'fragmentation_obs', fragmentation_obs,
+        'vibration_mm_s', vibration_mm_s::text,
+        'incident_ids', incident_ids,
+        'occurred_at_utc', occurred_at_utc::text
+      )::text,
+      'UTF8'
+    )
+  `,
   stockpile_event: `
     convert_to(
       jsonb_build_object(

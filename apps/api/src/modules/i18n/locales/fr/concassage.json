@@ -1,0 +1,15 @@
+{
+  "crusher_session": "Session de concassage",
+  "crusher": "Concasseur",
+  "input_tonnage": "Tonnage entrant",
+  "output_tonnage": "Tonnage sortant",
+  "performance_pct": "Performance (%)",
+  "energy_kwh": "Énergie (kWh)",
+  "session_start": "Début de session",
+  "session_end": "Fin de session",
+  "operating_hours": "Heures de fonctionnement",
+  "crusher_not_found": "Concasseur introuvable",
+  "session_not_found": "Session de concassage introuvable",
+  "session_in_progress": "Session en cours",
+  "no_active_session": "Aucune session active"
+}

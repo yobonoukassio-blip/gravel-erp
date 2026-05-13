@@ -1,0 +1,18 @@
+{
+  "screening_session": "جلسة الغربلة",
+  "screen": "منخل",
+  "calibre_yield": "مردود كل معيار",
+  "is_nonconforming": "غير مطابق",
+  "nonconformity_reason": "سبب عدم المطابقة",
+  "calibre_code": "رمز المعيار",
+  "session_start": "بداية الجلسة",
+  "session_end": "نهاية الجلسة",
+  "calibre_0_5": "0-5 ملم",
+  "calibre_5_15": "5-15 ملم",
+  "calibre_15_25": "15-25 ملم",
+  "calibre_25_plus": "25 ملم وما فوق",
+  "granulometry": "الحبيبية",
+  "fine_content_pct": "نسبة المواد الناعمة (%)",
+  "screen_not_found": "المنخل غير موجود",
+  "session_not_found": "جلسة الغربلة غير موجودة"
+}

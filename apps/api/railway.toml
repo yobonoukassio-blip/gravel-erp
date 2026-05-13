@@ -8,6 +8,6 @@ buildCommand = "cd ../.. && pnpm install --frozen-lockfile && pnpm --filter @gra
 [deploy]
 startCommand = "node dist/src/main.js"
 healthcheckPath = "/health/live"
-healthcheckTimeout = 30
+healthcheckTimeout = 120
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3

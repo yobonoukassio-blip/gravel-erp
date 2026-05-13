@@ -17,7 +17,7 @@ async function bootstrap(): Promise<void> {
       transform: true,
     }),
   );
-  app.setGlobalPrefix('api', { exclude: ['health/live', 'health/ready', 'health/metrics'] });
+  app.setGlobalPrefix('api', { exclude: ['/health/live', '/health/ready', '/health/metrics'] });
   app.enableShutdownHooks();
   app.enableCors({
     origin: ['http://localhost:4200', ...(process.env['CORS_ORIGINS']?.split(',') ?? [])],

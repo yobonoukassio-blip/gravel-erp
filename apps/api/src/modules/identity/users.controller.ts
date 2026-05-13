@@ -19,7 +19,7 @@ import { CLS_KEYS } from '../../common/cls/tenant-context';
  * `user_preferences`) — NOT this endpoint. CDC reconciles the two.
  */
 @UseGuards(JwtAuthGuard, TenantGuard)
-@Controller('api/users')
+@Controller('users')
 export class UsersController {
   constructor(
     private readonly users: UsersService,

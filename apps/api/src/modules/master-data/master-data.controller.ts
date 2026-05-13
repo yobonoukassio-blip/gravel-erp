@@ -33,7 +33,7 @@ import {
  *   under the hood.
  */
 @UseGuards(JwtAuthGuard, TenantGuard, RoleGuard)
-@Controller('api')
+@Controller('')
 export class MasterDataController {
   constructor(private readonly md: MasterDataService) {}
 

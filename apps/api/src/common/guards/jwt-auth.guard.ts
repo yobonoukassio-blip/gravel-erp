@@ -17,8 +17,8 @@ export const Public =
 /** Dev-mode hardcoded user injected when DEV_BYPASS_JWT=true. */
 const DEV_USER: JwtClaims = {
   userId: '00000000-0000-0000-0000-000000000001',
-  tenantId: '00000000-0000-0000-0000-000000000099',
-  siteIds: ['00000000-0000-0000-0000-000000000010'],
+  tenantId: '24cd97f8-0170-453e-89da-e9213dd710d7',   // Gravel Ivoire (Supabase)
+  siteIds: ['5213953c-3820-4da4-97ed-89bfbd605c07'],  // Carrière Mobaye
   role: 'DIRECTION_GROUPE',
   groupScope: null,
   preferredLocale: 'fr-CI',

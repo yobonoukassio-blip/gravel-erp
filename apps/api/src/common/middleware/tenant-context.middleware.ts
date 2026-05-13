@@ -21,6 +21,18 @@ export class TenantContextMiddleware implements NestMiddleware {
   constructor(private readonly cls: ClsService) {}
 
   use(req: Request & { user?: JwtClaims }, _res: Response, next: NextFunction): void {
+    // DEV_BYPASS_JWT: middleware runs before guards, so inject claims directly here.
+    if (process.env['DEV_BYPASS_JWT'] === 'true' && !req.user) {
+      req.user = {
+        userId: '00000000-0000-0000-0000-000000000001',
+        tenantId: '24cd97f8-0170-453e-89da-e9213dd710d7',
+        siteIds: ['5213953c-3820-4da4-97ed-89bfbd605c07'],
+        role: 'DIRECTION_GROUPE',
+        groupScope: null,
+        preferredLocale: 'fr-CI',
+      };
+    }
+
     const claims = req.user;
     if (!claims) {
       // JwtAuthGuard didn't run (e.g. @Public route). Still set a request id.

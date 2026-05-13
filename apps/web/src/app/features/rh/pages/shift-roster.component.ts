@@ -10,8 +10,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RhApiService, ShiftRosterRow } from '../services/rh-api.service';
 
-type ShiftSlot = ShiftRosterRow['roster_jsonb'][number];
-
 /** ISO date string for start of current week (Monday). */
 function currentWeekStart(): string {
   const now = new Date();

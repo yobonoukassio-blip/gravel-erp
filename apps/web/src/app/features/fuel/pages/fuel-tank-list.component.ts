@@ -71,9 +71,9 @@ export class FuelTankListComponent implements OnInit {
         if (!row || row.capacity_liters === 0) return null;
         return Math.round((row.balance_liters / row.capacity_liters) * 100);
       },
-      cellStyle: (p) => {
+      cellStyle: (p): Record<string, string> | null => {
         const pct = p.value as number | null;
-        if (pct == null) return {};
+        if (pct == null) return null;
         if (pct < 10) return { color: 'red', fontWeight: 'bold' };
         if (pct < 30) return { color: 'orange', fontWeight: 'bold' };
         return { color: 'green' };

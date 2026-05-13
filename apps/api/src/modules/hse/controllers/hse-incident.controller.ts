@@ -1,5 +1,4 @@
 import {
-  All,
   Body,
   Controller,
   Get,

@@ -11,7 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AgGridAngular } from 'ag-grid-angular';
-import type { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
+import type { CellClickedEvent, ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
 
 interface AlertRow {
   id: string;
@@ -132,7 +132,7 @@ export class AlertsInboxComponent implements OnInit {
     this.gridApi = evt.api;
   }
 
-  onCellClicked(evt: { event?: Event; data?: AlertRow }): void {
+  onCellClicked(evt: CellClickedEvent<AlertRow>): void {
     const target = evt.event?.target as HTMLButtonElement | null;
     if (!target || !evt.data) return;
     const action = target.dataset['action'];

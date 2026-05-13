@@ -16,7 +16,6 @@ import { getDataSourceToken } from '@nestjs/typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { HseIncidentService, GENESIS_PREV_HASH, sha256, buildHseIncidentCanonicalPayload } from '../services/hse-incident.service';
 import type { CreateHseIncidentInput } from '../services/hse-incident.service';
-import type { PersonImpacted } from '../entities/hse-incident.entity';
 import { verifyChain } from '../../../../common/chain-of-hash/event-chain.verifier';
 
 // ---------------------------------------------------------------------------

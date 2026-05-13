@@ -20,10 +20,6 @@ interface ConsumptionRow {
   hours_since_previous: string;
 }
 
-interface MedianRow {
-  median_ratio: string | null;
-}
-
 function buildConsumptionRows(count: number, litersPerHour: number, hoursPerRow: number): ConsumptionRow[] {
   return Array.from({ length: count }, () => ({
     liters: (litersPerHour * hoursPerRow).toFixed(2),

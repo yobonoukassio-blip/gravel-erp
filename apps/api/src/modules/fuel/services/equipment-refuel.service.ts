@@ -4,7 +4,6 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, EntityManager } from 'typeorm';
 import { EquipmentRefuel } from '../entities/equipment-refuel.entity';
-import { EquipmentFuelConsumption } from '../entities/equipment-fuel-consumption.entity';
 import { FuelTankEventService } from './fuel-tank-event.service';
 
 export interface CreateEquipmentRefuelInput {

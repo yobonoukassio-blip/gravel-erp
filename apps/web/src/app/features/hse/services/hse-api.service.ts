@@ -51,7 +51,7 @@ export class HseApiService {
   private readonly base = '/api/hse-incidents';
 
   listIncidents(siteId?: string): Observable<HseIncidentRow[]> {
-    const params = siteId ? { site_id: siteId } : {};
+    const params: Record<string, string> | undefined = siteId ? { site_id: siteId } : undefined;
     return this.http.get<HseIncidentRow[]>(this.base, { params });
   }
 

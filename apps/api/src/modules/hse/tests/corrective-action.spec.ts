@@ -14,7 +14,7 @@
 import { randomUUID } from 'crypto';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
-import { BadRequestException, ForbiddenException } from '@nestjs/common';
+import { ForbiddenException } from '@nestjs/common';
 import { CorrectiveActionService } from '../services/corrective-action.service';
 import { HseIncidentService, GENESIS_PREV_HASH } from '../services/hse-incident.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -227,7 +227,7 @@ function mapIncidentRow(r: IncidentRow): Record<string, unknown> {
 describe('CorrectiveActionService + HseIncidentService — CAPA closure guard', () => {
   let capaService: CorrectiveActionService;
   let incidentService: HseIncidentService;
-  let emitter: EventEmitter2;
+  let _emitter: EventEmitter2;
 
   const tenantId = randomUUID();
   const hseOfficerId = randomUUID();
@@ -256,7 +256,7 @@ describe('CorrectiveActionService + HseIncidentService — CAPA closure guard', 
 
     capaService = module.get(CorrectiveActionService);
     incidentService = module.get(HseIncidentService);
-    emitter = module.get(EventEmitter2);
+    _emitter = module.get(EventEmitter2);
   });
 
   it('closes severity=5 incident only after all CAPAs are verified', async () => {

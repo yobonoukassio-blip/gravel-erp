@@ -35,9 +35,6 @@ import { environment } from '../../environments/environment';
       <button mat-menu-item type="button" (click)="set('en')">
         {{ 'common.locale.en' | transloco }}
       </button>
-      <button mat-menu-item type="button" (click)="set('ar')">
-        {{ 'common.locale.ar' | transloco }}
-      </button>
     </mat-menu>
   `,
 })

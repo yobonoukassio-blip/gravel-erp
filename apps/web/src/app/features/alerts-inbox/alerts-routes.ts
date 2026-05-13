@@ -10,3 +10,6 @@ export const ALERTS_INBOX_ROUTES: Routes = [
     title: 'Alertes — Inbox',
   },
 ];
+
+// Alias consumed by app.routes.ts lazy-load
+export const ALERTS_ROUTES = ALERTS_INBOX_ROUTES;

@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, Req, Res, Logger } from '@nestjs/common';
+import { Controller, Get, Query, Req, Res, Logger } from '@nestjs/common';
 import { Response } from 'express';
 import { DashboardAggregatorService, SiteDirectorDashboard } from '../services/dashboard-aggregator.service';
 import { SseBroadcasterService } from '../services/sse-broadcaster.service';

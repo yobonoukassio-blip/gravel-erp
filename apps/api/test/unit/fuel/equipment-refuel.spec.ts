@@ -262,7 +262,7 @@ describe('EquipmentRefuelService.create (CAR-02)', () => {
   });
 
   it('rejects when hour_meter_reading < previous reading (ERR_HOUR_METER_REGRESSION)', async () => {
-    const { svc, ds } = makeService();
+    const { svc } = makeService();
 
     // First refuel at hour 200
     await svc.create(baseInput({ liters: 20, equipmentHourMeterReading: 200 }));
@@ -280,7 +280,7 @@ describe('EquipmentRefuelService.create (CAR-02)', () => {
   });
 
   it('accepts equal hour_meter_reading (same-hour refuel allowed)', async () => {
-    const { svc, ds } = makeService();
+    const { svc } = makeService();
     await svc.create(baseInput({ liters: 20, equipmentHourMeterReading: 100 }));
     // Equal is allowed — not a regression
     await expect(

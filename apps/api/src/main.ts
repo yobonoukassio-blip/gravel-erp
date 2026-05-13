@@ -1,3 +1,8 @@
+// Force IPv4 DNS resolution globally — Railway US West resolves Supabase hostnames
+// to IPv6 addresses which are unreachable. Must run before any network call.
+import { setDefaultResultOrder } from 'node:dns';
+setDefaultResultOrder('ipv4first');
+
 // IMPORTANT: OTel must be started BEFORE any module that should be instrumented
 // is imported. Keep this import at the very top of the file.
 import { startOtel } from './otel/otel';

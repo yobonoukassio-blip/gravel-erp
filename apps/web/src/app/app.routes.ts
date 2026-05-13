@@ -105,6 +105,11 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'rh',
+        loadChildren: () =>
+          import('./features/rh/rh-routes').then((m) => m.RH_ROUTES),
+      },
+      {
         path: 'activity-log',
         canActivate: [roleGuard(['DIRECTION_GROUPE', 'DIRECTEUR_SITE'])],
         loadComponent: () =>

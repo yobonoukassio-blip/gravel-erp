@@ -5,6 +5,7 @@ import { IotReadingValidated } from './entities/iot-reading-validated.entity';
 import { IotIngestionService } from './services/iot-ingestion.service';
 import { IotSanityService } from './services/iot-sanity.service';
 import { FuelReconciliationIotService } from './services/fuel-reconciliation-iot.service';
+import { IotController } from './controllers/iot.controller';
 
 /**
  * IotModule (Phase 5).
@@ -20,6 +21,7 @@ import { FuelReconciliationIotService } from './services/fuel-reconciliation-iot
  */
 @Module({
   imports: [TypeOrmModule.forFeature([IotReadingRaw, IotReadingValidated])],
+  controllers: [IotController],
   providers: [IotIngestionService, IotSanityService, FuelReconciliationIotService],
   exports: [IotIngestionService, IotSanityService, FuelReconciliationIotService],
 })

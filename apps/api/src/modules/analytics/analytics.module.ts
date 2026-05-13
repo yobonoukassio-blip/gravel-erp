@@ -11,6 +11,7 @@ import { MarginService } from './services/margin.service';
 import { OhadaExportService } from './services/ohada-export.service';
 import { AlertDispatcherService } from './services/alert-dispatcher.service';
 import { ConsolidationService } from './services/consolidation.service';
+import { AnalyticsController } from './controllers/analytics.controller';
 
 /**
  * AnalyticsModule (Phase 4).
@@ -27,6 +28,7 @@ import { ConsolidationService } from './services/consolidation.service';
     TypeOrmModule.forFeature([CostPerTonSnapshot, Budget, AnalyticalEntry, AlertRule]),
     EventEmitterModule,
   ],
+  controllers: [AnalyticsController],
   providers: [
     CostPerTonAggregatorService,
     BudgetComparisonService,

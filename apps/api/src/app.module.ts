@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClsModule } from 'nestjs-cls';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ScheduleModule } from '@nestjs/schedule';
 import { HealthModule } from './modules/health/health.module';
 import { SyncModule } from './modules/sync/sync.module';
 import { IdentityModule } from './modules/identity/identity.module';
@@ -57,6 +59,8 @@ import { IotModule } from './modules/iot/iot.module';
       global: true,
       middleware: { mount: true },
     }),
+    EventEmitterModule.forRoot({ wildcard: true }),
+    ScheduleModule.forRoot(),
     HealthModule,
     SyncModule,
     IdentityModule,

@@ -9,6 +9,7 @@ import { EquipmentAvailability } from './entities/equipment-availability.entity'
 import { WorkOrderService } from './services/work-order.service';
 import { SparePartService } from './services/spare-part.service';
 import { MtbfCalculatorService } from './services/mtbf-calculator.service';
+import { MaintenanceController } from './controllers/maintenance.controller';
 
 /**
  * MaintenanceModule (Phase 3 W2 P04).
@@ -29,6 +30,7 @@ import { MtbfCalculatorService } from './services/mtbf-calculator.service';
     ]),
     EventEmitterModule,
   ],
+  controllers: [MaintenanceController],
   providers: [WorkOrderService, SparePartService, MtbfCalculatorService],
   exports: [WorkOrderService, SparePartService, MtbfCalculatorService],
 })

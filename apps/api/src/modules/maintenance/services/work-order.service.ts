@@ -106,6 +106,16 @@ export class WorkOrderService {
         equipmentId: wo.equipmentId,
       });
 
+      this.events.emit('maintenance.work_order.closed', {
+        tenantId: dto.tenantId,
+        workOrderId: dto.workOrderId,
+        siteId: wo.siteId,
+        equipmentId: wo.equipmentId,
+        laborHours: dto.laborHours.toFixed(2),
+        downtimeMinutes: dto.downtimeMinutes,
+        closedAtUtc: new Date().toISOString(),
+      });
+
       return refreshed;
     });
   }

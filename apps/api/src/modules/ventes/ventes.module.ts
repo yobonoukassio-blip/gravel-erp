@@ -10,6 +10,7 @@ import { Invoice } from './entities/invoice.entity';
 import { BonDeLivraisonService } from './services/bon-de-livraison.service';
 import { FxRateSnapshotService } from './services/fx-rate-snapshot.service';
 import { InvoiceService } from './services/invoice.service';
+import { VentesController } from './controllers/ventes.controller';
 
 /**
  * VentesModule (Phase 3 W2 P05 + W3 P06).
@@ -30,6 +31,7 @@ import { InvoiceService } from './services/invoice.service';
     ]),
     EventEmitterModule,
   ],
+  controllers: [VentesController],
   providers: [BonDeLivraisonService, FxRateSnapshotService, InvoiceService],
   exports: [BonDeLivraisonService, FxRateSnapshotService, InvoiceService],
 })

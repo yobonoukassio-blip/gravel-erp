@@ -142,6 +142,74 @@ export class DashboardProjectionHandler {
   }
 
   // -----------------------------------------------------------------------
+  // 7. Ventes — BL signed (revenue delta)
+  // -----------------------------------------------------------------------
+
+  @OnEvent('production.vte.bl_signed')
+  onBlSigned(evt: TenantSiteEvent): void {
+    const { tenantId, siteId } = this.extractIds(evt);
+    if (!tenantId || !siteId) return;
+    const delta = {
+      kind: 'kpi.delta',
+      source: 'production.vte.bl_signed',
+      updated_keys: ['revenue_today_minor_units', 'bl_signed_count_today'],
+      values: { payload: evt.payload ?? evt },
+    };
+    this.emitToBothDashboards(tenantId, siteId, delta);
+  }
+
+  // -----------------------------------------------------------------------
+  // 8. Maintenance — work order opened
+  // -----------------------------------------------------------------------
+
+  @OnEvent('maintenance.work_order.opened')
+  onWorkOrderOpened(evt: TenantSiteEvent): void {
+    const { tenantId, siteId } = this.extractIds(evt);
+    if (!tenantId || !siteId) return;
+    const delta = {
+      kind: 'kpi.delta',
+      source: 'maintenance.work_order.opened',
+      updated_keys: ['open_work_orders_count', 'equipment_in_maintenance_count'],
+      values: { payload: evt.payload ?? evt },
+    };
+    this.emitToBothDashboards(tenantId, siteId, delta);
+  }
+
+  // -----------------------------------------------------------------------
+  // 9. Maintenance — work order closed (triggers MTBF refresh)
+  // -----------------------------------------------------------------------
+
+  @OnEvent('maintenance.work_order.closed')
+  onWorkOrderClosed(evt: TenantSiteEvent): void {
+    const { tenantId, siteId } = this.extractIds(evt);
+    if (!tenantId || !siteId) return;
+    const delta = {
+      kind: 'kpi.delta',
+      source: 'maintenance.work_order.closed',
+      updated_keys: ['open_work_orders_count', 'equipment_availability_pct', 'mtbf_hours'],
+      values: { payload: evt.payload ?? evt },
+    };
+    this.emitToBothDashboards(tenantId, siteId, delta);
+  }
+
+  // -----------------------------------------------------------------------
+  // 10. Maintenance — spare part threshold crossed
+  // -----------------------------------------------------------------------
+
+  @OnEvent('maintenance.spare_part.threshold_crossed')
+  onSparePartThreshold(evt: TenantSiteEvent): void {
+    const { tenantId, siteId } = this.extractIds(evt);
+    if (!tenantId || !siteId) return;
+    const delta = {
+      kind: 'kpi.delta',
+      source: 'maintenance.spare_part.threshold_crossed',
+      updated_keys: ['spare_parts_below_threshold_count'],
+      values: { payload: evt.payload ?? evt },
+    };
+    this.emitToBothDashboards(tenantId, siteId, delta);
+  }
+
+  // -----------------------------------------------------------------------
   // Private helpers
   // -----------------------------------------------------------------------
 

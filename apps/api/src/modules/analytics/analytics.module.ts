@@ -12,6 +12,7 @@ import { OhadaExportService } from './services/ohada-export.service';
 import { AlertDispatcherService } from './services/alert-dispatcher.service';
 import { ConsolidationService } from './services/consolidation.service';
 import { AnalyticsController } from './controllers/analytics.controller';
+import { AnalyticalEntryWriterHandler } from './event-handlers/analytical-entry-writer.handler';
 
 /**
  * AnalyticsModule (Phase 4).
@@ -22,6 +23,7 @@ import { AnalyticsController } from './controllers/analytics.controller';
  *   - OhadaExport (FIN-05) — Sage / Ciel / Odoo CSV
  *   - Consolidation (FIN-06) — multi-site P&L in pivot currency
  *   - AlertDispatcher (DSH-06) — multi-channel alert routing
+ *   - AnalyticalEntryWriter (FIN-04) — writes ledger entries from domain events
  */
 @Module({
   imports: [
@@ -36,6 +38,7 @@ import { AnalyticsController } from './controllers/analytics.controller';
     OhadaExportService,
     AlertDispatcherService,
     ConsolidationService,
+    AnalyticalEntryWriterHandler,
   ],
   exports: [
     CostPerTonAggregatorService,

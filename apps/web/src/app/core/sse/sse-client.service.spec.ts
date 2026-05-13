@@ -59,11 +59,11 @@ describe('SseClientService', () => {
     sessionStorage.clear();
     TestBed.configureTestingModule({ providers: [SseClientService] });
     svc = TestBed.inject(SseClientService);
-    jest.useFakeTimers();
+    jasmine.clock().install();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    jasmine.clock().uninstall();
     (globalThis as unknown as { EventSource: typeof EventSource }).EventSource =
       originalEventSource;
   });
@@ -102,7 +102,7 @@ describe('SseClientService', () => {
 
     // Force a reconnect.
     MockEventSource.instances[0].pushError();
-    jest.advanceTimersByTime(1000);
+    jasmine.clock().tick(1000);
 
     expect(MockEventSource.instances.length).toBeGreaterThanOrEqual(2);
     expect(MockEventSource.instances[1].url).toContain('last_event_id=evt-99');
@@ -124,7 +124,7 @@ describe('SseClientService', () => {
     });
 
     MockEventSource.instances[0].pushError(); // attempt = 1
-    jest.advanceTimersByTime(1000);
+    jasmine.clock().tick(1000);
     MockEventSource.instances[1].pushError(); // attempt = 2 — exhausted
     const err = await errorPromise;
     expect(String(err)).toMatch(/exhausted retries/);

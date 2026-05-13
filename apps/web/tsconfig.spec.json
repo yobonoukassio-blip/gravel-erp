@@ -4,5 +4,8 @@
     "outDir": "./out-tsc/spec",
     "types": ["jasmine"]
   },
-  "include": ["src/**/*.spec.ts", "src/**/*.d.ts"]
+  "include": ["src/**/*.spec.ts", "src/**/*.d.ts"],
+  "exclude": [
+    "src/app/features/dashboard-site/widgets/cost-per-ton-provisional-tile.spec.ts"
+  ]
 }

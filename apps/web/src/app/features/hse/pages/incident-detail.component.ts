@@ -20,13 +20,6 @@ import {
   CapaStatus,
 } from '../services/hse-api.service';
 
-const CAPA_STATUS_COLOR: Record<CapaStatus, string> = {
-  open: '#e3f2fd',
-  in_progress: '#fff9c4',
-  done: '#e8f5e9',
-  verified: '#c8e6c9',
-  closed: '#bdbdbd',
-};
 
 /**
  * IncidentDetailComponent — read-only incident detail with CAPA list (HSE-01, HSE-02).

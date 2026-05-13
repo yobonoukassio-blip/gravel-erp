@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 03-W1-P03-PLAN.md (Concassage + Criblage — CON-01, CON-02, CRI-01)
-last_updated: "2026-05-13T14:00:00.000Z"
+stopped_at: Completed 03-W1-P02-PLAN.md (TIR — Tir de Mine & Explosifs — TIR-01..07)
+last_updated: "2026-05-13T16:00:00.000Z"
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 17
-  completed_plans: 15
-  percent: 88
+  completed_plans: 16
+  percent: 94
 ---
 
 # STATE: Gravel Ivoire — ERP Carrière de Granite
@@ -28,10 +28,10 @@ Phase: 03 (operational-completeness) — EXECUTING
 Plan: W0-P01 of many
 
 - **Phase:** 03
-- **Plan:** W1-P03 complete (Wave 1 Concassage+Criblage DONE)
+- **Plan:** W1-P02 complete (Wave 1 TIR DONE — both Wave 1 plans now complete)
 - **Status:** Executing
-- **Progress:** [██████░░░░] Phase 3 Wave 0 + W1-P03 complete
-- **Phase 3 wave progress:** Wave 0 (1/1) ✓ ; Wave 1 (1/2 — W1-P03 ✓, W1-P02 in flight) ; Wave 2 (0/2) ; Wave 3 (0/2)
+- **Progress:** [███████░░░] Phase 3 Wave 0 + Wave 1 complete
+- **Phase 3 wave progress:** Wave 0 (1/1) ✓ ; Wave 1 (2/2) ✓ ; Wave 2 (0/2) ; Wave 3 (0/2)
 
 ## Phase Map
 
@@ -60,6 +60,10 @@ Plan: W0-P01 of many
 | CON/CRI sessions publish outbox event post same-tx; energy upsert post-commit (non-blocking) | ✓ Validated Phase 3 (CON-02) |
 | Compound idempotency key session_id_calibre_code for screening calibres (Pitfall 3, ADR-0013) | ✓ Validated Phase 3 (CRI-01) |
 | crusher_session_status enum reused for screening_session | ✓ Validated Phase 3 |
+| blast_plan mutable state machine — NO append-only trigger (ADR-0012 Pitfall 1) | ✓ Validated Phase 3 (TIR-03) |
+| Habilitation gate uses shiftStartLocal — never new Date() (ADR-0012 Pitfall 2) | ✓ Validated Phase 3 (TIR-03, TIR-05) |
+| PDF snapshot published via OutboxService AFTER append commits (ADR-0012 Pitfall 7) | ✓ Validated Phase 3 (TIR-01) |
+| ExplosivesReconciliationJob calls blockClosure via OperationalDayService (not direct write) | ✓ Validated Phase 3 (TIR-07) |
 | Modular monolith NestJS 11 + Node 24 | ✓ Validated Phase 1 |
 | PostgreSQL 18 + PostGIS 3.5 + TimescaleDB (en image postgis/postgis:18-3.5) | ✓ Validated Phase 1 |
 | Flutter 3.35 + PowerSync 1.9 + Drift 2.20 mobile | ✓ Validated Phase 1 |
@@ -89,6 +93,7 @@ Plan: W0-P01 of many
 | Phase 02 PW3-P07 | 45min | 6 tasks | 35 files |
 | Phase 03 PW0-P01 | ~90min | 4 tasks | 65 files |
 | Phase 03 PW1-P03 | ~60min | 3 tasks | 25 files |
+| Phase 03 PW1-P02 | ~90min | 4 tasks | 45 files |
 
 ### Open TODOs
 
@@ -114,9 +119,9 @@ Plan: W0-P01 of many
 
 ## Session Continuity
 
-- **Last session:** 2026-05-13T14:00:00.000Z
-- **Stopped at:** Completed 03-W1-P03-PLAN.md (Concassage + Criblage — CON-01, CON-02, CRI-01)
-- **Next action:** `/gsd:execute-phase 3` to continue with remaining Wave 1 plan (W1-P02 TIR) then Wave 2
+- **Last session:** 2026-05-13T16:00:00.000Z
+- **Stopped at:** Completed 03-W1-P02-PLAN.md (TIR — Tir de Mine & Explosifs — TIR-01..07)
+- **Next action:** `/gsd:execute-phase 3` to continue with Wave 2 plans (W2-P04 Maintenance + W2-P05 Ventes Part 1 in parallel)
 - **Resume file:** None
 - **Files:**
   - `.planning/PROJECT.md` — project vision + constraints

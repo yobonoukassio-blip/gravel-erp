@@ -73,7 +73,7 @@ Donner à un groupe minier une visibilité temps réel consolidée sur la produc
   6. Le tonnage entrant/sortant des concasseurs (primaire/secondaire) et la classification calibre + non-conformités au criblage alimentent automatiquement le stockpile event-sourced
 **Plans:** 7 plans across 4 waves (W0=P01, W1=P02+P03 parallel, W2=P04+P05 parallel, W3=P06+P07 parallel)
   - [x] 03-W0-P01-PLAN.md (Wave 0) — RH module + habilitation as-of gate + operational_day.closure_blockers + i18n 6 namespaces + Keycloak 8 roles + EventChainVerifier +2 + 5 ADR drafts (RH-01..04, HSE-04) [BLOCKING]
-  - [ ] 03-W1-P02-PLAN.md (Wave 1) — TIR module: explosives ledger append-only + detonator serial + blast plan saga + blast charge offline + reconciliation job (TIR-01..07)
+  - [x] 03-W1-P02-PLAN.md (Wave 1) — TIR module: explosives ledger append-only + detonator serial + blast plan saga + blast charge offline + reconciliation job (TIR-01..07)
   - [x] 03-W1-P03-PLAN.md (Wave 1) — Concassage + Criblage: crusher/screening sessions + outbox→stockpile consumers + web UI (CON-01, CON-02, CRI-01)
   - [ ] 03-W2-P04-PLAN.md (Wave 2) — Maintenance: equipment extension + PM plans + work orders + spare parts stock + MTBF/MTTR + mobile WO form (MNT-01..05)
   - [ ] 03-W2-P05-PLAN.md (Wave 2) — Ventes Part 1: customer + sale contract + BL offline dual-sign + STOCKPILE_OUTFLOW_SALE + customs dossier + FX snapshot (VTE-01..03, VTE-05, VTE-06)

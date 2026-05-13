@@ -31,13 +31,13 @@ Requirements pour la première release. Chaque exigence est mappée à une phase
 
 ### Production — Tir de mine & Explosifs
 
-- [ ] **TIR-01**: Le registre des explosifs entrants/sortants est append-only avec snapshot PDF signé et hash de contenu pour chaque mouvement
-- [ ] **TIR-02**: Chaque détonateur est tracé individuellement par numéro de série depuis réception jusqu'à utilisation
-- [ ] **TIR-03**: Un plan de tir est créé, validé HSE, et figé (event append-only) avant chargement des explosifs
-- [ ] **TIR-04**: Le chargement des explosifs est saisi par trou avec contrôle d'écart vs plan
-- [ ] **TIR-05**: Un tir ne peut être déclenché que si la zone de sécurité a été validée par HSE (saga clearance)
-- [ ] **TIR-06**: Le rapport de tir consigne fragmentation observée, vibration mesurée, incidents éventuels, et reste immuable
-- [ ] **TIR-07**: Une réconciliation quotidienne explosifs entrée/sortie/stock bloque la clôture journalière si écart détecté
+- [x] **TIR-01**: Le registre des explosifs entrants/sortants est append-only avec snapshot PDF signé et hash de contenu pour chaque mouvement
+- [x] **TIR-02**: Chaque détonateur est tracé individuellement par numéro de série depuis réception jusqu'à utilisation
+- [x] **TIR-03**: Un plan de tir est créé, validé HSE, et figé (event append-only) avant chargement des explosifs
+- [x] **TIR-04**: Le chargement des explosifs est saisi par trou avec contrôle d'écart vs plan
+- [x] **TIR-05**: Un tir ne peut être déclenché que si la zone de sécurité a été validée par HSE (saga clearance)
+- [x] **TIR-06**: Le rapport de tir consigne fragmentation observée, vibration mesurée, incidents éventuels, et reste immuable
+- [x] **TIR-07**: Une réconciliation quotidienne explosifs entrée/sortie/stock bloque la clôture journalière si écart détecté
 
 ### Production — Extraction, Transport, Concassage, Criblage, Stockage
 
@@ -205,13 +205,13 @@ Mapping requirement ↔ phase (validé après création du roadmap).
 | HSE-06 | Phase 2 — Vertical Slice Production | Complete |
 | DSH-01 | Phase 2 — Vertical Slice Production | Complete |
 | DSH-02 | Phase 2 — Vertical Slice Production | Pending |
-| TIR-01 | Phase 3 — Operational Completeness | Pending |
-| TIR-02 | Phase 3 — Operational Completeness | Pending |
-| TIR-03 | Phase 3 — Operational Completeness | Pending |
-| TIR-04 | Phase 3 — Operational Completeness | Pending |
-| TIR-05 | Phase 3 — Operational Completeness | Pending |
-| TIR-06 | Phase 3 — Operational Completeness | Pending |
-| TIR-07 | Phase 3 — Operational Completeness | Pending |
+| TIR-01 | Phase 3 — Operational Completeness | Complete (03-W1-P02) |
+| TIR-02 | Phase 3 — Operational Completeness | Complete (03-W1-P02) |
+| TIR-03 | Phase 3 — Operational Completeness | Complete (03-W1-P02) |
+| TIR-04 | Phase 3 — Operational Completeness | Complete (03-W1-P02) |
+| TIR-05 | Phase 3 — Operational Completeness | Complete (03-W1-P02) |
+| TIR-06 | Phase 3 — Operational Completeness | Complete (03-W1-P02) |
+| TIR-07 | Phase 3 — Operational Completeness | Complete (03-W1-P02) |
 | CON-01 | Phase 3 — Operational Completeness | Complete (03-W1-P03) |
 | CON-02 | Phase 3 — Operational Completeness | Complete (03-W1-P03) |
 | CRI-01 | Phase 3 — Operational Completeness | Complete (03-W1-P03) |

@@ -38,12 +38,9 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(
-      withInterceptorsFromDi(),
-      withInterceptors(environment.mockAuth ? [] : [authInterceptor()]),
-    ),
+    provideHttpClient(withInterceptorsFromDi(), withInterceptors([authInterceptor()])),
     provideAnimationsAsync(),
-    ...(environment.mockAuth ? [] : [importProvidersFrom(AuthModule.forRoot({ config: oidcConfig }))]),
+    importProvidersFrom(AuthModule.forRoot({ config: oidcConfig })),
     importProvidersFrom(
       FormlyModule.forRoot({
         types: [

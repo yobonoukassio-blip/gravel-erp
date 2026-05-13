@@ -9,7 +9,9 @@ import type { OpenIdConfiguration } from 'angular-auth-oidc-client';
 import { environment } from '../../../environments/environment';
 
 export const oidcConfig: OpenIdConfiguration = {
-  authority: `${environment.keycloakUrl}/realms/${environment.keycloakRealm}`,
+  authority: environment.keycloakUrl
+    ? `${environment.keycloakUrl}/realms/${environment.keycloakRealm}`
+    : 'https://auth.placeholder.invalid/realms/gravel',
   redirectUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/callback`,
   postLogoutRedirectUri:
     typeof window !== 'undefined' ? window.location.origin : '',
@@ -20,6 +22,8 @@ export const oidcConfig: OpenIdConfiguration = {
   renewTimeBeforeTokenExpiresInSeconds: 60,
   ignoreNonceAfterRefresh: true,
   secureRoutes: ['/api'],
-  silentRenew: true,
+  silentRenew: false,
+  // Prevent eager fetch of OIDC discovery doc on startup (allows mockAuth mode).
+  eagerLoadAuthWellKnownEndpoints: false,
   logLevel: environment.production ? 3 : 1, // 1=debug, 3=warn
 };

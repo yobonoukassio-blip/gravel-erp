@@ -1,0 +1,13 @@
+# Railway deployment config for @gravel/api (NestJS modular monolith)
+# https://docs.railway.com/reference/config-as-code
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "cd ../.. && pnpm install --frozen-lockfile && pnpm --filter @gravel/shared-types build && pnpm --filter @gravel/api build"
+
+[deploy]
+startCommand = "node dist/src/main.js"
+healthcheckPath = "/health/live"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3

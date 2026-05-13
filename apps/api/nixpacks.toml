@@ -1,0 +1,17 @@
+# Nixpacks config for Railway — fallback if railway.toml isn't picked up
+# Forces Node 22 and proper pnpm monorepo build
+
+[phases.setup]
+nixPkgs = ["nodejs_22", "pnpm-9_x"]
+
+[phases.install]
+cmds = ["cd ../.. && pnpm install --frozen-lockfile"]
+
+[phases.build]
+cmds = [
+  "cd ../.. && pnpm --filter @gravel/shared-types build",
+  "cd ../.. && pnpm --filter @gravel/api build",
+]
+
+[start]
+cmd = "node dist/src/main.js"

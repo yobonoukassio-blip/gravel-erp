@@ -18,6 +18,10 @@ async function bootstrap(): Promise<void> {
     }),
   );
   app.enableShutdownHooks();
+  app.enableCors({
+    origin: ['http://localhost:4200', ...(process.env['CORS_ORIGINS']?.split(',') ?? [])],
+    credentials: true,
+  });
 
   const port = Number.parseInt(process.env.PORT ?? '3000', 10);
   await app.listen(port);
@@ -29,3 +33,4 @@ bootstrap().catch((err) => {
   console.error('Failed to bootstrap Gravel API:', err);
   process.exit(1);
 });
+

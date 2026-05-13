@@ -13,6 +13,7 @@ import { DashboardProjectionHandler } from './event-handlers/dashboard-projectio
 import { DashboardAggregatorService } from './services/dashboard-aggregator.service';
 import { CostPerTonProvisionalService } from './services/cost-per-ton-provisional.service';
 import { SseBroadcasterService } from './services/sse-broadcaster.service';
+import { Phase3KpiService } from './services/phase3-kpi.service';
 
 /**
  * ProductionDashboardModule (Phase 2 W3 P08).
@@ -46,6 +47,7 @@ import { SseBroadcasterService } from './services/sse-broadcaster.service';
     CostPerTonProvisionalService,
     SseBroadcasterService,
     DashboardProjectionHandler,
+    Phase3KpiService,
   ],
   exports: [SseBroadcasterService, DashboardAggregatorService],
 })

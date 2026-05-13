@@ -80,6 +80,39 @@
     </div>
 
     <!-- ------------------------------------------------------------------ -->
+    <!-- Ventes — revenus provisoires (Phase 3)                            -->
+    <!-- ------------------------------------------------------------------ -->
+    <section class="section-title">
+      Ventes
+      <span class="provisional-badge">PROVISOIRE</span>
+    </section>
+    <div class="kpi-grid">
+      <gravel-kpi-tile
+        label="CA semaine (XOF)"
+        [value]="revenueWeek(d)"
+        testId="kpi-revenue-week"
+      />
+      <gravel-kpi-tile
+        label="CA mois (XOF)"
+        [value]="revenueMonth(d)"
+        testId="kpi-revenue-month"
+      />
+    </div>
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- Maintenance — ordres de travail ouverts (Phase 3)                 -->
+    <!-- ------------------------------------------------------------------ -->
+    <section class="section-title">Maintenance</section>
+    <div class="kpi-grid">
+      <gravel-kpi-tile
+        label="OT ouverts"
+        [value]="d.open_work_orders_count"
+        [highlight]="d.open_work_orders_count > 0 ? 'warn' : 'ok'"
+        testId="kpi-open-work-orders"
+      />
+    </div>
+
+    <!-- ------------------------------------------------------------------ -->
     <!-- Open incidents by severity                                         -->
     <!-- ------------------------------------------------------------------ -->
     <section class="section-title">{{ t('dashboard.section.incidents') }}</section>

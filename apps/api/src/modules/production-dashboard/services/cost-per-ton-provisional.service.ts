@@ -45,7 +45,7 @@ export class CostPerTonProvisionalService {
          SELECT cost_per_liter_minor_units
          FROM fuel_tank_event fte2
          WHERE fte2.tenant_id = efc.tenant_id
-           AND fte2.event_type = 'DELIVERY'
+           AND fte2.event_type = 'FUEL_DELIVERY_IN'
            AND fte2.created_at_utc <= efc.created_at_utc
          ORDER BY fte2.created_at_utc DESC
          LIMIT 1

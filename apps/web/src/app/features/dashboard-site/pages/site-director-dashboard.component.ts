@@ -26,6 +26,12 @@ interface FuelTank    { tank_id: string; label: string; balance_liters: number; 
 interface Stockpile   { stockpile_id: string; label: string; balance_kg: string; threshold_status: GaugeStatus; }
 interface Equipment   { equipment_id: string; label: string; out_of_service_since_utc: string | null; }
 
+interface VteRevenue {
+  weekRevenueXof: string;
+  monthRevenueXof: string;
+  isProvisional: true;
+}
+
 interface SiteDirectorDashboardPayload {
   tonnage_today_kg: string;
   tonnage_yesterday_kg: string;
@@ -43,6 +49,8 @@ interface SiteDirectorDashboardPayload {
     currency: string;
     label: 'cost_per_ton_provisional';
   };
+  open_work_orders_count: number;
+  vte_revenue: VteRevenue;
 }
 
 type SseDelta = { kind: 'kpi.delta'; updated_keys: string[] };
@@ -155,5 +163,15 @@ export class SiteDirectorDashboardComponent implements OnInit, OnDestroy {
 
   costCurrency(): string {
     return this.dashboard()?.cost_per_ton_provisional?.currency ?? 'XOF';
+  }
+
+  revenueWeek(d: SiteDirectorDashboardPayload): string {
+    const v = Number(d.vte_revenue?.weekRevenueXof ?? '0');
+    return v >= 1_000_000 ? `${(v / 1_000_000).toFixed(1)} M` : v.toLocaleString('fr-CI');
+  }
+
+  revenueMonth(d: SiteDirectorDashboardPayload): string {
+    const v = Number(d.vte_revenue?.monthRevenueXof ?? '0');
+    return v >= 1_000_000 ? `${(v / 1_000_000).toFixed(1)} M` : v.toLocaleString('fr-CI');
   }
 }

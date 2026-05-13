@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { CostPerTonProvisionalService, CostPerTonProvisionalResult } from './cost-per-ton-provisional.service';
+import { Phase3KpiService, VteRevenueKpi } from './phase3-kpi.service';
 
 // ---------------------------------------------------------------------------
 // Response shapes
@@ -47,6 +48,8 @@ export interface SiteDirectorDashboard {
   equipment_out_of_service: EquipmentOutOfService[];
   cost_per_ton_provisional: CostPerTonProvisionalResult;
   downtime_today_minutes: number;
+  open_work_orders_count: number;
+  vte_revenue: VteRevenueKpi;
 }
 
 export interface ActiveDrillingPlan {
@@ -86,6 +89,7 @@ export class DashboardAggregatorService {
   constructor(
     @InjectDataSource() private readonly ds: DataSource,
     private readonly costPerTon: CostPerTonProvisionalService,
+    private readonly phase3: Phase3KpiService,
   ) {}
 
   // -------------------------------------------------------------------------
@@ -108,6 +112,8 @@ export class DashboardAggregatorService {
       outOfService,
       costPerTonProv,
       downtimeMinutes,
+      openWorkOrders,
+      vteRevenue,
     ] = await Promise.all([
       this.fetchTonnages(tenantId, siteId, operationalDayId),
       this.fetchDrillingYield(tenantId, siteId, operationalDayId),
@@ -119,6 +125,8 @@ export class DashboardAggregatorService {
       this.fetchEquipmentOutOfService(tenantId, siteId),
       this.costPerTon.compute(tenantId, siteId, operationalDayId),
       this.fetchDowntimeMinutes(tenantId, siteId, operationalDayId),
+      this.fetchOpenWorkOrders(tenantId, siteId),
+      this.phase3.vteRevenue({ tenantId, siteId }),
     ]);
 
     return {
@@ -132,6 +140,8 @@ export class DashboardAggregatorService {
       equipment_out_of_service: outOfService,
       cost_per_ton_provisional: costPerTonProv,
       downtime_today_minutes: downtimeMinutes,
+      open_work_orders_count: openWorkOrders,
+      vte_revenue: vteRevenue,
     };
   }
 
@@ -509,6 +519,16 @@ export class DashboardAggregatorService {
 
     const r = rows[0] ?? { total: 0, in_progress: 0, completed: 0 };
     return { total: r.total, in_progress: r.in_progress, completed: r.completed };
+  }
+
+  private async fetchOpenWorkOrders(tenantId: string, siteId: string): Promise<number> {
+    const rows = (await this.ds.query(
+      `SELECT COUNT(*)::int AS cnt
+       FROM work_order
+       WHERE tenant_id = $1 AND site_id = $2 AND status IN ('open', 'in_progress')`,
+      [tenantId, siteId],
+    )) as Array<{ cnt: number }>;
+    return rows[0]?.cnt ?? 0;
   }
 
   private async fetchWeighingQueue(

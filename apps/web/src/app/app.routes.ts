@@ -120,6 +120,20 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'maintenance',
+        loadChildren: () =>
+          import('./features/maintenance/maintenance-routes').then(
+            (m) => m.MAINTENANCE_ROUTES,
+          ),
+      },
+      {
+        path: 'ventes',
+        loadChildren: () =>
+          import('./features/ventes/ventes-routes').then(
+            (m) => m.VENTES_ROUTES,
+          ),
+      },
+      {
         path: 'rh',
         loadChildren: () =>
           import('./features/rh/rh-routes').then((m) => m.RH_ROUTES),

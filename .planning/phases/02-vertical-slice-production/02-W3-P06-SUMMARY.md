@@ -40,6 +40,28 @@ equipment's rolling baseline (last 30 days p75). Thresholds: `> 1.5×` = anomaly
 
 **ADR-0007:** Promoted to Accepted with Implementation Notes.
 
+## Wiring Update (2026-05-13 — re-execution)
+
+- `FuelCostAllocatorService` finalised and exported from `FuelModule`.
+- `StockpileValuationService.computeInflowCost` now delegates to
+  `FuelCostAllocatorService.allocateFuelCostForOperationalDay` (replaces
+  the W2-P05 XOF/zero stub). `@Optional()` injection keeps the no-arg
+  test constructor working.
+- `StockpileModule` imports `FuelModule` so the allocator is in scope.
+- `FuelModule` registered on `AppModule`.
+- New spec: `apps/api/test/unit/fuel/fuel-cost-allocator.spec.ts` covers
+  zero-consumption path, per-ton math, zero-tonnage edge case, and PG
+  decimal-stripping.
+
+## Files Touched in Re-execution
+
+- apps/api/src/modules/fuel/services/fuel-cost-allocator.service.ts (new)
+- apps/api/test/unit/fuel/fuel-cost-allocator.spec.ts (new)
+- apps/api/src/modules/fuel/fuel.module.ts (export FuelCostAllocator)
+- apps/api/src/modules/stockpile/services/stockpile-valuation.service.ts (delegate to allocator)
+- apps/api/src/modules/stockpile/stockpile.module.ts (import FuelModule)
+- apps/api/src/app.module.ts (import FuelModule)
+
 ## Self-Check: PASSED
 
 - [x] All tasks executed and committed

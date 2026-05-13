@@ -77,4 +77,11 @@ export class VentesApiService {
       params: customerId ? { customerId } : {},
     });
   }
+
+  signBL(
+    blId: string,
+    body: { clientSignatureSha256: string; driverSignatureSha256: string; destinationCountry?: string },
+  ): Observable<BonDeLivraison> {
+    return this.http.patch<BonDeLivraison>(`/api/ventes/bl/${blId}/sign`, body);
+  }
 }

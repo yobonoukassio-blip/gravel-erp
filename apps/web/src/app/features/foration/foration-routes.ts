@@ -5,6 +5,7 @@ import type { Routes } from '@angular/router';
  * Lazy-loaded from app.routes.ts via `loadChildren`.
  */
 export const FORATION_ROUTES: Routes = [
+  { path: '', redirectTo: 'plans', pathMatch: 'full' },
   {
     path: 'plans',
     loadComponent: () =>

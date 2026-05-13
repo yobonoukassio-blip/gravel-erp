@@ -8,6 +8,7 @@ import type { Routes } from '@angular/router';
  *   - tickets    : weighing ticket list (TRP-02)
  */
 export const TRANSPORT_ROUTES: Routes = [
+  { path: '', redirectTo: 'rotations', pathMatch: 'full' },
   {
     path: 'rotations',
     loadComponent: () =>

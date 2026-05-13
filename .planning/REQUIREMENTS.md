@@ -51,7 +51,7 @@ Requirements pour la première release. Chaque exigence est mappée à une phase
 - [ ] **CRI-01**: Le criblage classe la production en calibres avec contrôle qualité et déclaration de non-conformités
 - [x] **STK-01**: Chaque stock (par calibre, par site, par zone) est un grand livre event-sourced ; le solde est dérivé d'événements append-only (entrée production, sortie vente, ajustement inventaire)
 - [x] **STK-02**: Des alertes se déclenchent automatiquement quand un stock franchit un seuil bas/haut configuré
-- [ ] **STK-03**: Le système valorise les stocks au coût de production (moyenne pondérée) avec conversion devise
+- [x] **STK-03**: Le système valorise les stocks au coût de production (moyenne pondérée) avec conversion devise
 
 ### Maintenance équipements
 
@@ -192,7 +192,7 @@ Mapping requirement ↔ phase (validé après création du roadmap).
 | TRP-03 | Phase 2 — Vertical Slice Production | Complete |
 | STK-01 | Phase 2 — Vertical Slice Production | Complete |
 | STK-02 | Phase 2 — Vertical Slice Production | Complete |
-| STK-03 | Phase 2 — Vertical Slice Production | Pending |
+| STK-03 | Phase 2 — Vertical Slice Production | Complete |
 | CAR-01 | Phase 2 — Vertical Slice Production | Complete |
 | CAR-02 | Phase 2 — Vertical Slice Production | Pending |
 | CAR-03 | Phase 2 — Vertical Slice Production | Pending |

@@ -297,6 +297,8 @@ jobs:
       - working-directory: apps/mobile
         run: flutter pub get
       - working-directory: apps/mobile
+        run: dart run build_runner build --delete-conflicting-outputs
+      - working-directory: apps/mobile
         run: flutter test
 
   mobile-int:

@@ -45,8 +45,11 @@ void main() {
     testWidgets('enforces 500-char maximum via maxLength', (tester) async {
       await tester.pumpWidget(_wrap(repo, _form()));
       final notesField = find.byKey(const ValueKey('activity-log-notes'));
-      final widget = tester.widget<TextFormField>(notesField);
-      expect(widget.maxLength, 500);
+      // maxLength lives on the underlying TextField, not TextFormField.
+      final tf = tester.widget<TextField>(
+        find.descendant(of: notesField, matching: find.byType(TextField)),
+      );
+      expect(tf.maxLength, 500);
     });
 
     testWidgets('saves a valid entry locally with sync_state=pending',

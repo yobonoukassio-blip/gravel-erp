@@ -9,6 +9,7 @@ import { MasterDataModule } from './modules/master-data/master-data.module';
 import { ExtractionModule } from './modules/extraction/extraction.module';
 import { ForationModule } from './modules/foration/foration.module';
 import { TransportModule } from './modules/transport/transport.module';
+import { StockpileModule } from './modules/stockpile/stockpile.module';
 
 /**
  * Root application module.
@@ -40,6 +41,7 @@ import { TransportModule } from './modules/transport/transport.module';
     ExtractionModule,
     ForationModule,
     TransportModule,
+    StockpileModule,
   ],
 })
 export class AppModule {}

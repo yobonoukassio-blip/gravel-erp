@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import * as crypto from 'node:crypto';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClsModule } from 'nestjs-cls';

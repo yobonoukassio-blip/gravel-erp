@@ -55,7 +55,7 @@ import { IotModule } from './modules/iot/iot.module';
           cfg.get('NODE_ENV') !== 'production',
         logging: cfg.get('TYPEORM_LOGGING') === 'true',
         ssl: { rejectUnauthorized: false },
-        extra: { application_name: 'gravel-api' },
+        extra: { application_name: 'gravel-api', family: 4 },
       }),
     }),
     ClsModule.forRoot({

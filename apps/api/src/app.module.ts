@@ -49,8 +49,10 @@ import { IotModule } from './modules/iot/iot.module';
         type: 'postgres',
         url: cfg.getOrThrow<string>('DATABASE_URL'),
         autoLoadEntities: true,
-        // synchronize=true only in dev — auto-creates tables from entities
-        synchronize: cfg.get('NODE_ENV') !== 'production',
+        // TYPEORM_SYNCHRONIZE=true override for initial production setup
+        synchronize:
+          cfg.get('TYPEORM_SYNCHRONIZE') === 'true' ||
+          cfg.get('NODE_ENV') !== 'production',
         logging: cfg.get('TYPEORM_LOGGING') === 'true',
         ssl: { rejectUnauthorized: false },
         extra: { application_name: 'gravel-api' },

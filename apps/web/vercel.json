@@ -5,7 +5,18 @@
   "installCommand": "echo 'install handled by buildCommand'",
   "framework": null,
   "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    {
+      "source": "/api/:path*",
+      "destination": "https://$API_HOST/api/:path*"
+    },
+    {
+      "source": "/health/:path*",
+      "destination": "https://$API_HOST/health/:path*"
+    },
+    {
+      "source": "/((?!api/|health/).*)",
+      "destination": "/index.html"
+    }
   ],
   "headers": [
     {

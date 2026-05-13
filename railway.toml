@@ -3,7 +3,7 @@
 
 [build]
 builder = "NIXPACKS"
-buildCommand = "pnpm install && pnpm --filter @gravel/shared-types build && pnpm --filter @gravel/api build"
+buildCommand = "NODE_ENV=development pnpm install && pnpm --filter @gravel/shared-types build && pnpm --filter @gravel/api build"
 
 [deploy]
 startCommand = "cd apps/api && node dist/src/main.js"

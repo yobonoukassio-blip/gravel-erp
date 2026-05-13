@@ -17,6 +17,7 @@ import { ProductionDashboardModule } from './modules/production-dashboard/produc
 import { OutboxModule } from './modules/outbox/outbox.module';
 import { AlertsModule } from './modules/alerts/alerts.module';
 import { RhModule } from './modules/rh/rh.module';
+import { TirModule } from './modules/tir/tir.module';
 import { ConcassageModule } from './modules/concassage/concassage.module';
 
 /**
@@ -67,6 +68,7 @@ import { ConcassageModule } from './modules/concassage/concassage.module';
     OutboxModule,
     AlertsModule,
     RhModule,
+    TirModule,
     ConcassageModule,
   ],
 })

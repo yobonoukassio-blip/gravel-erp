@@ -92,6 +92,56 @@ export class AlertsEventHandlers {
     });
   }
 
+  /**
+   * tir.reconciliation.gap_detected → 1 alert per site+day gap.
+   * Deduped: same site+day produces one OPEN alert until resolved.
+   */
+  @OnEvent('tir.reconciliation.gap_detected')
+  async onTirReconciliationGap(evt: {
+    tenantId: string;
+    siteId: string;
+    gapG: number;
+    operationalDayId: string;
+  }): Promise<void> {
+    await this.alerts.createFromEvent({
+      tenantId: evt.tenantId,
+      siteId: evt.siteId,
+      sourceEventType: 'tir.reconciliation.gap_detected',
+      sourceEventId: null,
+      dedupeKey: `tir:${evt.siteId}:${evt.operationalDayId}:recon_gap`,
+      severity: 'high',
+      payload: {
+        site_id: evt.siteId,
+        gap_g: evt.gapG,
+        operational_day_id: evt.operationalDayId,
+      },
+    });
+  }
+
+  /**
+   * tir.blast_plan.fire_clearance_timeout → alert for TIR_SUPERVISOR.
+   * Not deduped — each timeout is a distinct alert.
+   */
+  @OnEvent('tir.blast_plan.fire_clearance_timeout')
+  async onBlastPlanClearanceTimeout(evt: {
+    planId: string;
+    tenantId: string;
+    siteId: string;
+  }): Promise<void> {
+    await this.alerts.createFromEvent({
+      tenantId: evt.tenantId,
+      siteId: evt.siteId,
+      sourceEventType: 'tir.blast_plan.fire_clearance_timeout',
+      sourceEventId: evt.planId,
+      dedupeKey: null,
+      severity: 'critical',
+      payload: {
+        site_id: evt.siteId,
+        plan_id: evt.planId,
+      },
+    });
+  }
+
   @OnEvent('hse.incident.created')
   async onHseIncident(evt: EventEnvelope): Promise<void> {
     const p = evt.payload as {

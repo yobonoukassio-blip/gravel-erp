@@ -7,7 +7,9 @@ setDefaultResultOrder('ipv4first');
 // IMPORTANT: OTel must be started BEFORE any module that should be instrumented
 // is imported. Keep this import at the very top of the file.
 import { startOtel } from './otel/otel';
-startOtel();
+if (process.env['OTEL_SDK_DISABLED'] !== 'true') {
+  startOtel();
+}
 
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';

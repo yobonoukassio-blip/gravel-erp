@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
 
 // Entities
 // (No TypeORM entities needed — service uses raw queries on managed tables)
@@ -44,6 +45,7 @@ import { RhModule } from '../rh/rh.module';
   imports: [
     OutboxModule,
     RhModule,
+    EventEmitterModule.forRoot({ wildcard: true, maxListeners: 50 }),
   ],
   controllers: [
     ExplosivesLedgerController,
@@ -87,7 +89,7 @@ import { RhModule } from '../rh/rh.module';
         events: unknown,
         opDayService: unknown,
       ) => new ExplosivesReconciliationJob(reconService, events as never, opDayService as never),
-      inject: [ExplosivesReconciliationService, 'EventEmitter2', 'OPERATIONAL_DAY_SERVICE'],
+      inject: [ExplosivesReconciliationService, EventEmitter2, 'OPERATIONAL_DAY_SERVICE'],
     },
   ],
   exports: [

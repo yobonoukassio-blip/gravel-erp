@@ -1,0 +1,13 @@
+# Railway config — NestJS API (monorepo root)
+# Service root directory NOT set — build runs from repo root
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "pnpm install && pnpm --filter @gravel/shared-types build && pnpm --filter @gravel/api build"
+
+[deploy]
+startCommand = "cd apps/api && node dist/src/main.js"
+healthcheckPath = "/health/live"
+healthcheckTimeout = 120
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5

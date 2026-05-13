@@ -13,6 +13,8 @@ import { StockpileThresholdService } from './services/stockpile-threshold.servic
 import { StockpileController } from './controllers/stockpile.controller';
 import { RotationCompletedHandler } from './event-handlers/rotation-completed.handler';
 import { BalanceProjectionHandler } from './event-handlers/balance-projection.handler';
+import { CrusherSessionCompletedHandler } from './event-handlers/crusher-session-completed.handler';
+import { ScreeningSessionCompletedHandler } from './event-handlers/screening-session-completed.handler';
 import { BalanceRecomputeJob } from './jobs/balance-recompute.job';
 import { FuelModule } from '../fuel/fuel.module';
 
@@ -24,7 +26,9 @@ import { FuelModule } from '../fuel/fuel.module';
  *   - StockpileBalance projection (STK-01)
  *   - StockpileThreshold + crossing alerts (STK-02)
  *   - StockpileValuation cost_model_version=1 stub (STK-03)
- *   - rotation_completed outbox consumer (creates STOCKPILE_INFLOW)
+ *   - rotation_completed outbox consumer (creates STOCKPILE_INFLOW from transport)
+ *   - crusher_session_completed outbox consumer (CON-01 — STOCKPILE_INFLOW from crusher)
+ *   - screening_session_completed outbox consumer (CRI-01 — per-calibre STOCKPILE_INFLOW)
  *   - balance-projection handler (projection updater)
  *   - balance-recompute nightly drift detector
  */
@@ -43,6 +47,8 @@ import { FuelModule } from '../fuel/fuel.module';
     StockpileThresholdService,
     RotationCompletedHandler,
     BalanceProjectionHandler,
+    CrusherSessionCompletedHandler,
+    ScreeningSessionCompletedHandler,
     BalanceRecomputeJob,
   ],
   exports: [

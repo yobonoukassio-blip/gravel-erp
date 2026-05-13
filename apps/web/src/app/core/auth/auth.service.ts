@@ -26,12 +26,12 @@ export class AuthService {
 
   login(): void {
     if (environment.mockAuth) return;
-    this.oidc.authorize();
+    this.oidc!.authorize();
   }
 
   logout(): Observable<unknown> {
     if (environment.mockAuth) return of(null);
-    return this.oidc.logoff();
+    return this.oidc!.logoff();
   }
 
   readonly isAuthenticated$: Observable<boolean> = environment.mockAuth

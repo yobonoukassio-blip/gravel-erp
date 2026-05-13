@@ -73,16 +73,16 @@ Requirements pour la première release. Chaque exigence est mappée à une phase
 - [x] **HSE-01**: Tout incident/accident est saisi en append-only avec chaîne de hash, photos en object storage immuable, chronologie, gravité, personnes/équipements impactés
 - [x] **HSE-02**: Un workflow d'actions correctives est créé pour chaque incident et suivi jusqu'à clôture
 - [ ] **HSE-03**: Les EPI sont gérés par employé (attributions, états, retours) avec contrôle de validité *(DEFERRED Phase 3 — stub artifact in docs/phase-03-handoff/hse-rh-deferred-scope.md)*
-- [ ] **HSE-04**: Les habilitations (formation sécurité, permis explosifs, conduite engins) sont temporelles ("as-of") avec date d'obtention et date d'expiration *(DEFERRED Phase 3 — stub artifact in docs/phase-03-handoff/hse-rh-deferred-scope.md)*
+- [x] **HSE-04**: Les habilitations (formation sécurité, permis explosifs, conduite engins) sont temporelles ("as-of") avec date d'obtention et date d'expiration — ✓ Phase 3 W0-P01 (RhHabilitationService.isValidAt + EmployeeCertification temporal)
 - [ ] **HSE-05**: Un audit sécurité périodique est planifié, exécuté avec checklist, et clôturé avec rapport *(DEFERRED Phase 3 — stub artifact in docs/phase-03-handoff/hse-rh-deferred-scope.md)*
 - [x] **HSE-06**: Le KPI taux de fréquence des accidents (TF) est calculé en temps réel par site et consolidé groupe
 
 ### RH (light)
 
-- [ ] **RH-01**: Le référentiel employés contient identité, contrat, site d'affectation, rôle métier, habilitations rattachées
-- [ ] **RH-02**: Le pointage entrée/sortie de poste est saisi par superviseur ou opérateur sur mobile offline
-- [ ] **RH-03**: Les rotations d'équipes (shifts) sont planifiées par site avec affectation aux postes
-- [ ] **RH-04**: Les sous-traitants sont gérés comme entités first-class avec personnel rattaché, contrats, et habilitations
+- [x] **RH-01**: Le référentiel employés contient identité, contrat, site d'affectation, rôle métier, habilitations rattachées — ✓ Phase 3 W0-P01
+- [x] **RH-02**: Le pointage entrée/sortie de poste est saisi par superviseur ou opérateur sur mobile offline — ✓ Phase 3 W0-P01 (ShiftEntry append-only + Flutter offline form)
+- [x] **RH-03**: Les rotations d'équipes (shifts) sont planifiées par site avec affectation aux postes — ✓ Phase 3 W0-P01 (ShiftRoster pessimistic_lock + Angular weekly view)
+- [x] **RH-04**: Les sous-traitants sont gérés comme entités first-class avec personnel rattaché, contrats, et habilitations — ✓ Phase 3 W0-P01 (Subcontractor entity + unified employee table)
 
 ### Ventes & Expédition
 
@@ -200,7 +200,7 @@ Mapping requirement ↔ phase (validé après création du roadmap).
 | HSE-01 | Phase 2 — Vertical Slice Production | Complete |
 | HSE-02 | Phase 2 — Vertical Slice Production | Complete |
 | HSE-03 | Phase 3 — RH module (DEFERRED) | Deferred — stub in docs/phase-03-handoff/hse-rh-deferred-scope.md |
-| HSE-04 | Phase 3 — RH module (DEFERRED) | Deferred — stub in docs/phase-03-handoff/hse-rh-deferred-scope.md |
+| HSE-04 | Phase 3 — W0-P01 | Complete — RhHabilitationService.isValidAt + EmployeeCertification |
 | HSE-05 | Phase 3 — Audit module (DEFERRED) | Deferred — stub in docs/phase-03-handoff/hse-rh-deferred-scope.md |
 | HSE-06 | Phase 2 — Vertical Slice Production | Complete |
 | DSH-01 | Phase 2 — Vertical Slice Production | Complete |
@@ -220,10 +220,10 @@ Mapping requirement ↔ phase (validé après création du roadmap).
 | MNT-03 | Phase 3 — Operational Completeness | Pending |
 | MNT-04 | Phase 3 — Operational Completeness | Pending |
 | MNT-05 | Phase 3 — Operational Completeness | Pending |
-| RH-01 | Phase 3 — Operational Completeness | Pending |
-| RH-02 | Phase 3 — Operational Completeness | Pending |
-| RH-03 | Phase 3 — Operational Completeness | Pending |
-| RH-04 | Phase 3 — Operational Completeness | Pending |
+| RH-01 | Phase 3 — W0-P01 | Complete — Employee entity + CRUD + RLS |
+| RH-02 | Phase 3 — W0-P01 | Complete — ShiftEntry append-only + Flutter offline form |
+| RH-03 | Phase 3 — W0-P01 | Complete — ShiftRoster + Angular weekly view |
+| RH-04 | Phase 3 — W0-P01 | Complete — Subcontractor entity + EmployeeCertification |
 | VTE-01 | Phase 3 — Operational Completeness | Pending |
 | VTE-02 | Phase 3 — Operational Completeness | Pending |
 | VTE-03 | Phase 3 — Operational Completeness | Pending |

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 02-W3-P07-PLAN.md (HSE vertical slice)
-last_updated: "2026-05-13T03:25:08.479Z"
+stopped_at: Completed 03-W0-P01-PLAN.md (RH Foundations — Wave 0 blocking plan)
+last_updated: "2026-05-13T12:00:00.000Z"
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 17
-  completed_plans: 14
-  percent: 100
+  completed_plans: 15
+  percent: 88
 ---
 
 # STATE: Gravel Ivoire — ERP Carrière de Granite
@@ -18,20 +18,20 @@ progress:
 ## Project Reference
 
 - **Core Value:** Donner à un groupe minier une visibilité temps réel consolidée sur la production, les coûts à la tonne et la sécurité de chaque site/pays, avec saisie terrain mobile fiable même en mode offline.
-- **Current Focus:** Phase 02 — vertical-slice-production
+- **Current Focus:** Phase 03 — operational-completeness
 - **Domain:** Mining / Quarry ERP — multi-site, multi-country (West Africa / OHADA)
 - **Stack (recommended):** NestJS 11 / Node 24, PostgreSQL 18 + PostGIS + TimescaleDB, Flutter + PowerSync + Drift, Angular 20, Keycloak 26
 
 ## Current Position
 
-Phase: 02 (vertical-slice-production) — EXECUTING
-Plan: 8 of 8
+Phase: 03 (operational-completeness) — EXECUTING
+Plan: W0-P01 of many
 
 - **Phase:** 03
-- **Plan:** Not started
-- **Status:** Ready to plan
-- **Progress:** [██████████] 100% Phase 2
-- **Phase 2 wave progress:** Wave 0 (1/1) ✓ ; Wave 1 (2/2) ✓ ; Wave 2 (2/2) ✓ ; Wave 3 (3/3) ✓
+- **Plan:** W0-P01 complete (Wave 0 DONE — unblocks all Wave 1 plans)
+- **Status:** Executing
+- **Progress:** [█████░░░░░] Phase 3 Wave 0 complete
+- **Phase 3 wave progress:** Wave 0 (1/1) ✓ ; Wave 1 (0/2) ; Wave 2 (0/2) ; Wave 3 (0/2)
 
 ## Phase Map
 
@@ -68,6 +68,10 @@ Plan: 8 of 8
 | Angular 20 + Material + AG-Grid + Formly + Transloco | ✓ Validated Phase 1 |
 | OTel + Grafana LGTM self-host (api/web/mobile OTLP/HTTP) | ✓ Validated Phase 1 |
 | CI BLOCKING gates via `gate` aggregator job | ✓ Validated Phase 1 |
+| RhHabilitationService.isValidAt(id, code, asOfDate) — explicit date, never new Date() internally | ✓ Validated Phase 3 (ADR-0011) |
+| OperationalDay.closure_blockers JSONB — idempotent append via @> containment | ✓ Validated Phase 3 (ADR-0012) |
+| EventChainVerifier pre-registered for explosives_event + blast_report with frozen canonical payload | ✓ Validated Phase 3 (ADR-0012) |
+| Unified employee table (direct-hire + subcontractor): CHECK (site_id IS NOT NULL OR subcontractor_id IS NOT NULL) | ✓ Validated Phase 3 (RH-01) |
 | Transformation aval reportée hors MVP | Confirmed |
 | Paie complète hors MVP (export SIRH) | Confirmed |
 | OHADA: analytique uniquement, export vers Sage/Ciel/Odoo | Confirmed |
@@ -80,6 +84,7 @@ Plan: 8 of 8
 | Phase 02 P04 | 92m | 5 tasks | 29 files |
 | Phase 02 PW2-P05 | 60min | 5 tasks | 30 files |
 | Phase 02 PW3-P07 | 45min | 6 tasks | 35 files |
+| Phase 03 PW0-P01 | ~90min | 4 tasks | 65 files |
 
 ### Open TODOs
 
@@ -105,9 +110,9 @@ Plan: 8 of 8
 
 ## Session Continuity
 
-- **Last session:** 2026-05-13T03:30:00.000Z
-- **Stopped at:** Completed 02-W3-P07-PLAN.md (HSE vertical slice)
-- **Next action:** `/gsd:execute-phase 2` to continue with remaining Wave 3 plans (P06 Fuel, P08 Dashboard)
+- **Last session:** 2026-05-13T12:00:00.000Z
+- **Stopped at:** Completed 03-W0-P01-PLAN.md (RH Foundations — Wave 0 blocking plan)
+- **Next action:** `/gsd:execute-phase 3` to continue with Wave 1 plans (W1-P02 TIR, W1-P03)
 - **Resume file:** None
 - **Files:**
   - `.planning/PROJECT.md` — project vision + constraints

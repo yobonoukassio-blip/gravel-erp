@@ -10,8 +10,12 @@
 CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
--- TimescaleDB loaded but unused until Phase 5 (IoT). PG18 compatibility checked in CI.
-CREATE EXTENSION IF NOT EXISTS timescaledb;
+-- TimescaleDB: optional (not in postgis/postgis:17-3.5 CI image; present in production).
+DO $$ BEGIN
+  CREATE EXTENSION IF NOT EXISTS timescaledb;
+EXCEPTION WHEN OTHERS THEN
+  RAISE NOTICE 'timescaledb not available — skipping (CI/dev only)';
+END $$;
 
 DO $$
 BEGIN

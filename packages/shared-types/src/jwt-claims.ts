@@ -10,7 +10,19 @@ export type GravelRole =
   | 'MAINTENANCE'
   | 'HSE'
   | 'FINANCE'
-  | 'OPERATEUR_TERRAIN';
+  | 'OPERATEUR_TERRAIN'
+  // Phase 2 roles (D2-110)
+  | 'OPERATOR_DRILLING'
+  | 'OPERATOR_EXCAVATOR'
+  | 'TRUCK_DRIVER'
+  | 'WEIGHING_OPERATOR'
+  | 'HSE_OFFICER'
+  | 'SITE_MANAGER'
+  | 'QUARRY_CHIEF'
+  // Phase 3 roles
+  | 'PROCESSING_OPERATOR'
+  | 'SALES_MANAGER'
+  | 'MAINTENANCE_TECH';
 
 export const GRAVEL_ROLES: readonly GravelRole[] = [
   'DIRECTION_GROUPE',
@@ -20,6 +32,16 @@ export const GRAVEL_ROLES: readonly GravelRole[] = [
   'HSE',
   'FINANCE',
   'OPERATEUR_TERRAIN',
+  'OPERATOR_DRILLING',
+  'OPERATOR_EXCAVATOR',
+  'TRUCK_DRIVER',
+  'WEIGHING_OPERATOR',
+  'HSE_OFFICER',
+  'SITE_MANAGER',
+  'QUARRY_CHIEF',
+  'PROCESSING_OPERATOR',
+  'SALES_MANAGER',
+  'MAINTENANCE_TECH',
 ] as const;
 
 /**

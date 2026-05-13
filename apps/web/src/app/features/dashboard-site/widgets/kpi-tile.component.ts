@@ -12,7 +12,9 @@ import { MatCardModule } from '@angular/material/card';
   imports: [CommonModule, MatCardModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <mat-card class="kpi-tile" [attr.data-testid]="testId">
+    <mat-card class="kpi-tile" [attr.data-testid]="testId"
+      [class.kpi-warn]="highlight === 'warn'"
+      [class.kpi-ok]="highlight === 'ok'">
       <mat-card-header>
         <mat-card-subtitle class="kpi-label">{{ label }}</mat-card-subtitle>
       </mat-card-header>
@@ -27,6 +29,8 @@ import { MatCardModule } from '@angular/material/card';
     .kpi-label { font-size: 12px; color: rgba(0,0,0,.54); text-transform: uppercase; letter-spacing: .05em; }
     .kpi-value { font-size: 32px; font-weight: 700; line-height: 1; }
     .kpi-unit  { font-size: 14px; color: rgba(0,0,0,.6); }
+    .kpi-warn .kpi-value { color: #e65100; }
+    .kpi-ok   .kpi-value { color: #2e7d32; }
   `],
 })
 export class KpiTileComponent {
@@ -34,4 +38,5 @@ export class KpiTileComponent {
   @Input() value: string | number = '—';
   @Input() unit = '';
   @Input() testId = '';
+  @Input() highlight: 'warn' | 'ok' | '' = '';
 }

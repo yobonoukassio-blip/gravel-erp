@@ -10,7 +10,6 @@ import { AppModule } from './app.module';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
-  app.setGlobalPrefix('api', { exclude: ['health/live', 'health/ready'] });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -18,6 +17,7 @@ async function bootstrap(): Promise<void> {
       transform: true,
     }),
   );
+  app.setGlobalPrefix('api', { exclude: ['health/live', 'health/ready', 'health/metrics'] });
   app.enableShutdownHooks();
   app.enableCors({
     origin: ['http://localhost:4200', ...(process.env['CORS_ORIGINS']?.split(',') ?? [])],

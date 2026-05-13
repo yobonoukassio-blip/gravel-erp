@@ -10,6 +10,8 @@ import { ExtractionModule } from './modules/extraction/extraction.module';
 import { ForationModule } from './modules/foration/foration.module';
 import { TransportModule } from './modules/transport/transport.module';
 import { StockpileModule } from './modules/stockpile/stockpile.module';
+import { HseModule } from './modules/hse/hse.module';
+import { ProductionDashboardModule } from './modules/production-dashboard/production-dashboard.module';
 
 /**
  * Root application module.
@@ -21,10 +23,9 @@ import { StockpileModule } from './modules/stockpile/stockpile.module';
  *                            /api/users/me + /api/users/me/preferences
  *   - i18n       (W2-P04)  : LocaleResolver from CLS preferredLocale
  *
- * Pending plans:
- *   - tenancy / master-data entities live under src/modules/* (W1-P02);
- *     their module wiring is composed by feature plans (W2-P05).
- *   - audit      (W1-P02)  : append-only audit_log + chain-of-hash.
+ * Phase 2 Wave 3 modules:
+ *   - production-dashboard (W3-P08): site director + quarry chief dashboards,
+ *                                    SSE broadcaster, cost_per_ton_provisional
  */
 @Module({
   imports: [
@@ -42,6 +43,8 @@ import { StockpileModule } from './modules/stockpile/stockpile.module';
     ForationModule,
     TransportModule,
     StockpileModule,
+    HseModule,
+    ProductionDashboardModule,
   ],
 })
 export class AppModule {}

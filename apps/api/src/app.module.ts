@@ -53,6 +53,7 @@ import { IotModule } from './modules/iot/iot.module';
         // synchronize=true only in dev — auto-creates tables from entities
         synchronize: cfg.get('NODE_ENV') !== 'production',
         logging: cfg.get('TYPEORM_LOGGING') === 'true',
+        ssl: { rejectUnauthorized: false },
         extra: { application_name: 'gravel-api' },
       }),
     }),

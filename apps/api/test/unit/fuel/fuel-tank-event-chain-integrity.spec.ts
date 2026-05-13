@@ -72,12 +72,12 @@ describe('fuel_tank_event chain integrity (CAR-01)', () => {
         row_hash: Buffer.alloc(32, 0xff), // tampered
       };
     });
-    // Row 50's prev_hash references row 49's row_hash — mismatch detected there
+    // verifyChain recomputes row_hash and detects the tamper at row 49 itself.
     const result: ChainVerifyResult = verifyChain(corrupted);
     expect(result.valid).toBe(false);
     expect(result.brokenAt).toBeDefined();
-    expect(result.brokenAt!.id).toBe('event-50');
-    expect(result.brokenAt!.reason).toBe('phantom_event_inserted');
+    expect(result.brokenAt!.id).toBe('event-49');
+    expect(result.brokenAt!.reason).toBe('row_hash_mismatch');
   });
 
   it('detects corruption: canonical_payload tampered → valid=false', () => {

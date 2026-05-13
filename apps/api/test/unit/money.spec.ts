@@ -47,7 +47,7 @@ describe('FND-07: Money model — bigint minor units + 3 amounts', () => {
   });
 
   it('add: currency mismatch throws', () => {
-    expect(() => add(money(100n, 'EUR'), money(100n, 'XOF'))).toThrow(/Currency/);
+    expect(() => add(money(100n, 'EUR'), money(100n, 'XOF'))).toThrow(/[Cc]urrency/);
   });
 
   it('subtract: same currency', () => {

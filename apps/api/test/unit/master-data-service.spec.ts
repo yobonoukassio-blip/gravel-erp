@@ -11,9 +11,11 @@ import type { ClsService } from 'nestjs-cls';
 import type { DataSource } from 'typeorm';
 import { MasterDataService } from '../../src/modules/master-data/master-data.service';
 
-function makeService(tenantId: string | undefined = '00000000-0000-0000-0000-000000000001') {
+// Pass null (not undefined) to opt out of tenant context — JS default params
+// apply when undefined is passed, so null is the correct "no tenant" sentinel.
+function makeService(tenantId: string | null = '00000000-0000-0000-0000-000000000001') {
   const cls = {
-    get: (key: string) => (key === 'tenantId' ? tenantId : undefined),
+    get: (key: string) => (key === 'tenantId' ? tenantId ?? undefined : undefined),
   } as unknown as ClsService;
 
   const ds = {
@@ -57,7 +59,7 @@ describe('MasterDataService — validation guards', () => {
   });
 
   it('rejects calls without a CLS tenant context', async () => {
-    const svc = makeService(undefined);
+    const svc = makeService(null);
     await expect(svc.listSites({})).rejects.toBeInstanceOf(BadRequestException);
   });
 

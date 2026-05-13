@@ -36,11 +36,11 @@ export class AuthService {
 
   readonly isAuthenticated$: Observable<boolean> = environment.mockAuth
     ? of(true)
-    : this.oidc.isAuthenticated$.pipe(map((r) => r.isAuthenticated));
+    : this.oidc!.isAuthenticated$.pipe(map((r) => r.isAuthenticated));
 
   readonly userClaims$: Observable<JwtClaims | null> = environment.mockAuth
     ? of(DEV_CLAIMS)
-    : this.oidc.userData$.pipe(
+    : this.oidc!.userData$.pipe(
         map((r) => {
           const u = (r?.userData ?? null) as Record<string, unknown> | null;
           if (!u) return null;
@@ -55,5 +55,5 @@ export class AuthService {
         }),
       );
 
-  readonly accessToken$ = environment.mockAuth ? of('dev-mock-token') : this.oidc.getAccessToken();
+  readonly accessToken$ = environment.mockAuth ? of('dev-mock-token') : this.oidc!.getAccessToken();
 }

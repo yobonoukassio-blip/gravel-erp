@@ -16,6 +16,7 @@ import { HseModule } from './modules/hse/hse.module';
 import { ProductionDashboardModule } from './modules/production-dashboard/production-dashboard.module';
 import { OutboxModule } from './modules/outbox/outbox.module';
 import { AlertsModule } from './modules/alerts/alerts.module';
+import { RhModule } from './modules/rh/rh.module';
 
 /**
  * Root application module.
@@ -64,6 +65,7 @@ import { AlertsModule } from './modules/alerts/alerts.module';
     ProductionDashboardModule,
     OutboxModule,
     AlertsModule,
+    RhModule,
   ],
 })
 export class AppModule {}

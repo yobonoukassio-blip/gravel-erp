@@ -73,6 +73,25 @@ export class AlertsEventHandlers {
     });
   }
 
+  @OnEvent('rh.certification.expiring_soon')
+  async onCertificationExpiringSoon(evt: EventEnvelope): Promise<void> {
+    const p = evt.payload as {
+      site_id: string;
+      count: number;
+      as_of_date: string;
+      within_days: number;
+    };
+    await this.alerts.createFromEvent({
+      tenantId: evt.tenantId,
+      siteId: p.site_id,
+      sourceEventType: 'rh.certification.expiring_soon',
+      sourceEventId: null,
+      dedupeKey: `rh-cert-expiring:${p.site_id}:${p.as_of_date}`,
+      severity: 'medium',
+      payload: evt.payload,
+    });
+  }
+
   @OnEvent('hse.incident.created')
   async onHseIncident(evt: EventEnvelope): Promise<void> {
     const p = evt.payload as {

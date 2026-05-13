@@ -38,7 +38,10 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withInterceptorsFromDi(), withInterceptors([authInterceptor()])),
+    provideHttpClient(
+      withInterceptorsFromDi(),
+      withInterceptors(environment.mockAuth ? [] : [authInterceptor()]),
+    ),
     provideAnimationsAsync(),
     ...(environment.mockAuth ? [] : [importProvidersFrom(AuthModule.forRoot({ config: oidcConfig }))]),
     importProvidersFrom(

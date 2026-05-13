@@ -71,12 +71,14 @@ export class StockpileApiService {
     operational_day_id: string;
     occurred_at_utc: string;
     reason: string;
+    photo_sha256: string;
   }): Observable<StockpileEventRow> {
+    const { reason, photo_sha256, ...rest } = dto;
     return this.http.post<StockpileEventRow>('/api/stockpile-events', {
-      ...dto,
+      ...rest,
       event_type: 'STOCKPILE_ADJUSTMENT',
       material_type: 'granite_brut',
-      source_reference: { reason: dto.reason },
+      source_reference: { reason, photo_sha256 },
     });
   }
 }

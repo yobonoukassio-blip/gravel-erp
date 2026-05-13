@@ -16,6 +16,10 @@ import { StockpileApiService, StockpileRow } from '../services/stockpile-api.ser
   template: `
     <div class="toolbar">
       <h2>{{ 'stockpile.title' | transloco }}</h2>
+      <span class="provisional-label" data-testid="cost-provisional-label">
+        {{ 'stockpile.cost_model_version_disclaimer' | transloco }}
+        (Coût moyen pondéré v1 provisoire)
+      </span>
     </div>
     <ag-grid-angular
       class="ag-theme-material"
@@ -39,6 +43,14 @@ export class StockpileListComponent implements OnInit {
     { field: 'material_type', headerName: 'stockpile.columns.material', width: 140 },
     { field: 'calibre_code', headerName: 'stockpile.columns.calibre', width: 140 },
     { field: 'is_active', headerName: 'stockpile.columns.active', width: 100 },
+    {
+      colId: 'weighted_avg_cost',
+      headerName: 'stockpile.columns.weighted_avg_cost',
+      width: 200,
+      valueGetter: (p) =>
+        (p.data as StockpileRow & { weighted_avg_cost_per_ton_minor_units?: string })
+          ?.weighted_avg_cost_per_ton_minor_units ?? '—',
+    },
   ];
 
   ngOnInit(): void {

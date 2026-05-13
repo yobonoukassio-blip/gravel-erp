@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import * as crypto from 'node:crypto';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClsModule } from 'nestjs-cls';
@@ -59,7 +60,7 @@ import { IotModule } from './modules/iot/iot.module';
       global: true,
       middleware: { mount: true },
     }),
-    EventEmitterModule.forRoot({ wildcard: true }),
+    EventEmitterModule.forRoot({ wildcard: true, maxListeners: 50 }),
     ScheduleModule.forRoot(),
     HealthModule,
     SyncModule,

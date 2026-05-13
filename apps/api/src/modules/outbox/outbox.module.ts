@@ -1,15 +1,12 @@
 import { Module } from '@nestjs/common';
-import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OutboxEvent } from './outbox-event.entity';
 import { OutboxService } from './outbox.service';
 import { OutboxWorkerProcessor } from './outbox-worker.processor';
 
+// EventEmitterModule.forRoot() est enregistré globalement dans AppModule.
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([OutboxEvent]),
-    EventEmitterModule.forRoot({ wildcard: true, maxListeners: 50 }),
-  ],
+  imports: [TypeOrmModule.forFeature([OutboxEvent])],
   providers: [OutboxService, OutboxWorkerProcessor],
   exports: [OutboxService, TypeOrmModule],
 })

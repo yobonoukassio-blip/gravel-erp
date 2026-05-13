@@ -12,7 +12,7 @@ export const environment = {
   version: '1.0.0',
   apiBaseUrl: '',
   apiUrl: '',
-  keycloakUrl: '',
+  keycloakUrl: 'https://keycloak.placeholder.invalid',
   keycloakRealm: 'gravel-prod',
   otelEndpoint: '',
   mockAuth: true,

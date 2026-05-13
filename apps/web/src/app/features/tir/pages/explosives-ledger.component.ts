@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ExplosivesEventRow, TirApiService } from '../services/tir-api.service';
 
 /**
@@ -14,7 +15,7 @@ import { ExplosivesEventRow, TirApiService } from '../services/tir-api.service';
 @Component({
   selector: 'app-explosives-ledger',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="page-container">
       <header class="page-header">

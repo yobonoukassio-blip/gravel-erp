@@ -19,9 +19,9 @@ import { ForationApiService, DrillingPlan } from '../services/foration-api.servi
   template: `
     <div class="drilling-plan-list">
       <header class="toolbar">
-        <h1>{{ 'foration.drilling_plan_list_title' | transloco }}</h1>
+        <h1>Plans de tir / Foration</h1>
         <a mat-flat-button color="primary" routerLink="new" data-testid="drilling-plan-new">
-          {{ 'foration.new_plan' | transloco }}
+          Nouveau plan
         </a>
       </header>
 
@@ -51,26 +51,21 @@ export class DrillingPlanListComponent implements OnInit {
   readonly rows = signal<DrillingPlan[]>([]);
 
   readonly columnDefs: ColDef<DrillingPlan>[] = [
-    { field: 'id', headerName: 'foration.columns.id', width: 90 },
-    { field: 'zone_id', headerName: 'foration.columns.zone', width: 140 },
-    { field: 'bench_id', headerName: 'foration.columns.bench', width: 140 },
+    { field: 'id', headerName: 'ID', width: 90 },
+    { field: 'zone_id', headerName: 'Zone', width: 140 },
+    { field: 'bench_id', headerName: 'Banc', width: 140 },
     {
       field: 'status',
-      headerName: 'foration.columns.status',
+      headerName: 'Statut',
       width: 130,
       cellRenderer: (p: { value: string }) =>
         `<span class="badge badge-${p.value}">${p.value}</span>`,
     },
-    { field: 'planned_hole_count', headerName: 'foration.columns.planned_holes', width: 130 },
-    { field: 'target_depth_m', headerName: 'foration.columns.target_depth_m', width: 150 },
-    { field: 'diameter_mm', headerName: 'foration.columns.diameter_mm', width: 130 },
-    {
-      field: 'assigned_machine_id',
-      headerName: 'foration.columns.machine',
-      width: 160,
-      tooltipValueGetter: () => 'foration.machine_status_not_active',
-    },
-    { field: 'valid_from', headerName: 'foration.columns.valid_from', width: 170 },
+    { field: 'planned_hole_count', headerName: 'Trous planifiés', width: 140 },
+    { field: 'target_depth_m', headerName: 'Profondeur (m)', width: 150 },
+    { field: 'diameter_mm', headerName: 'Diamètre (mm)', width: 140 },
+    { field: 'assigned_machine_id', headerName: 'Machine', width: 160 },
+    { field: 'valid_from', headerName: 'Valide depuis', width: 170 },
   ];
 
   ngOnInit(): void {

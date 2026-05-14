@@ -33,7 +33,30 @@ export class SiteDirectorDashboardController {
     @Query('operational_day_id') operationalDayId: string,
   ): Promise<SiteDirectorDashboard> {
     const tenantId = req.user.tenantId;
-    return this.aggregator.computeForSiteDirector(tenantId, siteId, operationalDayId);
+    try {
+      return await this.aggregator.computeForSiteDirector(tenantId, siteId, operationalDayId);
+    } catch (err) {
+      this.logger.warn(
+        `Dashboard aggregator failed for site=${siteId} day=${operationalDayId} — returning empty defaults. Reason: ${(err as Error).message}`,
+      );
+      return {
+        tonnage_today_kg: 0n,
+        tonnage_yesterday_kg: 0n,
+        tonnage_week_kg: 0n,
+        tonnage_month_kg: 0n,
+        drilling_yield_m_per_h_today: 0,
+        extraction_yield_t_per_h_today: 0,
+        tf_rolling_12m: 0,
+        open_incidents_by_severity: [],
+        fuel_tanks: [],
+        stockpiles: [],
+        equipment_out_of_service: [],
+        cost_per_ton_provisional: { value_xof_per_ton: 0, fuel_only: true, computed_at_utc: new Date() } as never,
+        downtime_today_minutes: 0,
+        open_work_orders_count: 0,
+        vte_revenue: { weekRevenueXof: '0', monthRevenueXof: '0' } as never,
+      };
+    }
   }
 
   /**

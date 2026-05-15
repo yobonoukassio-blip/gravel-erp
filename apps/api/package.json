@@ -20,7 +20,8 @@
     "db:migrate": "node scripts/run-migrations.mjs",
     "db:seed:demo": "node scripts/seed-demo.mjs",
     "db:seed:user": "psql \"$DATABASE_URL\" -f scripts/seed-dev-user.sql",
-    "db:seed:opday": "node scripts/seed-operational-day-today.mjs"
+    "db:seed:opday": "node scripts/seed-operational-day-today.mjs",
+    "db:verify-password": "node scripts/verify-supabase-password.mjs"
   },
   "dependencies": {
     "@nestjs/core": "^11.0.0",

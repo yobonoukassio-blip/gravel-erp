@@ -16,7 +16,10 @@
     "lint": "eslint src test --ext .ts --max-warnings=0",
     "migration:run": "typeorm-ts-node-commonjs migration:run -d ormconfig.ts",
     "migration:generate": "typeorm-ts-node-commonjs migration:generate -d ormconfig.ts",
-    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d ormconfig.ts"
+    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d ormconfig.ts",
+    "db:migrate": "node scripts/run-migrations.mjs",
+    "db:seed:demo": "node scripts/seed-demo.mjs",
+    "db:seed:user": "psql \"$DATABASE_URL\" -f scripts/seed-dev-user.sql"
   },
   "dependencies": {
     "@nestjs/core": "^11.0.0",

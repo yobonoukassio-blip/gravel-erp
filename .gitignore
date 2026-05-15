@@ -68,6 +68,17 @@ infra/tofu/**/crash.*.log
 *.jks
 secrets/
 
+# Local dev/debug scripts that may contain hardcoded DSNs/credentials.
+# Canonical equivalents live under apps/api/scripts/ (env-driven). Do NOT
+# commit anything matching these patterns — refactor it into apps/api/scripts/.
+/apps/api/check_*.mjs
+/apps/api/fix_*.mjs
+/apps/api/seed_demo.mjs
+/apps/api/run_migrations.mjs
+/apps/api/add_aliases.mjs
+/apps/web/*.mjs
+/apps/web/vercel-original.json
+
 # OS
 .DS_Store
 Thumbs.db

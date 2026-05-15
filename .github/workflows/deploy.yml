@@ -61,7 +61,16 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 24 }
       - run: npm install -g vercel@latest
-      - name: Build & deploy
+      - name: Install deps + build Angular bundle
+        # vercel.json has `buildCommand: "echo prebuilt"`, so `vercel build`
+        # is a no-op. Build the Angular bundle explicitly into
+        # apps/web/dist/web/browser/ first; vercel deploy --prebuilt will
+        # then upload that directory.
+        run: |
+          pnpm install --no-frozen-lockfile
+          pnpm --filter @gravel/shared-types build
+          pnpm --filter @gravel/web build
+      - name: Vercel deploy
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}

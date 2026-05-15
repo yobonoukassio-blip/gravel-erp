@@ -50,10 +50,10 @@ export class DrillingPlanListComponent implements OnInit {
 
   readonly rows = signal<DrillingPlan[]>([]);
 
-  readonly columnDefs: ColDef<DrillingPlan>[] = [
-    { field: 'id', headerName: 'ID', width: 90 },
-    { field: 'zone_id', headerName: 'Zone', width: 140 },
-    { field: 'bench_id', headerName: 'Banc', width: 140 },
+  readonly columnDefs: ColDef<any>[] = [
+    { field: 'id', headerName: 'ID', width: 90, valueFormatter: (p) => p.value?.slice(0, 8) ?? '' },
+    { field: 'zoneId' as never, headerName: 'Zone', width: 140, valueGetter: (p) => (p.data as unknown as { zoneId?: string })?.zoneId?.slice(0, 8) ?? '' },
+    { field: 'benchId' as never, headerName: 'Banc', width: 140, valueGetter: (p) => (p.data as unknown as { benchId?: string })?.benchId?.slice(0, 8) ?? '' },
     {
       field: 'status',
       headerName: 'Statut',
@@ -61,11 +61,14 @@ export class DrillingPlanListComponent implements OnInit {
       cellRenderer: (p: { value: string }) =>
         `<span class="badge badge-${p.value}">${p.value}</span>`,
     },
-    { field: 'planned_hole_count', headerName: 'Trous planifiés', width: 140 },
-    { field: 'target_depth_m', headerName: 'Profondeur (m)', width: 150 },
-    { field: 'diameter_mm', headerName: 'Diamètre (mm)', width: 140 },
-    { field: 'assigned_machine_id', headerName: 'Machine', width: 160 },
-    { field: 'valid_from', headerName: 'Valide depuis', width: 170 },
+    { headerName: 'Trous planifiés', width: 140, valueGetter: (p) => (p.data as unknown as { plannedHoleCount?: number })?.plannedHoleCount },
+    { headerName: 'Profondeur (m)', width: 150, valueGetter: (p) => (p.data as unknown as { targetDepthM?: string })?.targetDepthM },
+    { headerName: 'Diamètre (mm)', width: 140, valueGetter: (p) => (p.data as unknown as { diameterMm?: number })?.diameterMm },
+    { headerName: 'Machine', width: 160, valueGetter: (p) => (p.data as unknown as { assignedMachineId?: string })?.assignedMachineId ?? '—' },
+    { headerName: 'Valide depuis', width: 170, valueGetter: (p) => {
+      const v = (p.data as unknown as { validFrom?: string })?.validFrom;
+      return v ? new Date(v).toLocaleDateString('fr-FR') : '';
+    } },
   ];
 
   ngOnInit(): void {

@@ -30,12 +30,12 @@ export class StockpileEventsComponent implements OnInit {
 
   readonly rows = signal<StockpileEventRow[]>([]);
 
-  readonly columnDefs: ColDef<StockpileEventRow>[] = [
-    { field: 'occurred_at_utc', headerName: 'stockpile.events.columns.date', width: 180 },
-    { field: 'event_type', headerName: 'stockpile.events.columns.type', width: 180 },
-    { field: 'calibre_code', headerName: 'stockpile.events.columns.calibre', width: 120 },
-    { field: 'tonnage_delta_kg', headerName: 'stockpile.events.columns.delta_kg', width: 140 },
-    { field: 'chain_hash', headerName: 'stockpile.events.columns.hash', flex: 1 },
+  readonly columnDefs: ColDef<any>[] = [
+    { field: 'occurredAtUtc', headerName: 'Date', width: 180 },
+    { field: 'eventType', headerName: 'Type', width: 180 },
+    { field: 'calibreCode', headerName: 'Calibre', width: 120 },
+    { field: 'tonnageDeltaKg', headerName: 'Delta Kg', width: 140 },
+    { field: 'chainHash', headerName: 'Hash', flex: 1 },
   ];
 
   ngOnInit(): void {

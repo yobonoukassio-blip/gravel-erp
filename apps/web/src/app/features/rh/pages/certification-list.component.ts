@@ -65,7 +65,7 @@ export class CertificationListComponent implements OnInit {
 
   readonly rows = signal<CertificationRow[]>([]);
 
-  readonly columnDefs: ColDef<CertificationRow>[] = [
+  readonly columnDefs: ColDef<any>[] = [
     {
       headerName: 'Employé',
       flex: 2,
@@ -74,16 +74,16 @@ export class CertificationListComponent implements OnInit {
         return r ? `${r.employee_id}` : '';
       },
     },
-    { field: 'cert_code', headerName: 'Code habilitation', flex: 1 },
+    { field: 'certCode', headerName: 'Code habilitation', flex: 1 },
     {
-      field: 'valid_from',
+      field: 'validFrom',
       headerName: 'Valable dès',
       width: 130,
       valueFormatter: (p) =>
         p.value ? new Date(p.value as string).toLocaleDateString('fr-CI') : '—',
     },
     {
-      field: 'valid_to',
+      field: 'validTo',
       headerName: 'Expire le',
       width: 130,
       valueFormatter: (p) =>

@@ -79,12 +79,12 @@ export class ConsolidationComponent implements OnInit {
   readonly pnl = signal<ConsolidatedPnL | null>(null);
   readonly rows = signal<SiteRow[]>([]);
 
-  readonly columnDefs: ColDef<SiteRow>[] = [
-    { field: 'siteId', headerName: 'finance.consolidation.columns.site', flex: 1 },
-    { field: 'revenueMinor', headerName: 'finance.consolidation.columns.revenue', width: 160 },
-    { field: 'costMinor', headerName: 'finance.consolidation.columns.cost', width: 160 },
-    { field: 'marginMinor', headerName: 'finance.consolidation.columns.margin', width: 160 },
-    { field: 'tonnageT', headerName: 'finance.consolidation.columns.tonnage_t', width: 140 },
+  readonly columnDefs: ColDef<any>[] = [
+    { field: 'siteId', headerName: 'Site', flex: 1 },
+    { field: 'revenueMinor', headerName: 'Revenue', width: 160 },
+    { field: 'costMinor', headerName: 'Cost', width: 160 },
+    { field: 'marginMinor', headerName: 'Margin', width: 160 },
+    { field: 'tonnageT', headerName: 'Tonnage T', width: 140 },
   ];
 
   ngOnInit(): void {

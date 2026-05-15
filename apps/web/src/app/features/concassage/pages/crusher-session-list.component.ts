@@ -81,51 +81,51 @@ export class CrusherSessionListComponent implements OnInit {
   private tenantId = ''; // Stub: wired from auth context in downstream plans
   private statusFilter: 'ACTIVE' | 'PAUSED' | 'COMPLETED' | '' = '';
 
-  readonly columnDefs: ColDef<CrusherSession>[] = [
+  readonly columnDefs: ColDef<any>[] = [
     {
       field: 'sessionStartUtc',
-      headerName: 'concassage.columns.session_start',
+      headerName: 'Session Start',
       valueFormatter: (p) => p.value ? new Date(p.value as string).toLocaleString('fr-FR') : '',
       width: 180,
     },
     {
       field: 'status',
-      headerName: 'concassage.columns.status',
+      headerName: 'Statut',
       width: 130,
       cellRenderer: (p: { value: string }) => {
         const colors: Record<string, string> = { ACTIVE: 'green', PAUSED: 'orange', COMPLETED: 'blue' };
         return `<span style="color:${colors[p.value] ?? 'grey'};font-weight:600">${p.value}</span>`;
       },
     },
-    { field: 'crusherId', headerName: 'concassage.columns.crusher_id', width: 150 },
-    { field: 'calibreCode', headerName: 'concassage.columns.calibre_code', width: 120 },
+    { field: 'crusherId', headerName: 'Crusher Id', width: 150 },
+    { field: 'calibreCode', headerName: 'Calibre', width: 120 },
     {
       field: 'inputTonnageKg',
-      headerName: 'concassage.columns.input_tonnage_kg',
+      headerName: 'Input Tonnage Kg',
       width: 150,
       valueFormatter: (p) => `${Number(p.value).toLocaleString('fr-FR')} kg`,
     },
     {
       field: 'outputTonnageKg',
-      headerName: 'concassage.columns.output_tonnage_kg',
+      headerName: 'Output Tonnage Kg',
       width: 160,
       valueFormatter: (p) => `${Number(p.value).toLocaleString('fr-FR')} kg`,
     },
     {
       field: 'performancePct',
-      headerName: 'concassage.columns.performance_pct',
+      headerName: 'Performance Pct',
       width: 130,
       valueFormatter: (p) => `${Number(p.value).toFixed(1)} %`,
     },
     {
       field: 'energyKwh',
-      headerName: 'concassage.columns.energy_kwh',
+      headerName: 'Energy Kwh',
       width: 120,
       valueFormatter: (p) => `${Number(p.value).toFixed(2)} kWh`,
     },
     {
       field: 'operatingHours',
-      headerName: 'concassage.columns.operating_hours',
+      headerName: 'Operating Hours',
       width: 130,
       valueFormatter: (p) => `${Number(p.value).toFixed(2)} h`,
     },

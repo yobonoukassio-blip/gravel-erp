@@ -54,10 +54,10 @@ import { TenantAwareGridComponent } from '../../shared/ag-grid/tenant-aware-grid
 })
 export class SitesListComponent {
   readonly columnDefs: ColDef[] = [
-    { field: 'code', headerName: 'sites.columns.code', sortable: true, width: 140 },
-    { field: 'name', headerName: 'sites.columns.name', sortable: true, flex: 1 },
-    { field: 'functionalCurrency', headerName: 'sites.columns.currency', width: 120 },
-    { field: 'ianaTimezone', headerName: 'sites.columns.timezone', width: 200 },
-    { field: 'status', headerName: 'sites.columns.status', width: 120 },
+    { field: 'code', headerName: 'Code', sortable: true, width: 140 },
+    { field: 'name', headerName: 'Nom', sortable: true, flex: 1 },
+    { field: 'functionalCurrency', headerName: 'Devise', width: 120 },
+    { field: 'ianaTimezone', headerName: 'Timezone', width: 200 },
+    { field: 'status', headerName: 'Statut', width: 120 },
   ];
 }

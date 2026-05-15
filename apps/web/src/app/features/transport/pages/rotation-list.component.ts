@@ -35,19 +35,19 @@ export class RotationListComponent implements OnInit {
   readonly rows = signal<TruckRotation[]>([]);
   readonly operationalDayId = signal<string>('current');
 
-  readonly columnDefs: ColDef<TruckRotation>[] = [
-    { field: 'id', headerName: 'transport.columns.id', width: 90 },
-    { field: 'operational_day_id', headerName: 'transport.columns.operational_day', width: 130 },
-    { field: 'truck_equipment_id', headerName: 'transport.columns.truck', width: 140 },
-    { field: 'driver_id', headerName: 'transport.columns.driver', width: 140 },
-    { field: 'loaded_at_bench_id', headerName: 'transport.columns.bench', width: 140 },
-    { field: 'unloaded_at_zone_id', headerName: 'transport.columns.zone', width: 140 },
-    { field: 'material_type', headerName: 'transport.columns.material', width: 130 },
-    { field: 'loaded_tonnage_t', headerName: 'transport.columns.tonnage', width: 110 },
-    { field: 'cycle_time_minutes', headerName: 'transport.columns.cycle_time', width: 130 },
+  readonly columnDefs: ColDef<any>[] = [
+    { field: 'id', headerName: 'ID', width: 90 },
+    { field: 'operationalDayId', headerName: 'Journée', width: 130 },
+    { field: 'truckEquipmentId', headerName: 'Camion', width: 140 },
+    { field: 'driverId', headerName: 'Chauffeur', width: 140 },
+    { field: 'loadedAtBenchId', headerName: 'Banc', width: 140 },
+    { field: 'unloadedAtZoneId', headerName: 'Zone', width: 140 },
+    { field: 'materialType', headerName: 'Matériau', width: 130 },
+    { field: 'loadedTonnageT', headerName: 'Tonnage (t)', width: 110 },
+    { field: 'cycleTimeMinutes', headerName: 'Cycle (min)', width: 130 },
     {
       colId: 'status',
-      headerName: 'transport.columns.status',
+      headerName: 'Statut',
       width: 140,
       valueGetter: (p) => this.statusOf(p.data),
       cellRenderer: (p: { value: string }) =>

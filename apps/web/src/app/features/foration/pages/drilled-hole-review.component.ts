@@ -47,32 +47,32 @@ export class DrilledHoleReviewComponent implements OnInit {
 
   readonly rows = signal<DrilledHole[]>([]);
 
-  readonly columnDefs: ColDef<DrilledHole>[] = [
-    { field: 'hole_index_in_plan', headerName: 'foration.columns.hole_index', width: 100 },
+  readonly columnDefs: ColDef<any>[] = [
+    { field: 'holeIndexInPlan', headerName: 'Hole Index', width: 100 },
     {
-      field: 'gps_point',
-      headerName: 'foration.columns.gps',
+      field: 'gpsPoint',
+      headerName: 'Gps',
       width: 220,
       valueFormatter: (p) => {
         const v = p.value as { coordinates: [number, number] } | null;
         return v ? `${v.coordinates[1].toFixed(5)}, ${v.coordinates[0].toFixed(5)}` : '—';
       },
     },
-    { field: 'gps_accuracy_m', headerName: 'foration.columns.gps_accuracy_m', width: 140 },
-    { field: 'actual_depth_m', headerName: 'foration.columns.actual_depth_m', width: 140 },
-    { field: 'actual_diameter_mm', headerName: 'foration.columns.actual_diameter_mm', width: 150 },
+    { field: 'gpsAccuracyM', headerName: 'Gps Accuracy M', width: 140 },
+    { field: 'actualDepthM', headerName: 'Actual Depth M', width: 140 },
+    { field: 'actualDiameterMm', headerName: 'Actual Diameter Mm', width: 150 },
     {
-      field: 'tolerance_violation',
-      headerName: 'foration.columns.tolerance_violation',
+      field: 'toleranceViolation',
+      headerName: 'Tolerance Violation',
       width: 160,
       cellRenderer: (p: { value: boolean }) =>
         p.value
           ? `<span class="badge-violation">tolerance_violation</span>`
           : `<span class="badge-ok">OK</span>`,
     },
-    { field: 'operator_id', headerName: 'foration.columns.operator', width: 160 },
-    { field: 'machine_id', headerName: 'foration.columns.machine', width: 160 },
-    { field: 'fuel_liters_consumed', headerName: 'foration.columns.fuel_liters', width: 130 },
+    { field: 'operatorId', headerName: 'Operator', width: 160 },
+    { field: 'machineId', headerName: 'Machine', width: 160 },
+    { field: 'fuelLitersConsumed', headerName: 'Fuel Liters', width: 130 },
   ];
 
   ngOnInit(): void {

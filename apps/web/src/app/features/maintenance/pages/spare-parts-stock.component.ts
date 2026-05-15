@@ -36,12 +36,12 @@ export class SparePartsStockComponent implements OnInit {
 
   readonly rows = signal<SparePart[]>([]);
 
-  readonly columnDefs: ColDef<SparePart>[] = [
-    { field: 'sku', headerName: 'maintenance.spare_parts.sku', width: 160 },
-    { field: 'label', headerName: 'maintenance.spare_parts.label', flex: 2 },
-    { field: 'quantityOnHand', headerName: 'maintenance.spare_parts.qty', width: 130 },
-    { field: 'thresholdMin', headerName: 'maintenance.spare_parts.threshold', width: 140 },
-    { field: 'belowThreshold', headerName: 'maintenance.spare_parts.alert', width: 110 },
+  readonly columnDefs: ColDef<any>[] = [
+    { field: 'sku', headerName: 'Sku', width: 160 },
+    { field: 'label', headerName: 'Libellé', flex: 2 },
+    { field: 'quantityOnHand', headerName: 'Qty', width: 130 },
+    { field: 'thresholdMin', headerName: 'Threshold', width: 140 },
+    { field: 'belowThreshold', headerName: 'Alert', width: 110 },
   ];
 
   readonly rowClass = (params: { data: SparePart | undefined }): string | undefined =>

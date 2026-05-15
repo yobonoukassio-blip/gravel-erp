@@ -52,18 +52,18 @@ export class EmployeeListComponent implements OnInit {
 
   readonly rows = signal<EmployeeRow[]>([]);
 
-  readonly columnDefs: ColDef<EmployeeRow>[] = [
-    { field: 'employee_number', headerName: 'Matricule', width: 130 },
-    { field: 'last_name', headerName: 'Nom', flex: 1 },
-    { field: 'first_name', headerName: 'Prénom', flex: 1 },
+  readonly columnDefs: ColDef<any>[] = [
+    { field: 'employeeNumber', headerName: 'Matricule', width: 130 },
+    { field: 'lastName', headerName: 'Nom', flex: 1 },
+    { field: 'firstName', headerName: 'Prénom', flex: 1 },
     {
-      field: 'contract_type',
+      field: 'contractType',
       headerName: 'Contrat',
       width: 110,
     },
-    { field: 'role_code', headerName: 'Rôle métier', flex: 1 },
+    { field: 'roleCode', headerName: 'Rôle métier', flex: 1 },
     {
-      field: 'is_active',
+      field: 'isActive',
       headerName: 'Actif',
       width: 90,
       cellStyle: (p) => ({

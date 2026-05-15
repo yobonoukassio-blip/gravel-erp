@@ -53,12 +53,12 @@ export class FuelTankListComponent implements OnInit {
 
   readonly rows = signal<FuelTankRow[]>([]);
 
-  readonly columnDefs: ColDef<FuelTankRow>[] = [
+  readonly columnDefs: ColDef<any>[] = [
     { field: 'code', headerName: 'Code', width: 120 },
     { field: 'label', headerName: 'Libellé', flex: 2 },
-    { field: 'capacity_liters', headerName: 'Capacité (L)', width: 140 },
+    { field: 'capacityLiters', headerName: 'Capacité (L)', width: 140 },
     {
-      field: 'balance_liters',
+      field: 'balanceLiters',
       headerName: 'Solde actuel (L)',
       width: 160,
     },
@@ -80,13 +80,13 @@ export class FuelTankListComponent implements OnInit {
       },
     },
     {
-      field: 'last_reconciliation_drift',
+      field: 'lastReconciliationDrift',
       headerName: 'Écart recon. (L)',
       width: 160,
       valueFormatter: (p) =>
         p.value == null ? '—' : `${(p.value as number).toFixed(1)} L`,
     },
-    { field: 'fuel_type', headerName: 'Type', width: 100 },
+    { field: 'fuelType', headerName: 'Type', width: 100 },
   ];
 
   ngOnInit(): void {

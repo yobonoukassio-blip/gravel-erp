@@ -41,22 +41,22 @@ export class EquipmentAvailabilityComponent implements OnInit {
 
   readonly rows = signal<EquipmentAvailability[]>([]);
 
-  readonly columnDefs: ColDef<EquipmentAvailability>[] = [
-    { field: 'equipmentLabel', headerName: 'maintenance.availability.equipment', flex: 2 },
-    { field: 'status', headerName: 'maintenance.availability.status', width: 140 },
+  readonly columnDefs: ColDef<any>[] = [
+    { field: 'equipmentLabel', headerName: 'Équipement', flex: 2 },
+    { field: 'status', headerName: 'Statut', width: 140 },
     {
       field: 'mtbfHours',
-      headerName: 'maintenance.availability.mtbf_h',
+      headerName: 'Mtbf H',
       width: 130,
       valueFormatter: (p) => (p.value == null ? 'N/A' : Number(p.value).toFixed(1)),
     },
     {
       field: 'mttrHours',
-      headerName: 'maintenance.availability.mttr_h',
+      headerName: 'Mttr H',
       width: 130,
       valueFormatter: (p) => (p.value == null ? 'N/A' : Number(p.value).toFixed(1)),
     },
-    { field: 'failureCount', headerName: 'maintenance.availability.failures', width: 110 },
+    { field: 'failureCount', headerName: 'Failures', width: 110 },
   ];
 
   ngOnInit(): void {

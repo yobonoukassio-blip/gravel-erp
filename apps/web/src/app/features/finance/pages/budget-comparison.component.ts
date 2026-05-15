@@ -50,14 +50,14 @@ export class BudgetComparisonComponent implements OnInit {
 
   readonly rows = signal<BudgetVsActual[]>([]);
 
-  readonly columnDefs: ColDef<BudgetVsActual>[] = [
-    { field: 'category', headerName: 'finance.budget.columns.category', flex: 1 },
-    { field: 'budgetMinor', headerName: 'finance.budget.columns.budget', width: 160 },
-    { field: 'actualMinor', headerName: 'finance.budget.columns.actual', width: 160 },
-    { field: 'variancePct', headerName: 'finance.budget.columns.variance_pct', width: 140 },
+  readonly columnDefs: ColDef<any>[] = [
+    { field: 'category', headerName: 'Catégorie', flex: 1 },
+    { field: 'budgetMinor', headerName: 'Budget', width: 160 },
+    { field: 'actualMinor', headerName: 'Réel', width: 160 },
+    { field: 'variancePct', headerName: 'Variance Pct', width: 140 },
     {
       field: 'status',
-      headerName: 'finance.budget.columns.status',
+      headerName: 'Statut',
       width: 140,
       cellRenderer: (p: { value: string }) =>
         `<span class="badge badge-${p.value}">${p.value}</span>`,

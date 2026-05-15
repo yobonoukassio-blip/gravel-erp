@@ -28,12 +28,12 @@ export class CustomerListComponent implements OnInit {
 
   readonly rows = signal<Customer[]>([]);
 
-  readonly columnDefs: ColDef<Customer>[] = [
-    { field: 'code', headerName: 'ventes.customer.columns.code', width: 120 },
-    { field: 'name', headerName: 'ventes.customer.columns.name', flex: 2 },
-    { field: 'defaultCurrency', headerName: 'ventes.customer.columns.currency', width: 100 },
-    { field: 'paymentTermsDays', headerName: 'ventes.customer.columns.payment_terms', width: 140 },
-    { field: 'isActive', headerName: 'ventes.customer.columns.active', width: 90 },
+  readonly columnDefs: ColDef<any>[] = [
+    { field: 'code', headerName: 'Code', width: 120 },
+    { field: 'name', headerName: 'Nom', flex: 2 },
+    { field: 'defaultCurrency', headerName: 'Devise', width: 100 },
+    { field: 'paymentTermsDays', headerName: 'Délai paiement', width: 140 },
+    { field: 'isActive', headerName: 'Actif', width: 90 },
   ];
 
   ngOnInit(): void {

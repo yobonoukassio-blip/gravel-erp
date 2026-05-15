@@ -95,14 +95,14 @@ export class ExtractionCycleListComponent implements OnInit {
   readonly operationalDayId = signal<string>('');
   readonly equipmentFilter = signal<string>('');
 
-  readonly cycleColumnDefs: ColDef<ExtractionCycleRow>[] = [
-    { field: 'cycle_started_at_local', headerName: 'Date', sortable: true, width: 180 },
-    { field: 'bench_id', headerName: 'Banc', sortable: true, width: 140 },
-    { field: 'equipment_id', headerName: 'Engin', sortable: true, width: 140 },
-    { field: 'operator_id', headerName: 'Opérateur', sortable: true, width: 140 },
-    { field: 'material_type', headerName: 'Matériau', sortable: true, width: 140 },
+  readonly cycleColumnDefs: ColDef<any>[] = [
+    { field: 'cycleStartedAtLocal', headerName: 'Date', sortable: true, width: 180 },
+    { field: 'benchId', headerName: 'Banc', sortable: true, width: 140 },
+    { field: 'equipmentId', headerName: 'Engin', sortable: true, width: 140 },
+    { field: 'operatorId', headerName: 'Opérateur', sortable: true, width: 140 },
+    { field: 'materialType', headerName: 'Matériau', sortable: true, width: 140 },
     {
-      field: 'estimated_tonnage_t',
+      field: 'estimatedTonnageT',
       headerName: 'Tonnage estimé (t)',
       sortable: true,
       width: 170,
@@ -112,7 +112,7 @@ export class ExtractionCycleListComponent implements OnInit {
         params.value != null ? `${params.value.toFixed(1)}` : '—',
     },
     {
-      field: 'downtime_minutes',
+      field: 'downtimeMinutes',
       headerName: 'Arrêt (min)',
       sortable: true,
       width: 140,
@@ -124,13 +124,13 @@ export class ExtractionCycleListComponent implements OnInit {
     { field: 'notes', headerName: 'Notes', flex: 1 },
   ];
 
-  readonly yieldColumnDefs: ColDef<YieldRow>[] = [
-    { field: 'equipment_id', headerName: 'Engin', sortable: true, width: 160 },
-    { field: 'operator_id', headerName: 'Opérateur', sortable: true, width: 160 },
-    { field: 'cycle_count', headerName: 'Cycles', sortable: true, width: 100 },
-    { field: 'total_estimated_t', headerName: 'Total estimé (t)', sortable: true, width: 170 },
-    { field: 'productive_hours', headerName: 'Heures productives', sortable: true, width: 170 },
-    { field: 'yield_t_per_h', headerName: 'Rendement (t/h)', sortable: true, width: 170 },
+  readonly yieldColumnDefs: ColDef<any>[] = [
+    { field: 'equipmentId', headerName: 'Engin', sortable: true, width: 160 },
+    { field: 'operatorId', headerName: 'Opérateur', sortable: true, width: 160 },
+    { field: 'cycleCount', headerName: 'Cycles', sortable: true, width: 100 },
+    { field: 'totalEstimatedT', headerName: 'Total estimé (t)', sortable: true, width: 170 },
+    { field: 'productiveHours', headerName: 'Heures productives', sortable: true, width: 170 },
+    { field: 'yieldTPerH', headerName: 'Rendement (t/h)', sortable: true, width: 170 },
   ];
 
   async ngOnInit(): Promise<void> {

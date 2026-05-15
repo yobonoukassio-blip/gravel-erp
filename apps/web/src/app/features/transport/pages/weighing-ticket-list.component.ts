@@ -36,18 +36,18 @@ export class WeighingTicketListComponent implements OnInit {
   readonly rows = signal<WeighingTicket[]>([]);
   readonly operationalDayId = signal<string>('current');
 
-  readonly columnDefs: ColDef<WeighingTicket>[] = [
-    { field: 'ticket_number', headerName: 'transport.columns.ticket_number', width: 220 },
-    { field: 'gross_kg', headerName: 'transport.columns.gross_kg', width: 110 },
-    { field: 'tare_kg', headerName: 'transport.columns.tare_kg', width: 110 },
-    { field: 'net_kg', headerName: 'transport.columns.net_kg', width: 110 },
-    { field: 'truck_equipment_id', headerName: 'transport.columns.truck', width: 140 },
-    { field: 'driver_id', headerName: 'transport.columns.driver', width: 140 },
-    { field: 'material_type', headerName: 'transport.columns.material', width: 130 },
-    { field: 'weighed_at_local', headerName: 'transport.columns.weighed_at', width: 180 },
+  readonly columnDefs: ColDef<any>[] = [
+    { field: 'ticketNumber', headerName: 'Ticket Number', width: 220 },
+    { field: 'grossKg', headerName: 'Gross Kg', width: 110 },
+    { field: 'tareKg', headerName: 'Tare Kg', width: 110 },
+    { field: 'netKg', headerName: 'Net Kg', width: 110 },
+    { field: 'truckEquipmentId', headerName: 'Camion', width: 140 },
+    { field: 'driverId', headerName: 'Chauffeur', width: 140 },
+    { field: 'materialType', headerName: 'Matériau', width: 130 },
+    { field: 'weighedAtLocal', headerName: 'Weighed At', width: 180 },
     {
-      field: 'content_hash',
-      headerName: 'transport.columns.content_hash',
+      field: 'contentHash',
+      headerName: 'Content Hash',
       width: 130,
       valueFormatter: (p) =>
         typeof p.value === 'string' ? p.value.slice(0, 12) + '…' : '',
@@ -55,15 +55,15 @@ export class WeighingTicketListComponent implements OnInit {
     },
     {
       colId: 'signatures',
-      headerName: 'transport.columns.signatures',
+      headerName: 'Signatures',
       width: 120,
       valueGetter: (p) =>
         (p.data?.client_signature_blob_sha256 ? 'C' : '') +
         (p.data?.driver_signature_blob_sha256 ? 'D' : ''),
     },
     {
-      field: 'is_offline_generated',
-      headerName: 'transport.columns.is_offline_generated',
+      field: 'isOfflineGenerated',
+      headerName: 'Is Offline Generated',
       width: 130,
       cellRenderer: (p: { value: boolean }) =>
         p.value

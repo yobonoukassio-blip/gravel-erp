@@ -30,17 +30,17 @@ export class InvoiceListComponent implements OnInit {
 
   readonly rows = signal<Invoice[]>([]);
 
-  readonly columnDefs: ColDef<Invoice>[] = [
-    { field: 'number', headerName: 'ventes.invoice.columns.number', width: 180 },
-    { field: 'customerId', headerName: 'ventes.invoice.columns.customer', width: 160 },
-    { field: 'issueDate', headerName: 'ventes.invoice.columns.date', width: 140 },
-    { field: 'totalMinorUnits', headerName: 'ventes.invoice.columns.total', width: 160 },
-    { field: 'currency', headerName: 'ventes.invoice.columns.currency', width: 100 },
-    { field: 'fxRateToXof', headerName: 'ventes.invoice.columns.fx_to_xof', width: 130 },
-    { field: 'totalXofMinorUnits', headerName: 'ventes.invoice.columns.total_xof', width: 160 },
+  readonly columnDefs: ColDef<any>[] = [
+    { field: 'number', headerName: 'Number', width: 180 },
+    { field: 'customerId', headerName: 'Client', width: 160 },
+    { field: 'issueDate', headerName: 'Date', width: 140 },
+    { field: 'totalMinorUnits', headerName: 'Total', width: 160 },
+    { field: 'currency', headerName: 'Devise', width: 100 },
+    { field: 'fxRateToXof', headerName: 'Fx To Xof', width: 130 },
+    { field: 'totalXofMinorUnits', headerName: 'Total Xof', width: 160 },
     {
       field: 'status',
-      headerName: 'ventes.invoice.columns.status',
+      headerName: 'Statut',
       width: 110,
       cellRenderer: (p: { value: string }) =>
         `<span class="badge badge-${p.value}">${p.value}</span>`,

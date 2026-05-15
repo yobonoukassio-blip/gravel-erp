@@ -50,11 +50,11 @@ export class RefuelListComponent implements OnInit {
 
   readonly rows = signal<RefuelListRow[]>([]);
 
-  readonly columnDefs: ColDef<RefuelListRow>[] = [
-    { field: 'equipment_code', headerName: 'Engin', width: 140 },
+  readonly columnDefs: ColDef<any>[] = [
+    { field: 'equipmentCode', headerName: 'Engin', width: 140 },
     { field: 'liters', headerName: 'Litres', width: 100 },
     {
-      field: 'hours_since_previous',
+      field: 'hoursSincePrevious',
       headerName: 'Heures depuis prev.',
       width: 180,
       valueFormatter: (p) => p.value == null ? '—' : `${(p.value as number).toFixed(1)} h`,
@@ -70,14 +70,14 @@ export class RefuelListComponent implements OnInit {
       },
     },
     {
-      field: 'anomaly_flag',
+      field: 'anomalyFlag',
       headerName: 'Anomalie',
       width: 110,
       cellRenderer: (p: { value: boolean }) =>
         p.value ? `<span style="color:red;font-weight:bold">⚠ ANOMALIE</span>` : '',
     },
     {
-      field: 'created_at_utc',
+      field: 'createdAtUtc',
       headerName: 'Date',
       width: 180,
       valueFormatter: (p) => new Date(p.value as string).toLocaleString('fr-FR'),

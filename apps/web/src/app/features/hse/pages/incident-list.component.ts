@@ -94,7 +94,7 @@ export class IncidentListComponent implements OnInit {
 
   readonly rows = signal<HseIncidentRow[]>([]);
 
-  readonly columnDefs: ColDef<HseIncidentRow>[] = [
+  readonly columnDefs: ColDef<any>[] = [
     {
       field: 'category',
       headerName: 'Catégorie',
@@ -113,13 +113,13 @@ export class IncidentListComponent implements OnInit {
       }),
     },
     {
-      field: 'occurred_at_utc',
+      field: 'occurredAtUtc',
       headerName: 'Date',
       flex: 1,
       valueFormatter: (p) =>
         p.value ? new Date(p.value as string).toLocaleDateString('fr-CI') : '—',
     },
-    { field: 'location_text', headerName: 'Lieu', flex: 2 },
+    { field: 'locationText', headerName: 'Lieu', flex: 2 },
     {
       field: 'status',
       headerName: 'Statut',

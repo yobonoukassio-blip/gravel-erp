@@ -38,14 +38,14 @@ export class StockpileListComponent implements OnInit {
 
   readonly rows = signal<StockpileRow[]>([]);
 
-  readonly columnDefs: ColDef<StockpileRow>[] = [
-    { field: 'name', headerName: 'stockpile.columns.name', flex: 2 },
-    { field: 'material_type', headerName: 'stockpile.columns.material', width: 140 },
-    { field: 'calibre_code', headerName: 'stockpile.columns.calibre', width: 140 },
-    { field: 'is_active', headerName: 'stockpile.columns.active', width: 100 },
+  readonly columnDefs: ColDef<any>[] = [
+    { field: 'name', headerName: 'Nom', flex: 2 },
+    { field: 'materialType', headerName: 'Matériau', width: 140 },
+    { field: 'calibreCode', headerName: 'Calibre', width: 140 },
+    { field: 'isActive', headerName: 'Actif', width: 100 },
     {
       colId: 'weighted_avg_cost',
-      headerName: 'stockpile.columns.weighted_avg_cost',
+      headerName: 'Coût moyen pondéré',
       width: 200,
       valueGetter: (p) =>
         (p.data as StockpileRow & { weighted_avg_cost_per_ton_minor_units?: string })

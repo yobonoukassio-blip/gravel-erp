@@ -30,15 +30,15 @@ export class WorkOrderListComponent implements OnInit {
 
   readonly rows = signal<WorkOrder[]>([]);
 
-  readonly columnDefs: ColDef<WorkOrder>[] = [
-    { field: 'id', headerName: 'maintenance.columns.id', width: 100 },
-    { field: 'equipmentId', headerName: 'maintenance.columns.equipment', width: 160 },
-    { field: 'type', headerName: 'maintenance.columns.type', width: 120 },
-    { field: 'status', headerName: 'maintenance.columns.status', width: 120 },
-    { field: 'diagnosis', headerName: 'maintenance.columns.diagnosis', flex: 2 },
-    { field: 'downtimeMinutes', headerName: 'maintenance.columns.downtime_min', width: 140 },
-    { field: 'laborHours', headerName: 'maintenance.columns.labor_h', width: 110 },
-    { field: 'openedAtUtc', headerName: 'maintenance.columns.opened_at', width: 180 },
+  readonly columnDefs: ColDef<any>[] = [
+    { field: 'id', headerName: 'ID', width: 100 },
+    { field: 'equipmentId', headerName: 'Équipement', width: 160 },
+    { field: 'type', headerName: 'Type', width: 120 },
+    { field: 'status', headerName: 'Statut', width: 120 },
+    { field: 'diagnosis', headerName: 'Diagnosis', flex: 2 },
+    { field: 'downtimeMinutes', headerName: 'Downtime Min', width: 140 },
+    { field: 'laborHours', headerName: 'Labor H', width: 110 },
+    { field: 'openedAtUtc', headerName: 'Opened At', width: 180 },
   ];
 
   ngOnInit(): void {

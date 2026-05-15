@@ -86,37 +86,37 @@ export class ScreeningSessionListComponent implements OnInit {
   private tenantId = ''; // Stub: from auth context
   private statusFilter: 'ACTIVE' | 'PAUSED' | 'COMPLETED' | '' = '';
 
-  readonly columnDefs: ColDef<ScreeningSessionRow>[] = [
+  readonly columnDefs: ColDef<any>[] = [
     {
       field: 'sessionStartUtc',
-      headerName: 'criblage.columns.session_start',
+      headerName: 'Session Start',
       valueFormatter: (p) => p.value ? new Date(p.value as string).toLocaleString('fr-FR') : '',
       width: 180,
     },
     {
       field: 'status',
-      headerName: 'criblage.columns.status',
+      headerName: 'Statut',
       width: 130,
       cellRenderer: (p: { value: string }) => {
         const colors: Record<string, string> = { ACTIVE: 'green', PAUSED: 'orange', COMPLETED: 'blue' };
         return `<span style="color:${colors[p.value] ?? 'grey'};font-weight:600">${p.value}</span>`;
       },
     },
-    { field: 'screenId', headerName: 'criblage.columns.screen_id', width: 150 },
+    { field: 'screenId', headerName: 'Screen Id', width: 150 },
     {
       field: 'inputTonnageKg',
-      headerName: 'criblage.columns.input_tonnage_kg',
+      headerName: 'Input Tonnage Kg',
       width: 160,
       valueFormatter: (p) => `${Number(p.value).toLocaleString('fr-FR')} kg`,
     },
     {
-      field: 'calibre_yield_count',
-      headerName: 'criblage.columns.calibre_yield_count',
+      field: 'calibreYieldCount',
+      headerName: 'Calibre Yield Count',
       width: 150,
     },
     {
-      field: 'has_nonconformity',
-      headerName: 'criblage.columns.has_nonconformity',
+      field: 'hasNonconformity',
+      headerName: 'Has Nonconformity',
       width: 160,
       cellRenderer: (p: { value: boolean }) => {
         if (p.value) {

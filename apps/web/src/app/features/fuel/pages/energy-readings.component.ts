@@ -115,18 +115,18 @@ export class EnergyReadingsComponent implements OnInit {
     source_meter_code: [null as string | null],
   });
 
-  readonly columnDefs: ColDef<EnergyReadingRow>[] = [
-    { field: 'year_month', headerName: 'Mois', width: 110 },
-    { field: 'usage_type', headerName: 'Usage', width: 130 },
+  readonly columnDefs: ColDef<any>[] = [
+    { field: 'yearMonth', headerName: 'Mois', width: 110 },
+    { field: 'usageType', headerName: 'Usage', width: 130 },
     {
       field: 'kwh',
       headerName: 'kWh',
       width: 120,
       valueFormatter: (p) => `${(p.value as number).toLocaleString('fr-FR')} kWh`,
     },
-    { field: 'source_meter_code', headerName: 'Compteur', width: 140 },
+    { field: 'sourceMeterCode', headerName: 'Compteur', width: 140 },
     {
-      field: 'recorded_at_utc',
+      field: 'recordedAtUtc',
       headerName: 'Saisi le',
       width: 160,
       valueFormatter: (p) => new Date(p.value as string).toLocaleDateString('fr-FR'),

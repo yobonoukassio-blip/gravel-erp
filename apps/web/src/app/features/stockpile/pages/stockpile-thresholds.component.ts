@@ -28,12 +28,12 @@ export class StockpileThresholdsComponent implements OnInit {
 
   readonly rows = signal<StockpileThreshold[]>([]);
 
-  readonly columnDefs: ColDef<StockpileThreshold>[] = [
-    { field: 'stockpile_id', headerName: 'stockpile.thresholds.columns.stockpile', flex: 1 },
-    { field: 'calibre_code', headerName: 'stockpile.thresholds.columns.calibre', width: 120 },
-    { field: 'min_tonnage_kg', headerName: 'stockpile.thresholds.columns.min_kg', width: 140 },
-    { field: 'max_tonnage_kg', headerName: 'stockpile.thresholds.columns.max_kg', width: 140 },
-    { field: 'is_active', headerName: 'stockpile.thresholds.columns.active', width: 90 },
+  readonly columnDefs: ColDef<any>[] = [
+    { field: 'stockpileId', headerName: 'Stockpile', flex: 1 },
+    { field: 'calibreCode', headerName: 'Calibre', width: 120 },
+    { field: 'minTonnageKg', headerName: 'Min Kg', width: 140 },
+    { field: 'maxTonnageKg', headerName: 'Max Kg', width: 140 },
+    { field: 'isActive', headerName: 'Actif', width: 90 },
   ];
 
   ngOnInit(): void {

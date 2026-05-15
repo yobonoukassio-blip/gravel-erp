@@ -46,7 +46,7 @@ export class BlListComponent implements OnInit {
 
   readonly rows = signal<BonDeLivraison[]>([]);
 
-  readonly columnDefs: ColDef<BonDeLivraison>[] = [
+  readonly columnDefs: ColDef<any>[] = [
     { field: 'number', headerName: 'N° BL', width: 180 },
     { field: 'customerId', headerName: 'Client', width: 160 },
     { field: 'calibreCode', headerName: 'Calibre', width: 110 },

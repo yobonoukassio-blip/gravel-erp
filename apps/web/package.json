@@ -4,7 +4,7 @@
   "private": true,
   "description": "Gravel Ivoire ERP — Angular 20 web admin (sites, zones, permits, activity-log read-only).",
   "scripts": {
-    "start": "ng serve",
+    "start": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
     "test:quick": "ng test --watch=false --browsers=ChromeHeadless",
     "test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",

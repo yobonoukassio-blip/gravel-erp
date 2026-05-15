@@ -58,11 +58,11 @@ export class CorrectiveActionListComponent implements OnInit {
 
   readonly rows = signal<CorrectiveActionRow[]>([]);
 
-  readonly columnDefs: ColDef<CorrectiveActionRow>[] = [
+  readonly columnDefs: ColDef<any>[] = [
     { field: 'description', headerName: 'Description', flex: 3 },
-    { field: 'incident_id', headerName: 'Incident', width: 280 },
+    { field: 'incidentId', headerName: 'Incident', width: 280 },
     {
-      field: 'due_date_local',
+      field: 'dueDateLocal',
       headerName: 'Échéance',
       width: 130,
     },

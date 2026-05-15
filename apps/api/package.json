@@ -19,7 +19,8 @@
     "migration:revert": "typeorm-ts-node-commonjs migration:revert -d ormconfig.ts",
     "db:migrate": "node scripts/run-migrations.mjs",
     "db:seed:demo": "node scripts/seed-demo.mjs",
-    "db:seed:user": "psql \"$DATABASE_URL\" -f scripts/seed-dev-user.sql"
+    "db:seed:user": "psql \"$DATABASE_URL\" -f scripts/seed-dev-user.sql",
+    "db:seed:opday": "psql \"$DATABASE_URL\" -f scripts/seed-operational-day-today.sql"
   },
   "dependencies": {
     "@nestjs/core": "^11.0.0",

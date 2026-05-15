@@ -4,6 +4,14 @@
 import { setDefaultResultOrder } from 'node:dns';
 setDefaultResultOrder('ipv4first');
 
+// JSON.stringify cannot serialize BigInt natively, which makes any endpoint
+// returning a bigint (tonnage_*_kg in dashboard payloads, money minor units)
+// crash with `TypeError: Do not know how to serialize a BigInt`. Emit BigInt
+// as a string in JSON responses — callers already treat XOF amounts as strings.
+(BigInt.prototype as unknown as { toJSON: () => string }).toJSON = function () {
+  return this.toString();
+};
+
 // IMPORTANT: OTel must be started BEFORE any module that should be instrumented
 // is imported. Keep this import at the very top of the file.
 import { startOtel } from './otel/otel';

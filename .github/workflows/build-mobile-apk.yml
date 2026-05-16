@@ -1,0 +1,125 @@
+name: Build Mobile APK
+
+# Builds the Gravel Ivoire mobile Android APK. Triggered manually from the
+# Actions tab or automatically on push to main when mobile sources change.
+# Output APK is uploaded as a workflow artifact + attached to a GitHub Release
+# when a tag matching `mobile-v*` is pushed.
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_mode:
+        description: 'Build mode'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - release
+          - debug
+  push:
+    branches: [main]
+    tags: ['mobile-v*']
+    paths:
+      - 'apps/mobile/**'
+      - '.github/workflows/build-mobile-apk.yml'
+
+env:
+  FLUTTER_VERSION: '3.41.9'
+  JAVA_VERSION: '17'
+  GRAVEL_TENANT_ID: '24cd97f8-0170-453e-89da-e9213dd710d7'
+  GRAVEL_SITE_ID: '5213953c-3820-4da4-97ed-89bfbd605c07'
+  GRAVEL_USER_ID: '00000000-0000-0000-0000-000000000001'
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: apps/mobile
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Show Flutter version
+        run: flutter --version
+
+      - name: Add Android platform support
+        # The mobile project ships without android/ — generate it here.
+        run: flutter create . --platforms=android --org=ci.gravelivoire --project-name=gravel_mobile
+
+      - name: Cache pub
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            apps/mobile/.dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('apps/mobile/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('apps/mobile/android/**/*.gradle*', 'apps/mobile/android/**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Regenerate Drift
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Build APK (${{ github.event.inputs.build_mode || 'release' }})
+        run: |
+          MODE="${{ github.event.inputs.build_mode || 'release' }}"
+          flutter build apk --$MODE \
+            --dart-define=GRAVEL_TENANT_ID=$GRAVEL_TENANT_ID \
+            --dart-define=GRAVEL_SITE_ID=$GRAVEL_SITE_ID \
+            --dart-define=GRAVEL_USER_ID=$GRAVEL_USER_ID
+
+      - name: Rename APK with metadata
+        id: rename
+        run: |
+          MODE="${{ github.event.inputs.build_mode || 'release' }}"
+          SHA="${GITHUB_SHA::8}"
+          DATE=$(date -u +%Y%m%d)
+          SRC="build/app/outputs/flutter-apk/app-${MODE}.apk"
+          DST="gravel-mobile-${MODE}-${DATE}-${SHA}.apk"
+          cp "$SRC" "$DST"
+          echo "apk_path=apps/mobile/$DST" >> "$GITHUB_OUTPUT"
+          echo "apk_name=$DST" >> "$GITHUB_OUTPUT"
+          ls -lh "$DST"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.rename.outputs.apk_name }}
+          path: ${{ steps.rename.outputs.apk_path }}
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Create GitHub Release on tag push
+        if: startsWith(github.ref, 'refs/tags/mobile-v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.rename.outputs.apk_path }}
+          generate_release_notes: true

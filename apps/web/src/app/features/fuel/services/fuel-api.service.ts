@@ -78,23 +78,23 @@ export class FuelApiService {
   private readonly http = inject(HttpClient);
 
   listTanks(siteId: string): Observable<FuelTankRow[]> {
-    return this.http.get<FuelTankRow[]>('/api/fuel/tanks', { params: { site_id: siteId } });
+    return this.http.get<FuelTankRow[]>('/api/fuel-tanks', { params: { site_id: siteId } });
   }
 
   listEvents(tankId: string): Observable<FuelTankEventRow[]> {
-    return this.http.get<FuelTankEventRow[]>('/api/fuel/tank-events', {
+    return this.http.get<FuelTankEventRow[]>('/api/fuel-tank-events', {
       params: { tank_id: tankId },
     });
   }
 
   listRefuels(siteId: string): Observable<EquipmentRefuelRow[]> {
-    return this.http.get<EquipmentRefuelRow[]>('/api/fuel/equipment-refuels', {
+    return this.http.get<EquipmentRefuelRow[]>('/api/equipment-refuels', {
       params: { site_id: siteId },
     });
   }
 
   createDelivery(dto: CreateFuelDeliveryDto): Observable<FuelTankEventRow> {
-    return this.http.post<FuelTankEventRow>('/api/fuel/tank-events', {
+    return this.http.post<FuelTankEventRow>('/api/fuel-tank-events', {
       tank_id: dto.tank_id,
       event_type: 'FUEL_DELIVERY_IN',
       liters_delta: dto.liters,
@@ -112,10 +112,10 @@ export class FuelApiService {
   listEnergyReadings(siteId: string, yearMonth?: string): Observable<EnergyReadingRow[]> {
     const params: Record<string, string> = { site_id: siteId };
     if (yearMonth) params['year_month'] = yearMonth;
-    return this.http.get<EnergyReadingRow[]>('/api/fuel/energy-readings', { params });
+    return this.http.get<EnergyReadingRow[]>('/api/energy-readings', { params });
   }
 
   upsertEnergyReading(dto: UpsertEnergyReadingDto): Observable<EnergyReadingRow> {
-    return this.http.post<EnergyReadingRow>('/api/fuel/energy-readings', dto);
+    return this.http.post<EnergyReadingRow>('/api/energy-readings', dto);
   }
 }

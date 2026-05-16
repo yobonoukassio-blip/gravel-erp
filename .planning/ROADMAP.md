@@ -46,7 +46,7 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 08-W1-P01-PLAN.md --- Equipment meter denormalization + event-driven updaters (hour/km columns, backfill, MeterUpdateHandler)
-- [ ] 08-W1-P02-PLAN.md --- Spare-part threshold event flow (payload enrichment, recovery event, AlertsEventHandler subscribers)
+- [x] 08-W1-P02-PLAN.md --- Spare-part threshold event flow (payload enrichment, recovery event, AlertsEventHandler subscribers)
 - [ ] 08-W2-P01-PLAN.md --- PreventiveMaintenanceSchedulerJob @Cron + findOpen idempotency + alert_rule seed
 
 ### Phase 9: Notification Delivery

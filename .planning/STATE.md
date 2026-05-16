@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Phases
 status: Executing Phase 08
-last_updated: "2026-05-16T17:53:08.324Z"
+last_updated: "2026-05-16T17:57:13.980Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 6
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # STATE: Gravel Ivoire — ERP Carriere de Granite
@@ -75,6 +75,8 @@ Tech debt deferred to v2: IOT MQTT pipeline (Phase 6).
 - **Phase 7 Plan 01:** Amortissement stays 0n until production_equipment gains `purchase_cost_minor` + `useful_life_years` columns (deferred to FIN-07).
 - [Phase 08]: 08-W1-P01: Event names hardcoded in @OnEvent decorators (no runtime fallback). Payload extensions are additive — existing consumers unaffected.
 - [Phase 08]: 08-W1-P01: IF-HIGHER guard implemented in SQL WHERE clause (atomic, race-free) — not in application logic. All UPDATEs scope by tenant_id (RLS-safe).
+- [Phase 08]: Phase-8 canonical severity boundary mapping: emitters use 'warning'|'critical' payload labels; AlertsEventHandlers maps 'warning' -> Alert.severity 'high' at the handler boundary (keeps emitters decoupled from Alert enum).
+- [Phase 08]: Spare-part stockout comparator is 'newQuantity <= 0' (not '=== 0') — forward-compatible against negative-balance edge cases.
 
 ### Todos
 

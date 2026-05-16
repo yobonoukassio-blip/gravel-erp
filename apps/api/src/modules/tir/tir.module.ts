@@ -27,6 +27,7 @@ import { BlastReportController } from './controllers/blast-report.controller';
 // Dependencies from other modules
 import { OutboxModule } from '../outbox/outbox.module';
 import { RhModule } from '../rh/rh.module';
+import { EmployeeService } from '../rh/services/employee.service';
 
 /**
  * TirModule — Tir de Mine & Explosifs (TIR-01..TIR-07).
@@ -66,21 +67,12 @@ import { RhModule } from '../rh/rh.module';
     BlastPlanSagaHandler,
     // Jobs
     BlastClearanceTimeoutJob,
-    // Operational day service proxy (avoids circular dependency)
+    // Real EmployeeService (from RhModule) provides blockClosure/resolveClosure
+    // against operational_days.closure_blockers. Token alias keeps the
+    // injection contract stable; tests can still override the token.
     {
       provide: 'OPERATIONAL_DAY_SERVICE',
-      useFactory: () => ({
-        // These methods are provided by OperationalDayService but we inline
-        // a DataSource-based implementation here to avoid circular module deps.
-        // In Phase 4, refactor to inject OperationalDayModule properly.
-        blockClosure: async (_dayId: string, _reason: string) => {
-          // Placeholder — wired to actual OperationalDayService via DI in Phase 4.
-          // Tests mock this directly.
-        },
-        resolveClosure: async (_dayId: string, _reason: string) => {
-          // Placeholder — same as above.
-        },
-      }),
+      useExisting: EmployeeService,
     },
     {
       provide: ExplosivesReconciliationJob,

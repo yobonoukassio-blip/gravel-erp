@@ -1,6 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+
+/**
+ * SF-008 (audit 2026-05-16): thrown when consolidation needs an FX rate that
+ * doesn't exist in `fx_rate_snapshot`. Surface as a 400 with a clear message
+ * so the group dashboard can render "FX rate missing — please import rates
+ * for <from>→<to> as of <date>" instead of returning a corrupted P&L.
+ */
+export class MissingFxRateError extends BadRequestException {
+  constructor(currencyFrom: string, currencyTo: string, asOf: string) {
+    super({
+      code: 'FX_RATE_MISSING',
+      currencyFrom,
+      currencyTo,
+      asOf,
+      message: `FX rate missing for ${currencyFrom}→${currencyTo} as of ${asOf}. Import a fx_rate_snapshot row before retrying consolidation.`,
+    });
+  }
+}
 
 export interface ConsolidatedPnL {
   pivotCurrency: string;
@@ -94,7 +112,11 @@ export class ConsolidationService {
         fxMap.set(fromCurr, res);
         return res;
       }
-      return null;
+      // SF-008 (audit 2026-05-16): no FX rate available — previously returned
+      // null and the caller summed centimes EUR with units XOF, producing a
+      // consolidated P&L off by a factor of 100-650. Now throws so the group
+      // dashboard surfaces "FX rate missing for X→Y on Z" instead of garbage.
+      throw new MissingFxRateError(fromCurr, params.pivotCurrency, params.periodTo);
     };
 
     interface ContractAgg {

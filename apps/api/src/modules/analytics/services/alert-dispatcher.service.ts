@@ -277,10 +277,14 @@ export class AlertDispatcherService {
         locale: r.preferred_locale ?? 'fr-CI',
       }));
     } catch (err) {
-      this.logger.warn(
+      // SF-007 (audit 2026-05-16): rethrow so the dispatch call surfaces
+      // 'recipient lookup failed' as a retryable error. Previously returned
+      // `[]` which the caller interpreted as "no recipients" — alert was
+      // marked dispatched but no one ever received an email/SMS/in-app push.
+      this.logger.error(
         `recipient lookup failed for rule ${rule.id}: ${(err as Error).message}`,
       );
-      return [];
+      throw err;
     }
   }
 }

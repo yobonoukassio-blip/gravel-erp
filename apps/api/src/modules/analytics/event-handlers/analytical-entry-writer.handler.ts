@@ -181,9 +181,13 @@ export class AnalyticalEntryWriterHandler {
         ],
       );
     } catch (err) {
+      // SF-001 (audit 2026-05-16): rethrow so EventEmitter2 surfaces the
+      // failure to its outbox-worker retry path. Previously swallowed → silent
+      // ledger drop on transient DB pressure.
       this.logger.error(
         `analytical entry BL ${evt.blId}: ${(err as Error).message}`,
       );
+      throw err;
     }
   }
 
@@ -213,6 +217,7 @@ export class AnalyticalEntryWriterHandler {
       this.logger.error(
         `analytical entry WO ${evt.workOrderId}: ${(err as Error).message}`,
       );
+      throw err; // SF-001: surface to EventEmitter2 retry path
     }
   }
 
@@ -288,6 +293,7 @@ export class AnalyticalEntryWriterHandler {
       this.logger.error(
         `analytical entry refuel ${evt.refuelId}: ${(err as Error).message}`,
       );
+      throw err; // SF-001
     }
   }
 
@@ -360,6 +366,7 @@ export class AnalyticalEntryWriterHandler {
       this.logger.error(
         `analytical entry extraction cycle ${evt.cycleId}: ${(err as Error).message}`,
       );
+      throw err; // SF-001
     }
   }
 
@@ -405,6 +412,7 @@ export class AnalyticalEntryWriterHandler {
       this.logger.error(
         `analytical entry rotation ${evt.rotation_id}: ${(err as Error).message}`,
       );
+      throw err; // SF-001
     }
   }
 
@@ -455,6 +463,7 @@ export class AnalyticalEntryWriterHandler {
       this.logger.error(
         `analytical entry crusher session ${evt.session_id}: ${(err as Error).message}`,
       );
+      throw err; // SF-001
     }
   }
 
@@ -521,6 +530,7 @@ export class AnalyticalEntryWriterHandler {
       this.logger.error(
         `analytical entry screening session ${evt.session_id}: ${(err as Error).message}`,
       );
+      throw err; // SF-001
     }
   }
   /**
@@ -562,6 +572,7 @@ export class AnalyticalEntryWriterHandler {
       );
     } catch (err) {
       this.logger.error(`analytical entry TIR ${evt.blastPlanId}: ${(err as Error).message}`);
+      throw err; // SF-001
     }
   }
 
@@ -600,6 +611,7 @@ export class AnalyticalEntryWriterHandler {
       );
     } catch (err) {
       this.logger.error(`analytical entry HSE ${evt.incident_id}: ${(err as Error).message}`);
+      throw err; // SF-001
     }
   }
 }

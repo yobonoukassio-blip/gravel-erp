@@ -55,18 +55,18 @@ Requirements pour la première release. Chaque exigence est mappée à une phase
 
 ### Maintenance équipements
 
-- [ ] **MNT-01**: Un parc équipements (foreuses, pelles, chargeuses, camions, concasseurs, groupes électrogènes) est maintenu avec spécifications, compteurs heures, et statut
-- [ ] **MNT-02**: Un plan de maintenance préventive est défini par équipement (intervalle horaire, kilométrique ou temporel)
-- [ ] **MNT-03**: Une intervention corrective est saisie avec diagnostic, pièces consommées, heures main d'œuvre, durée d'arrêt
-- [ ] **MNT-04**: Le stock de pièces de rechange déclenche des alertes quand le seuil est franchi
-- [ ] **MNT-05**: La disponibilité par équipement (MTBF / MTTR) est calculée et exposée au dashboard
+- [x] **MNT-01**: Un parc équipements (foreuses, pelles, chargeuses, camions, concasseurs, groupes électrogènes) est maintenu avec spécifications, compteurs heures, et statut
+- [~] **MNT-02**: Un plan de maintenance préventive est défini par équipement (intervalle horaire, kilométrique ou temporel) — *entités présentes, scheduler @Cron différé*
+- [x] **MNT-03**: Une intervention corrective est saisie avec diagnostic, pièces consommées, heures main d'œuvre, durée d'arrêt
+- [~] **MNT-04**: Le stock de pièces de rechange déclenche des alertes quand le seuil est franchi — *seuil enregistré, handler `maintenance.spare_part.threshold_crossed` absent*
+- [x] **MNT-05**: La disponibilité par équipement (MTBF / MTTR) est calculée et exposée au dashboard
 
 ### Carburant & Énergie
 
 - [x] **CAR-01**: Les cuves de carburant ont un solde event-sourced (entrées livraisons, sorties ravitaillements) avec rapprochement quotidien
-- [ ] **CAR-02**: Chaque ravitaillement engin est saisi sur mobile offline (engin, opérateur, litres, compteur heures, photo jauge optionnelle)
-- [ ] **CAR-03**: Un ratio L/h ou L/tonne anormal par engin déclenche une alerte (détection vol / fuite)
-- [ ] **CAR-04**: La consommation électrique site est suivie par usage (concassage, criblage, ateliers)
+- [x] **CAR-02**: Chaque ravitaillement engin est saisi sur mobile offline (engin, opérateur, litres, compteur heures, photo jauge optionnelle)
+- [x] **CAR-03**: Un ratio L/h ou L/tonne anormal par engin déclenche une alerte (détection vol / fuite)
+- [x] **CAR-04**: La consommation électrique site est suivie par usage (concassage, criblage, ateliers)
 
 ### HSE (Hygiène Sécurité Environnement)
 
@@ -86,12 +86,12 @@ Requirements pour la première release. Chaque exigence est mappée à une phase
 
 ### Ventes & Expédition
 
-- [ ] **VTE-01**: Un référentiel clients (CRM léger) contient identité, devise contractuelle, conditions de paiement, contacts
-- [ ] **VTE-02**: Un contrat de vente précise produit, calibre, prix, devise, quantités prévues, période, transporteurs autorisés
-- [ ] **VTE-03**: Un bon de livraison numérique est généré sur pesage (sur site ou offline) avec signature client/chauffeur
-- [ ] **VTE-04**: Une facture multi-devise est générée à partir des BL avec conversion taux du jour figé
-- [ ] **VTE-05**: Le suivi transporteur (interne ou externe) lie BL, camion, chauffeur, et destination
-- [ ] **VTE-06**: Pour les ventes export, un dossier douane (déclaration, certificats, transit) est rattaché au BL
+- [x] **VTE-01**: Un référentiel clients (CRM léger) contient identité, devise contractuelle, conditions de paiement, contacts
+- [x] **VTE-02**: Un contrat de vente précise produit, calibre, prix, devise, quantités prévues, période, transporteurs autorisés
+- [x] **VTE-03**: Un bon de livraison numérique est généré sur pesage (sur site ou offline) avec signature client/chauffeur
+- [x] **VTE-04**: Une facture multi-devise est générée à partir des BL avec conversion taux du jour figé
+- [x] **VTE-05**: Le suivi transporteur (interne ou externe) lie BL, camion, chauffeur, et destination
+- [x] **VTE-06**: Pour les ventes export, un dossier douane (déclaration, certificats, transit) est rattaché au BL
 
 ### Finance & Contrôle de gestion
 
@@ -116,7 +116,7 @@ Requirements pour la première release. Chaque exigence est mappée à une phase
 - [ ] **IOT-01**: Une passerelle edge déployée par site reçoit les flux MQTT des capteurs et bufferise jusqu'à 7 jours en cas de coupure WAN
 - [ ] **IOT-02**: La télématique flotte (Teltonika ou équivalent) ingère position GPS, vitesse, état moteur des camions et engins
 - [ ] **IOT-03**: Les capteurs carburant en cuve et sur engins ingèrent niveau et consommation pour rapprochement automatique avec les saisies manuelles
-- [ ] **IOT-04**: Les données IoT passent un modèle sanity 3 couches (raw / validated / business) avec data_quality_flag explicite ; les KPI production excluent les lectures invalides
+- [x] **IOT-04**: Les données IoT passent un modèle sanity 3 couches (raw / validated / business) avec data_quality_flag explicite ; les KPI production excluent les lectures invalides
 
 ## v2 Requirements
 
@@ -194,9 +194,9 @@ Mapping requirement ↔ phase (validé après création du roadmap).
 | STK-02 | Phase 2 — Vertical Slice Production | Complete |
 | STK-03 | Phase 2 — Vertical Slice Production | Complete |
 | CAR-01 | Phase 2 — Vertical Slice Production | Complete |
-| CAR-02 | Phase 2 — Vertical Slice Production | Pending |
-| CAR-03 | Phase 2 — Vertical Slice Production | Pending |
-| CAR-04 | Phase 2 — Vertical Slice Production | Pending |
+| CAR-02 | Phase 2 — Vertical Slice Production | Complete (02-W3-P06) |
+| CAR-03 | Phase 2 — Vertical Slice Production | Complete (02-W3-P06) |
+| CAR-04 | Phase 2 — Vertical Slice Production | Complete (02-W3-P06) |
 | HSE-01 | Phase 2 — Vertical Slice Production | Complete |
 | HSE-02 | Phase 2 — Vertical Slice Production | Complete |
 | HSE-03 | Phase 3 — RH module (DEFERRED) | Deferred — stub in docs/phase-03-handoff/hse-rh-deferred-scope.md |
@@ -215,21 +215,21 @@ Mapping requirement ↔ phase (validé après création du roadmap).
 | CON-01 | Phase 3 — Operational Completeness | Complete (03-W1-P03) |
 | CON-02 | Phase 3 — Operational Completeness | Complete (03-W1-P03) |
 | CRI-01 | Phase 3 — Operational Completeness | Complete (03-W1-P03) |
-| MNT-01 | Phase 3 — Operational Completeness | Pending |
-| MNT-02 | Phase 3 — Operational Completeness | Pending |
-| MNT-03 | Phase 3 — Operational Completeness | Pending |
-| MNT-04 | Phase 3 — Operational Completeness | Pending |
-| MNT-05 | Phase 3 — Operational Completeness | Pending |
+| MNT-01 | Phase 3 — Operational Completeness | Complete (03-W2-P04) |
+| MNT-02 | Phase 3 — Operational Completeness | Partial — entités OK, scheduler @Cron différé v1.1 |
+| MNT-03 | Phase 3 — Operational Completeness | Complete (03-W2-P04) |
+| MNT-04 | Phase 3 — Operational Completeness | Partial — seuil enregistré, alert handler manquant v1.1 |
+| MNT-05 | Phase 3 — Operational Completeness | Complete (03-W2-P04) |
 | RH-01 | Phase 3 — W0-P01 | Complete — Employee entity + CRUD + RLS |
 | RH-02 | Phase 3 — W0-P01 | Complete — ShiftEntry append-only + Flutter offline form |
 | RH-03 | Phase 3 — W0-P01 | Complete — ShiftRoster + Angular weekly view |
 | RH-04 | Phase 3 — W0-P01 | Complete — Subcontractor entity + EmployeeCertification |
-| VTE-01 | Phase 3 — Operational Completeness | Pending |
-| VTE-02 | Phase 3 — Operational Completeness | Pending |
-| VTE-03 | Phase 3 — Operational Completeness | Pending |
-| VTE-04 | Phase 3 — Operational Completeness | Pending |
-| VTE-05 | Phase 3 — Operational Completeness | Pending |
-| VTE-06 | Phase 3 — Operational Completeness | Pending |
+| VTE-01 | Phase 3 — Operational Completeness | Complete (03-W3-P06) |
+| VTE-02 | Phase 3 — Operational Completeness | Complete (03-W3-P06) |
+| VTE-03 | Phase 3 — Operational Completeness | Complete (03-W3-P06) — wiring BlSignedHandler corrected post-audit |
+| VTE-04 | Phase 3 — Operational Completeness | Complete (03-W3-P06-bis) |
+| VTE-05 | Phase 3 — Operational Completeness | Complete (03-W3-P06) |
+| VTE-06 | Phase 3 — Operational Completeness | Complete (03-W3-P06) |
 | FIN-01 | Phase 4 — Analytics, Consolidation & Finance | Pending |
 | FIN-02 | Phase 4 — Analytics, Consolidation & Finance | Pending |
 | FIN-03 | Phase 4 — Analytics, Consolidation & Finance | Pending |
@@ -243,7 +243,7 @@ Mapping requirement ↔ phase (validé après création du roadmap).
 | IOT-01 | Phase 5 — IoT Integration | Pending |
 | IOT-02 | Phase 5 — IoT Integration | Pending |
 | IOT-03 | Phase 5 — IoT Integration | Pending |
-| IOT-04 | Phase 5 — IoT Integration | Pending |
+| IOT-04 | Phase 5 — IoT Integration | Complete (05) — 3-layer sanity model wired |
 
 **Coverage:**
 - v1 requirements: 71 total

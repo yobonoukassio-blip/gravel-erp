@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AlertsModule } from '../alerts/alerts.module';
 import { WorkOrder } from './entities/work-order.entity';
@@ -11,6 +12,8 @@ import { WorkOrderService } from './services/work-order.service';
 import { SparePartService } from './services/spare-part.service';
 import { MtbfCalculatorService } from './services/mtbf-calculator.service';
 import { MeterUpdateHandler } from './event-handlers/meter-update.handler';
+import { PmOpenedAlertHandler } from './event-handlers/pm-opened-alert.handler';
+import { PreventiveMaintenanceSchedulerJob } from './jobs/preventive-maintenance-scheduler.job';
 import { MaintenanceController } from './controllers/maintenance.controller';
 
 /**
@@ -33,10 +36,18 @@ import { MaintenanceController } from './controllers/maintenance.controller';
       EquipmentAvailability,
     ]),
     EventEmitterModule,
+    ScheduleModule.forRoot(),
     AlertsModule,
   ],
   controllers: [MaintenanceController],
-  providers: [WorkOrderService, SparePartService, MtbfCalculatorService, MeterUpdateHandler],
+  providers: [
+    WorkOrderService,
+    SparePartService,
+    MtbfCalculatorService,
+    MeterUpdateHandler,
+    PmOpenedAlertHandler,
+    PreventiveMaintenanceSchedulerJob,
+  ],
   exports: [WorkOrderService, SparePartService, MtbfCalculatorService],
 })
 export class MaintenanceModule {}

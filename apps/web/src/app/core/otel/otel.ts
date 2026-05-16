@@ -31,11 +31,12 @@ export function startWebOtel(): void {
   if (started) return;
   started = true;
 
-  const endpoint =
-    environment.otelEndpoint || 'http://otel-collector.observability:4318';
+  const endpoint = environment.otelEndpoint;
 
-  // Skip OTel if endpoint is still the placeholder (relative URL would crash).
-  if (!endpoint.startsWith('http')) return;
+  // Skip OTel entirely when no endpoint is configured (prod hosted on Vercel
+  // without a Grafana LGTM collector). Avoid the K8s-internal fallback that
+  // would trigger Mixed Content blocks under HTTPS.
+  if (!endpoint || !endpoint.startsWith('http')) return;
 
   const provider = new WebTracerProvider({
     resource: new Resource({

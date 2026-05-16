@@ -67,7 +67,7 @@ import {
             <!-- markdown rendered as pre-formatted for now; replace with ng-markdown pipe in prod -->
             <pre class="chronology">{{ incident()!.chronology_md }}</pre>
 
-            @if (incident()!.people_impacted?.length) {
+            @if ((incident()!.people_impacted ?? []).length) {
               <mat-divider />
               <h3>Personnes impliquées</h3>
               <table mat-table [dataSource]="incident()!.people_impacted" class="people-table">
@@ -88,7 +88,7 @@ import {
               </table>
             }
 
-            @if (incident()!.content_addressed_attachments?.length) {
+            @if ((incident()!.content_addressed_attachments ?? []).length) {
               <mat-divider />
               <h3>Pièces jointes ({{ incident()!.content_addressed_attachments.length }})</h3>
               <div class="attachments">

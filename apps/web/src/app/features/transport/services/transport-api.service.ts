@@ -50,9 +50,10 @@ export class TransportApiService {
   private readonly http = inject(HttpClient);
 
   listRotations(operationalDayId: string): Observable<TruckRotation[]> {
-    return this.http.get<TruckRotation[]>(
-      `/api/rotations?operational_day_id=${operationalDayId}`,
-    );
+    const url = operationalDayId
+      ? `/api/rotations?operational_day_id=${operationalDayId}`
+      : '/api/rotations';
+    return this.http.get<TruckRotation[]>(url);
   }
 
   listPendingDispatch(): Observable<TruckRotation[]> {

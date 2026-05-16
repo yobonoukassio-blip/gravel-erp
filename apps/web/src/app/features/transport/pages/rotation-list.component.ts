@@ -42,31 +42,31 @@ export class RotationListComponent implements OnInit {
       valueFormatter: (p) => p.value ? String(p.value).slice(0, 8) : '—',
     },
     {
-      field: 'operational_day_id', headerName: 'Journée', width: 110,
+      field: 'operationalDayId', headerName: 'Journée', width: 110,
       valueFormatter: (p) => p.value ? String(p.value).slice(0, 8) : '—',
     },
     {
-      field: 'truck_equipment_id', headerName: 'Camion', width: 110,
+      field: 'truckEquipmentId', headerName: 'Camion', width: 110,
       valueFormatter: (p) => p.value ? String(p.value).slice(0, 8) : '—',
     },
     {
-      field: 'driver_id', headerName: 'Chauffeur', width: 110,
+      field: 'driverId', headerName: 'Chauffeur', width: 110,
       valueFormatter: (p) => p.value ? String(p.value).slice(0, 8) : '—',
     },
     {
-      field: 'loaded_at_bench_id', headerName: 'Banc', width: 110,
+      field: 'loadedAtBenchId', headerName: 'Banc', width: 110,
       valueFormatter: (p) => p.value ? String(p.value).slice(0, 8) : '—',
     },
     {
-      field: 'unloaded_at_zone_id', headerName: 'Zone', width: 110,
+      field: 'unloadedAtZoneId', headerName: 'Zone', width: 110,
       valueFormatter: (p) => p.value ? String(p.value).slice(0, 8) : '—',
     },
-    { field: 'material_type', headerName: 'Matériau', width: 130 },
+    { field: 'materialType', headerName: 'Matériau', width: 130 },
     {
-      field: 'loaded_tonnage_t', headerName: 'Tonnage (t)', width: 110,
+      field: 'loadedTonnageT', headerName: 'Tonnage (t)', width: 110,
       valueFormatter: (p) => p.value != null ? Number(p.value).toFixed(2) : '—',
     },
-    { field: 'cycle_time_minutes', headerName: 'Cycle (min)', width: 110 },
+    { field: 'cycleTimeMinutes', headerName: 'Cycle (min)', width: 110 },
     {
       colId: 'status',
       headerName: 'Statut',
@@ -86,8 +86,9 @@ export class RotationListComponent implements OnInit {
 
   private statusOf(r: TruckRotation | null | undefined): string {
     if (!r) return 'pending';
-    if (r.unloaded_at_utc) return 'done';
-    if (r.truck_equipment_id) return 'in-transit';
+    const row = r as unknown as { unloadedAtUtc?: string; truckEquipmentId?: string; status?: string };
+    if (row.status === 'COMPLETED' || row.unloadedAtUtc) return 'done';
+    if (row.status === 'IN_PROGRESS' || row.truckEquipmentId) return 'in-transit';
     return 'pending';
   }
 }

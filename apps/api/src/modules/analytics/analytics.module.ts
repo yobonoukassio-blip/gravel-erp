@@ -41,6 +41,7 @@ import { EmailProvider, SmsProvider } from './services/notification-providers';
     AlertDispatcherService,
     ConsolidationService,
     AnalyticalEntryWriterHandler,
+    CostPerTonAggregatorJob,
     EmailProvider,
     SmsProvider,
   ],

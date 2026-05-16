@@ -116,7 +116,7 @@ export class InvoiceListComponent implements OnInit {
   readonly rows = signal<Invoice[]>([]);
 
   readonly pendingCount = computed(() =>
-    this.rows().filter((r) => r.status === 'pending' || r.status === 'draft').length,
+    this.rows().filter((r) => r.status === 'draft' || r.status === 'sent').length,
   );
 
   readonly defaultColDef: ColDef = {

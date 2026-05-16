@@ -9,134 +9,277 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TranslocoModule } from '@jsverse/transloco';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatChipsModule } from '@angular/material/chips';
 import { AgGridAngular } from 'ag-grid-angular';
-import type { ColDef } from 'ag-grid-community';
+import type { ColDef, ValueFormatterParams } from 'ag-grid-community';
+import { firstValueFrom } from 'rxjs';
+import { AuthService } from '../../../core/auth/auth.service';
+import { statusPillRenderer } from '../../../shared/ag-grid/status-pill';
 import { ConcassageApiService, CrusherSession } from '../services/concassage-api.service';
 
-/**
- * CrusherSessionListComponent (CON-01).
- *
- * AG Grid with columns:
- *   session_start, status (badge), crusher_id, input_tonnage_kg, output_tonnage_kg,
- *   performance_pct (%), energy_kwh, operating_hours
- *
- * CASL guard: PROCESSING_OPERATOR or QUARRY_CHIEF (enforced server-side; client shows/hides nav).
- */
+type SessionStatus = 'ACTIVE' | 'PAUSED' | 'COMPLETED';
+
+/** CrusherSessionListComponent (CON-01). */
 @Component({
   selector: 'gravel-crusher-session-list',
   standalone: true,
-  imports: [CommonModule, TranslocoModule, MatButtonModule, MatChipsModule, AgGridAngular],
+  imports: [CommonModule, TranslocoModule, MatButtonModule, MatIconModule, AgGridAngular],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="toolbar">
-      <h2>{{ 'concassage.crusher_sessions.title' | transloco }}</h2>
-      <button mat-raised-button color="primary" (click)="openNew()">
-        {{ 'concassage.crusher_sessions.open_session' | transloco }}
-      </button>
+    <div class="page gv-anim-fade">
+      <header class="page-head">
+        <div class="page-head-text">
+          <span class="page-eyebrow">PRODUCTION · CON-01</span>
+          <h1 class="page-title">{{ 'concassage.crusher_sessions.title' | transloco }}</h1>
+          <p class="page-sub">Sessions de concassage primaire et secondaire</p>
+        </div>
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          (click)="openNew()"
+          class="page-action"
+        >
+          <mat-icon>add</mat-icon>
+          {{ 'concassage.crusher_sessions.open_session' | transloco }}
+        </button>
+      </header>
+
+      <section class="filter-bar">
+        <label class="filter-label">
+          <span class="filter-key">{{ 'concassage.filters.status' | transloco }}</span>
+          <select class="filter-select" (change)="onStatusFilter($event)">
+            <option value="">{{ 'concassage.filters.all' | transloco }}</option>
+            <option value="ACTIVE">Active</option>
+            <option value="PAUSED">Pause</option>
+            <option value="COMPLETED">Terminée</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="grid-card">
+        @if (loading()) {
+          <div class="state-row">
+            <span class="loading-dot"></span>
+            <span class="loading-dot"></span>
+            <span class="loading-dot"></span>
+            <span>{{ 'concassage.loading' | transloco }}</span>
+          </div>
+        }
+        <ag-grid-angular
+          class="ag-theme-quartz"
+          style="height: 540px;"
+          [rowData]="rows()"
+          [columnDefs]="columnDefs"
+          [defaultColDef]="defaultColDef"
+          [animateRows]="true"
+          [pagination]="true"
+          [paginationPageSize]="25"
+          (rowClicked)="onRowClicked($event)"
+        />
+      </section>
     </div>
-
-    <div class="filters-bar">
-      <label>
-        {{ 'concassage.filters.status' | transloco }}:
-        <select (change)="onStatusFilter($event)" class="filter-select">
-          <option value="">{{ 'concassage.filters.all' | transloco }}</option>
-          <option value="ACTIVE">ACTIVE</option>
-          <option value="PAUSED">PAUSED</option>
-          <option value="COMPLETED">COMPLETED</option>
-        </select>
-      </label>
-    </div>
-
-    @if (loading()) {
-      <p class="loading-hint">{{ 'concassage.loading' | transloco }}</p>
-    }
-
-    <ag-grid-angular
-      class="ag-theme-material"
-      style="height: 520px;"
-      [rowData]="rows()"
-      [columnDefs]="columnDefs"
-      [pagination]="true"
-      [paginationPageSize]="25"
-      (rowClicked)="onRowClicked($event)"
-    />
   `,
-  styles: [
-    `.toolbar { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }`,
-    `.filters-bar { padding: 4px 0 12px; display: flex; gap: 16px; }`,
-    `.filter-select { margin-left: 4px; }`,
-    `.loading-hint { color: #666; font-style: italic; }`,
-  ],
+  styles: [`
+    :host { display: block; }
+    .page { display: flex; flex-direction: column; gap: var(--gv-space-5); }
+    .page-head {
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: var(--gv-space-4);
+      padding: var(--gv-space-5) var(--gv-space-6);
+      background: linear-gradient(135deg, var(--gv-navy-900), var(--gv-navy-700));
+      border-radius: var(--gv-radius-lg);
+      overflow: hidden;
+      color: oklch(96% 0.005 250);
+      box-shadow: var(--gv-shadow-2);
+    }
+    .page-head::before {
+      content: '';
+      position: absolute;
+      top: -50%; right: -10%;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, oklch(78% 0.16 85 / 0.26) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .page-head-text { position: relative; z-index: 1; display: flex; flex-direction: column; gap: var(--gv-space-1); }
+    .page-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.16em; color: var(--gv-gold); }
+    .page-title { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin: 0; color: oklch(98% 0.005 250); }
+    .page-sub { font-size: 13px; color: oklch(82% 0.012 250); margin: 0; }
+    .page-action { position: relative; z-index: 1; display: inline-flex !important; align-items: center; gap: var(--gv-space-2); }
+
+    .filter-bar {
+      display: grid;
+      gap: var(--gv-space-3);
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      padding: var(--gv-space-4);
+      background: var(--gv-surface);
+      border: 1px solid var(--gv-border);
+      border-radius: var(--gv-radius-md);
+      box-shadow: var(--gv-shadow-1);
+    }
+    .filter-label { display: flex; flex-direction: column; gap: var(--gv-space-1); }
+    .filter-key { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--gv-text-soft); }
+    .filter-select {
+      appearance: none;
+      padding: 8px 30px 8px 12px;
+      background: var(--gv-surface);
+      border: 1.5px solid var(--gv-border);
+      border-radius: var(--gv-radius);
+      font-family: var(--gv-font-sans);
+      font-size: 13px;
+      color: var(--gv-text);
+      cursor: pointer;
+      transition: border-color var(--gv-duration-1) var(--gv-ease);
+      background-image: linear-gradient(45deg, transparent 50%, var(--gv-text-muted) 50%),
+                        linear-gradient(135deg, var(--gv-text-muted) 50%, transparent 50%);
+      background-position: calc(100% - 16px) calc(50% - 2px),
+                           calc(100% - 11px) calc(50% - 2px);
+      background-size: 5px 5px;
+      background-repeat: no-repeat;
+    }
+    .filter-select:focus { outline: none; border-color: var(--gv-gold); box-shadow: 0 0 0 3px var(--gv-gold-ring); }
+
+    .grid-card {
+      background: var(--gv-surface);
+      border: 1px solid var(--gv-border);
+      border-radius: var(--gv-radius-md);
+      box-shadow: var(--gv-shadow-1);
+      overflow: hidden;
+    }
+    .grid-card ag-grid-angular { --ag-wrapper-border-radius: 0; }
+
+    .state-row {
+      display: flex;
+      align-items: center;
+      gap: var(--gv-space-2);
+      padding: var(--gv-space-3) var(--gv-space-4);
+      color: var(--gv-text-muted);
+      font-size: 13px;
+      border-bottom: 1px solid var(--gv-border);
+    }
+    .loading-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--gv-gold);
+      animation: gv-pulse-dot 1.4s var(--gv-ease) infinite;
+    }
+    .loading-dot:nth-child(2) { animation-delay: 0.18s; }
+    .loading-dot:nth-child(3) { animation-delay: 0.36s; }
+  `],
 })
 export class CrusherSessionListComponent implements OnInit {
   private readonly api = inject(ConcassageApiService);
   private readonly router = inject(Router);
   private readonly snack = inject(MatSnackBar);
+  private readonly auth = inject(AuthService);
 
   readonly rows = signal<CrusherSession[]>([]);
   readonly loading = signal(false);
 
-  private tenantId = '24cd97f8-0170-453e-89da-e9213dd710d7'; // Demo: Gravel Ivoire
-  private statusFilter: 'ACTIVE' | 'PAUSED' | 'COMPLETED' | '' = '';
+  private tenantId: string | null = null;
+  private statusFilter: SessionStatus | '' = '';
+
+  readonly defaultColDef: ColDef = {
+    sortable: true,
+    resizable: true,
+    filter: true,
+  };
 
   readonly columnDefs: ColDef[] = [
     {
       field: 'session_start_utc',
       headerName: 'Début session',
-      valueFormatter: (p) => p.value ? new Date(p.value as string).toLocaleString('fr-FR') : '',
+      valueFormatter: (p: ValueFormatterParams) =>
+        p.value ? new Date(p.value as string).toLocaleString('fr-CI') : '—',
       width: 180,
+      cellStyle: { fontVariantNumeric: 'tabular-nums', fontSize: '12px' },
     },
     {
       field: 'status',
       headerName: 'Statut',
-      width: 130,
-      cellRenderer: (p: { value: string }) => {
-        const colors: Record<string, string> = { ACTIVE: 'green', PAUSED: 'orange', COMPLETED: 'blue' };
-        return `<span style="color:${colors[p.value] ?? 'grey'};font-weight:600">${p.value}</span>`;
-      },
+      width: 150,
+      cellRenderer: statusPillRenderer<SessionStatus>({
+        ACTIVE: { tone: 'success', label: 'Active' },
+        PAUSED: { tone: 'warning', label: 'Pause' },
+        COMPLETED: { tone: 'info', label: 'Terminée' },
+      }),
     },
     {
       field: 'crusher_id',
       headerName: 'Concasseur',
       width: 150,
-      valueFormatter: (p) => p.value ? String(p.value).slice(0, 8) : '—',
+      valueFormatter: (p: ValueFormatterParams) =>
+        p.value ? `${String(p.value).slice(0, 8)}…` : '—',
+      cellStyle: { fontFamily: 'var(--gv-font-mono)', fontSize: '12px' },
     },
-    { field: 'calibre_code', headerName: 'Calibre', width: 120 },
+    {
+      field: 'calibre_code',
+      headerName: 'Calibre',
+      width: 130,
+      cellStyle: { fontFamily: 'var(--gv-font-mono)', fontSize: '12px', fontWeight: '600' },
+    },
     {
       field: 'input_tonnage_kg',
-      headerName: 'Tonnage entrée',
-      width: 150,
-      valueFormatter: (p) => p.value != null ? `${(Number(p.value)/1000).toFixed(1)} t` : '—',
+      headerName: 'Entrée (t)',
+      width: 140,
+      type: 'rightAligned',
+      valueFormatter: (p: ValueFormatterParams) =>
+        p.value != null ? (Number(p.value) / 1000).toFixed(1) : '—',
+      cellStyle: { fontVariantNumeric: 'tabular-nums', color: 'var(--gv-text-muted)' },
     },
     {
       field: 'output_tonnage_kg',
-      headerName: 'Tonnage sortie',
-      width: 160,
-      valueFormatter: (p) => p.value != null ? `${(Number(p.value)/1000).toFixed(1)} t` : '—',
+      headerName: 'Sortie (t)',
+      width: 140,
+      type: 'rightAligned',
+      valueFormatter: (p: ValueFormatterParams) =>
+        p.value != null ? (Number(p.value) / 1000).toFixed(1) : '—',
+      cellStyle: { fontVariantNumeric: 'tabular-nums', fontWeight: '600' },
     },
     {
       field: 'performance_pct',
       headerName: 'Performance',
-      width: 130,
-      valueFormatter: (p) => p.value != null ? `${Number(p.value).toFixed(1)} %` : '—',
+      width: 140,
+      type: 'rightAligned',
+      valueFormatter: (p: ValueFormatterParams) =>
+        p.value != null ? `${Number(p.value).toFixed(1)} %` : '—',
+      cellStyle: (p) => {
+        const v = p.value as number | null;
+        if (v == null) return { fontVariantNumeric: 'tabular-nums', color: 'var(--gv-text-muted)' };
+        return {
+          fontVariantNumeric: 'tabular-nums',
+          fontWeight: '600',
+          color: v >= 80 ? 'oklch(38% 0.14 152)' : v >= 60 ? 'oklch(45% 0.16 75)' : 'oklch(42% 0.19 25)',
+        };
+      },
     },
     {
       field: 'energy_kwh',
-      headerName: 'Énergie',
-      width: 120,
-      valueFormatter: (p) => p.value != null ? `${Number(p.value).toFixed(2)} kWh` : '—',
+      headerName: 'Énergie (kWh)',
+      width: 140,
+      type: 'rightAligned',
+      valueFormatter: (p: ValueFormatterParams) =>
+        p.value != null ? Number(p.value).toFixed(2) : '—',
+      cellStyle: { fontVariantNumeric: 'tabular-nums', color: 'var(--gv-text-muted)' },
     },
     {
       field: 'operating_hours',
       headerName: 'Heures',
       width: 130,
-      valueFormatter: (p) => p.value != null ? `${Number(p.value).toFixed(2)} h` : '—',
+      type: 'rightAligned',
+      valueFormatter: (p: ValueFormatterParams) =>
+        p.value != null ? Number(p.value).toFixed(2) : '—',
+      cellStyle: { fontVariantNumeric: 'tabular-nums' },
     },
   ];
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    const claims = await firstValueFrom(this.auth.userClaims$);
+    this.tenantId = claims?.tenantId ?? null;
     this.loadSessions();
   }
 
@@ -151,11 +294,12 @@ export class CrusherSessionListComponent implements OnInit {
   }
 
   onStatusFilter(event: Event): void {
-    this.statusFilter = (event.target as HTMLSelectElement).value as typeof this.statusFilter;
+    this.statusFilter = (event.target as HTMLSelectElement).value as SessionStatus | '';
     this.loadSessions();
   }
 
   private loadSessions(): void {
+    if (!this.tenantId) return;
     this.loading.set(true);
     this.api
       .listCrusherSessions({
@@ -167,10 +311,9 @@ export class CrusherSessionListComponent implements OnInit {
           this.rows.set(sessions);
           this.loading.set(false);
         },
-        error: (err: unknown) => {
+        error: () => {
           this.loading.set(false);
           this.snack.open('concassage.errors.load_failed', 'OK', { duration: 4000 });
-          console.error('Failed to load crusher sessions', err);
         },
       });
   }

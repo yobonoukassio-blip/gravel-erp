@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
 import { WorkOrder, WorkOrderType } from '../entities/work-order.entity';
 import { MtbfCalculatorService } from './mtbf-calculator.service';
 
@@ -149,6 +149,13 @@ export class WorkOrderService {
         [wo.equipmentId, dto.tenantId],
       );
 
+      // D-04: advance PM plan state atomically with the WO close.
+      // Without this, the hourly scheduler would re-open the same WO every tick
+      // because next_due_at_utc never advances (days) or last_executed_meter is stale (hours/km).
+      if (wo.type === 'preventive' && wo.pmPlanId) {
+        await this.advancePmPlanState(manager, dto.tenantId, wo.pmPlanId, wo.equipmentId);
+      }
+
       const refreshed = await manager.findOneOrFail(WorkOrder, { where: { id: dto.workOrderId } });
 
       // Refresh MTBF/MTTR projection (outside main tx but immediate)
@@ -169,5 +176,64 @@ export class WorkOrderService {
 
       return refreshed;
     });
+  }
+
+  /**
+   * D-04: After a preventive WO is closed, advance the linked PM plan so the
+   * scheduler does not re-trigger on the next hourly tick.
+   *
+   *   - last_executed_at_utc = now()
+   *   - last_executed_meter  = hour_meter_current (hours) | odometer_km_current (km) | null (days)
+   *   - next_due_at_utc      = now() + interval_value days   (days only — hours/km use runtime compare)
+   *
+   * Runs inside the same transaction as the WO close so the two are atomic.
+   */
+  private async advancePmPlanState(
+    manager: EntityManager,
+    tenantId: string,
+    pmPlanId: string,
+    equipmentId: string,
+  ): Promise<void> {
+    const plans = (await manager.query(
+      `SELECT interval_unit, interval_value
+         FROM preventive_maintenance_plan
+        WHERE id = $1 AND tenant_id = $2`,
+      [pmPlanId, tenantId],
+    )) as Array<{ interval_unit: 'hours' | 'km' | 'days'; interval_value: number }>;
+    if (plans.length === 0) return;
+    const plan = plans[0];
+
+    const equip = (await manager.query(
+      `SELECT hour_meter_current, odometer_km_current
+         FROM production_equipment
+        WHERE id = $1 AND tenant_id = $2`,
+      [equipmentId, tenantId],
+    )) as Array<{ hour_meter_current: string | null; odometer_km_current: string | null }>;
+    const hourMeter = equip[0]?.hour_meter_current ?? null;
+    const kmMeter = equip[0]?.odometer_km_current ?? null;
+
+    if (plan.interval_unit === 'days') {
+      await manager.query(
+        `UPDATE preventive_maintenance_plan
+            SET last_executed_at_utc = now(),
+                last_executed_meter  = NULL,
+                next_due_at_utc      = now() + ($3 || ' days')::interval,
+                updated_at           = now()
+          WHERE id = $1 AND tenant_id = $2`,
+        [pmPlanId, tenantId, plan.interval_value],
+      );
+      return;
+    }
+
+    const newMeter = plan.interval_unit === 'hours' ? hourMeter : kmMeter;
+    await manager.query(
+      `UPDATE preventive_maintenance_plan
+          SET last_executed_at_utc = now(),
+              last_executed_meter  = $3,
+              next_due_at_utc      = NULL,
+              updated_at           = now()
+        WHERE id = $1 AND tenant_id = $2`,
+      [pmPlanId, tenantId, newMeter],
+    );
   }
 }

@@ -3,7 +3,7 @@ import { IotIngestionService } from '../services/iot-ingestion.service';
 import { FuelReconciliationIotService } from '../services/fuel-reconciliation-iot.service';
 
 interface AuthedRequest {
-  user: { sub: string; tenantId: string; roles?: string[] };
+  user: { userId: string; tenantId: string; roles?: string[] };
 }
 
 interface IngestDto {

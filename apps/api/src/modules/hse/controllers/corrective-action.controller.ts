@@ -17,7 +17,7 @@ import {
 } from '../services/corrective-action.service';
 
 interface AuthedRequest {
-  user: { sub: string; tenantId: string; roles?: string[] };
+  user: { userId: string; tenantId: string; roles?: string[] };
 }
 
 interface CreateCapaDto {
@@ -59,7 +59,7 @@ export class CorrectiveActionController {
       dueDateLocal: dto.due_date_local,
       ianaTimezone: dto.iana_timezone,
       priority: dto.priority,
-      createdBy: req.user.sub,
+      createdBy: req.user.userId,
       actorRole: pickPrimaryRole(req.user.roles),
     };
     return this.service.create(input);
@@ -93,7 +93,7 @@ export class CorrectiveActionController {
       tenantId: req.user.tenantId,
       capaId: id,
       newStatus: dto.status,
-      userId: req.user.sub,
+      userId: req.user.userId,
       actorRole: pickPrimaryRole(req.user.roles),
       closedEvidenceAttachments: dto.closed_evidence_attachments,
     };

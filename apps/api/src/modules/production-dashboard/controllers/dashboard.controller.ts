@@ -3,7 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 interface AuthedRequest {
-  user: { sub: string; tenantId: string };
+  user: { userId: string; tenantId: string };
 }
 
 interface MaintenanceKpi {

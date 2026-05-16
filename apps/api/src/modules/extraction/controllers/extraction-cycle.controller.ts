@@ -25,7 +25,7 @@ import {
 } from '../entities/extraction-cycle.entity';
 
 interface AuthedRequest {
-  user: { sub: string; tenantId: string };
+  user: { userId: string; tenantId: string };
 }
 
 interface CreateCycleDto {
@@ -73,7 +73,7 @@ export class ExtractionCycleController {
       downtimeReasonCode: body.downtime_reason_code ?? null,
       notes: body.notes ?? null,
       correctsId: body.corrects_id ?? null,
-      createdBy: req.user.sub,
+      createdBy: req.user.userId,
     };
     return this.svc.create(input);
   }

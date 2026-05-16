@@ -4,7 +4,7 @@ import { DashboardAggregatorService, SiteDirectorDashboard } from '../services/d
 import { SseBroadcasterService } from '../services/sse-broadcaster.service';
 
 interface AuthedRequest {
-  user: { sub: string; tenantId: string; siteId?: string };
+  user: { userId: string; tenantId: string; siteId?: string };
   on?: (event: string, listener: () => void) => void;
 }
 

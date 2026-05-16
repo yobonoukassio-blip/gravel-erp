@@ -17,7 +17,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 interface AuthedRequest {
-  user: { sub: string; tenantId: string; roles?: string[] };
+  user: { userId: string; tenantId: string; roles?: string[] };
 }
 
 interface AppendStockpileEventDto {
@@ -174,7 +174,7 @@ export class StockpileController {
       operationalDayId: dto.operational_day_id,
       sourceReference: dto.source_reference ?? {},
       occurredAtUtc: new Date(dto.occurred_at_utc),
-      createdBy: req.user.sub,
+      createdBy: req.user.userId,
       actorRole: role,
       costPerTonMinorUnits:
         dto.cost_per_ton_minor_units == null

@@ -9,7 +9,7 @@ import { BonDeLivraisonService } from '../services/bon-de-livraison.service';
 import { InvoiceService } from '../services/invoice.service';
 
 interface AuthedRequest {
-  user: { sub: string; tenantId: string };
+  user: { userId: string; tenantId: string };
 }
 
 /** Ventes REST endpoints (Phase 3 VTE-01..VTE-04). */

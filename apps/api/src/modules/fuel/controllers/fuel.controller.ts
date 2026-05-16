@@ -22,7 +22,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 interface AuthedRequest {
-  user: { sub: string; tenantId: string; siteId?: string; roles?: string[] };
+  user: { userId: string; tenantId: string; siteId?: string; roles?: string[] };
 }
 
 interface AppendFuelTankEventDto {
@@ -117,7 +117,7 @@ export class FuelController {
       operationalDayId: dto.operational_day_id,
       sourceReference: dto.source_reference ?? {},
       occurredAtUtc: new Date(dto.occurred_at_utc),
-      createdBy: req.user.sub,
+      createdBy: req.user.userId,
       actorRole: role,
       costPerLiterMinorUnits:
         dto.cost_per_liter_minor_units == null ? null : BigInt(dto.cost_per_liter_minor_units),
@@ -162,7 +162,7 @@ export class FuelController {
       createdAtLocal: new Date(dto.created_at_local),
       ianaTimezone: dto.iana_timezone,
       notes: dto.notes ?? null,
-      createdBy: req.user.sub,
+      createdBy: req.user.userId,
       occurredAtUtc: new Date(dto.occurred_at_utc),
     });
   }
@@ -189,7 +189,7 @@ export class FuelController {
       usageType: dto.usage_type,
       kwh: dto.kwh,
       sourceMeterCode: dto.source_meter_code ?? null,
-      recordedBy: req.user.sub,
+      recordedBy: req.user.userId,
       notes: dto.notes ?? null,
     });
   }

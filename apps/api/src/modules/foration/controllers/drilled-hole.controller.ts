@@ -15,7 +15,7 @@ import { DrilledHole } from '../entities/drilled-hole.entity';
 import { DrilledHoleService } from '../services/drilled-hole.service';
 
 interface AuthedRequest {
-  user: { sub: string; tenantId: string };
+  user: { userId: string; tenantId: string };
 }
 
 interface AppendDto {
@@ -81,7 +81,7 @@ export class DrilledHoleController {
       photoBlobSha256: dto.photo_blob_sha256 ?? null,
       toleranceViolationReason: dto.tolerance_violation_reason ?? null,
       correctsHoleId: dto.corrects_hole_id ?? null,
-      createdBy: req.user.sub,
+      createdBy: req.user.userId,
     });
   }
 

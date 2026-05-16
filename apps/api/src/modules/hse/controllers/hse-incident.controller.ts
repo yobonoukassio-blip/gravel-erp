@@ -17,7 +17,7 @@ import { HseIncidentService, CreateHseIncidentInput } from '../services/hse-inci
 import { HseAttachmentService } from '../services/hse-attachment.service';
 
 interface AuthedRequest {
-  user: { sub: string; tenantId: string; roles?: string[] };
+  user: { userId: string; tenantId: string; roles?: string[] };
 }
 
 interface CreateHseIncidentDto {
@@ -77,7 +77,7 @@ export class HseIncidentController {
       operationalDayId: dto.operational_day_id,
       category: dto.category as CreateHseIncidentInput['category'],
       severity: dto.severity,
-      reporterUserId: req.user.sub,
+      reporterUserId: req.user.userId,
       locationText: dto.location_text,
       gpsPoint: dto.gps_point ?? null,
       peopleImpacted: dto.people_impacted ?? [],
@@ -109,7 +109,7 @@ export class HseIncidentController {
     @Param('id') id: string,
     @Req() req: AuthedRequest,
   ): Promise<HseIncident> {
-    return this.service.close(id, req.user.tenantId, req.user.sub);
+    return this.service.close(id, req.user.tenantId, req.user.userId);
   }
 
   @Patch(':id')

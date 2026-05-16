@@ -18,7 +18,7 @@ import {
 } from './production-equipment.service';
 
 interface AuthedRequest {
-  user: { sub: string; tenantId: string };
+  user: { userId: string; tenantId: string };
 }
 
 interface CreateDto {

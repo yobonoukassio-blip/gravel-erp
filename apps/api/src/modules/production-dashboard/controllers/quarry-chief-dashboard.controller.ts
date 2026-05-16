@@ -4,7 +4,7 @@ import { DashboardAggregatorService, QuarryChiefDashboard } from '../services/da
 import { SseBroadcasterService } from '../services/sse-broadcaster.service';
 
 interface AuthedRequest {
-  user: { sub: string; tenantId: string };
+  user: { userId: string; tenantId: string };
   on?: (event: string, listener: () => void) => void;
 }
 

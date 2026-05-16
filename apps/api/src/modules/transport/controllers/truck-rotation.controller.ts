@@ -11,7 +11,7 @@ import { TruckRotation } from '../entities/truck-rotation.entity';
 import { TruckRotationService } from '../services/truck-rotation.service';
 
 interface AuthedRequest {
-  user: { sub: string; tenantId: string };
+  user: { userId: string; tenantId: string };
 }
 
 interface CreateRotationDto {
@@ -57,7 +57,7 @@ export class TruckRotationController {
       materialType: dto.material_type,
       weighingTicketId: dto.weighing_ticket_id,
       loadedAtUtc: new Date(dto.loaded_at_utc),
-      createdBy: req.user.sub,
+      createdBy: req.user.userId,
     });
   }
 

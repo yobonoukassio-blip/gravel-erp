@@ -15,7 +15,7 @@ import { WeighingTicket } from '../entities/weighing-ticket.entity';
 import { WeighingTicketService } from '../services/weighing-ticket.service';
 
 interface AuthedRequest {
-  user: { sub: string; tenantId: string };
+  user: { userId: string; tenantId: string };
 }
 
 interface CreateWeighingTicketDto {
@@ -66,14 +66,14 @@ export class WeighingTicketController {
       weighedAtLocal: new Date(dto.weighed_at_local),
       ianaTimezone: dto.iana_timezone,
       operationalDayId: dto.operational_day_id,
-      operatorUserId: req.user.sub,
+      operatorUserId: req.user.userId,
       weighingStationCode: dto.weighing_station_code,
       clientSignatureBlobSha256: dto.client_signature_blob_sha256 ?? null,
       driverSignatureBlobSha256: dto.driver_signature_blob_sha256 ?? null,
       notes: dto.notes ?? null,
       isOfflineGenerated: dto.is_offline_generated,
       clientContentHash: dto.content_hash,
-      createdBy: req.user.sub,
+      createdBy: req.user.userId,
     });
   }
 

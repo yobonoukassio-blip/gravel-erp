@@ -7,7 +7,7 @@ import { WorkOrderService } from '../services/work-order.service';
 import { SparePartService } from '../services/spare-part.service';
 
 interface AuthedRequest {
-  user: { sub: string; tenantId: string };
+  user: { userId: string; tenantId: string };
 }
 
 /** Maintenance REST endpoints (Phase 3 MNT-03 MNT-04). */

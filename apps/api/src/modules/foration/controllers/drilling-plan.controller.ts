@@ -13,7 +13,7 @@ import { DrillingPlanService } from '../services/drilling-plan.service';
 
 interface AuthedRequest {
   user: {
-    sub: string;
+    userId: string;
     tenantId: string;
     roles?: string[];
   };
@@ -60,7 +60,7 @@ export class DrillingPlanController {
       assignedMachineId: dto.assigned_machine_id ?? null,
       validFrom: new Date(dto.valid_from),
       validTo: dto.valid_to ? new Date(dto.valid_to) : null,
-      createdBy: req.user.sub,
+      createdBy: req.user.userId,
     });
   }
 
@@ -103,7 +103,7 @@ export class DrillingPlanController {
     @Param('id') id: string,
     @Req() req: AuthedRequest,
   ): Promise<DrillingPlan> {
-    return this.service.activate(id, req.user.tenantId, req.user.sub);
+    return this.service.activate(id, req.user.tenantId, req.user.userId);
   }
 
   @Post(':id/close')
@@ -112,7 +112,7 @@ export class DrillingPlanController {
     @Req() req: AuthedRequest,
   ): Promise<DrillingPlan> {
     const isManager = (req.user.roles ?? []).includes('SITE_MANAGER');
-    return this.service.closePlan(id, req.user.tenantId, req.user.sub, isManager);
+    return this.service.closePlan(id, req.user.tenantId, req.user.userId, isManager);
   }
 
   @Post(':id/archive')

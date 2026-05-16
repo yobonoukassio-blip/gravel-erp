@@ -3,13 +3,13 @@ import { Alert, AlertStatus } from './alert.entity';
 import { AlertsService } from './alerts.service';
 
 interface AuthedRequest {
-  user: { sub: string; tenantId: string };
+  user: { userId: string; tenantId: string };
 }
 
 /**
  * Alerts REST surface (Phase 2 — D2-74).
  * Phase 1 TenantGuard + JWT decoding wires `req.user.tenantId` and
- * `req.user.sub`. The controller stays small — service holds the rules.
+ * `req.user.userId`. The controller stays small — service holds the rules.
  */
 @Controller('alerts')
 export class AlertsController {
@@ -34,7 +34,7 @@ export class AlertsController {
     @Req() req: AuthedRequest,
     @Body() _body: Record<string, unknown> = {},
   ): Promise<Alert> {
-    return this.alerts.ack(id, req.user.sub, req.user.tenantId);
+    return this.alerts.ack(id, req.user.userId, req.user.tenantId);
   }
 
   @Post(':id/resolve')
@@ -43,6 +43,6 @@ export class AlertsController {
     @Req() req: AuthedRequest,
     @Body() _body: Record<string, unknown> = {},
   ): Promise<Alert> {
-    return this.alerts.resolve(id, req.user.sub, req.user.tenantId);
+    return this.alerts.resolve(id, req.user.userId, req.user.tenantId);
   }
 }

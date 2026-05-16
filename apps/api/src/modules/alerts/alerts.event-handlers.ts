@@ -165,4 +165,50 @@ export class AlertsEventHandlers {
       payload: evt.payload,
     });
   }
+
+  /**
+   * Spare-part stock dropped at or below threshold (D-08, D-10, D-13).
+   * Deduped: same spare_part + 'below_threshold' = 1 OPEN alert.
+   */
+  @OnEvent('maintenance.spare_part.threshold_crossed')
+  async onSparePartThresholdCrossed(evt: {
+    tenantId: string;
+    siteId: string;
+    sparePartId: string;
+    sku?: string;
+    quantityOnHand: number;
+    thresholdMin: number | null;
+    severity: 'high' | 'critical';
+  }): Promise<void> {
+    await this.alerts.createFromEvent({
+      tenantId: evt.tenantId,
+      siteId: evt.siteId,
+      sourceEventType: 'maintenance.spare_part.threshold_crossed',
+      sourceEventId: null,
+      dedupeKey: `spare_part:${evt.sparePartId}:below_threshold`,
+      severity: evt.severity,
+      payload: {
+        site_id: evt.siteId,
+        spare_part_id: evt.sparePartId,
+        sku: evt.sku ?? null,
+        quantity_on_hand: evt.quantityOnHand,
+        threshold_min: evt.thresholdMin,
+      },
+    });
+  }
+
+  /**
+   * Spare-part stock recovered above threshold (D-08, D-10). Resolves the
+   * existing OPEN alert silently; no-op if no matching alert.
+   */
+  @OnEvent('maintenance.spare_part.threshold_recovered')
+  async onSparePartThresholdRecovered(evt: {
+    tenantId: string;
+    sparePartId: string;
+  }): Promise<void> {
+    await this.alerts.resolveByDedupeKey(
+      evt.tenantId,
+      `spare_part:${evt.sparePartId}:below_threshold`,
+    );
+  }
 }

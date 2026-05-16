@@ -54,4 +54,15 @@ export class ProductionEquipment {
 
   @UpdateDateColumn({ type: 'timestamptz', name: 'updated_at' })
   updatedAt!: Date;
+
+  /** Denormalized hour meter — updated by MeterUpdateHandler via IF-HIGHER rule (D-05, D-06). */
+  @Column({ type: 'numeric', precision: 12, scale: 2, name: 'hour_meter_current', nullable: true })
+  hourMeterCurrent!: string | null;
+
+  /** Denormalized odometer — updated by MeterUpdateHandler via IF-HIGHER rule (D-05, D-06). */
+  @Column({ type: 'numeric', precision: 12, scale: 2, name: 'odometer_km_current', nullable: true })
+  odometerKmCurrent!: string | null;
+
+  @Column({ type: 'date', name: 'commissioned_date', nullable: true })
+  commissionedDate!: string | null;
 }

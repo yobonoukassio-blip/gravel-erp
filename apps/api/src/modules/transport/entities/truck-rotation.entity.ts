@@ -88,6 +88,10 @@ export class TruckRotation {
   })
   cycleTimeMinutes?: string | null;
 
+  /** Truck odometer reading AFTER unloading (D-06). Phase 8 reads this to denormalize odometer_km_current on production_equipment. NULL for legacy rotations. */
+  @Column({ type: 'numeric', precision: 12, scale: 2, name: 'km_total_after', nullable: true })
+  kmTotalAfter?: string | null;
+
   @Column({ type: 'uuid', name: 'created_by' })
   createdBy!: string;
 

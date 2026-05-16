@@ -35,10 +35,13 @@ interface RawKeycloakClaims {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(private readonly config: ConfigService) {
-    // When DEV_BYPASS_JWT=true, JwtAuthGuard returns early — this strategy is
-    // never invoked. We still need a valid constructor so NestJS DI doesn't crash;
-    // use a dummy URL so jwks-rsa doesn't throw at init time.
-    const bypass = config.get<string>('DEV_BYPASS_JWT') === 'true';
+    // When DEV_BYPASS_JWT=true (non-prod only — see P0-4 in JwtAuthGuard),
+    // JwtAuthGuard returns early — this strategy is never invoked. We still
+    // need a valid constructor so NestJS DI doesn't crash; use a dummy URL so
+    // jwks-rsa doesn't throw at init time.
+    const bypass =
+      config.get<string>('DEV_BYPASS_JWT') === 'true' &&
+      config.get<string>('NODE_ENV') !== 'production';
     const keycloakUrl = bypass
       ? 'http://localhost:8080'
       : config.getOrThrow<string>('KEYCLOAK_URL');

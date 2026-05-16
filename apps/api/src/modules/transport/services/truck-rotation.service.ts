@@ -115,14 +115,19 @@ export class TruckRotationService {
    * D2-35: complete a rotation. Sets `unloaded_at_utc` AND publishes the
    * `production.transport.rotation_completed` outbox event in the SAME tx.
    * P05 stockpile consumer materializes STOCKPILE_INFLOW from this event.
+   *
+   * Phase 8 (D-06): optionally accepts `kmTotalAfter` (truck odometer after unloading).
+   * When provided, persisted on the row and included in the event payload so the
+   * MeterUpdateHandler can denormalize odometer_km_current on production_equipment.
    */
   async complete(
     rotationId: string,
     tenantId: string,
     unloadedAtUtc: Date,
+    kmTotalAfter?: string | null,
   ): Promise<TruckRotation> {
     return this.dataSource.transaction(async (manager) => {
-      return this.completeWithManager(rotationId, tenantId, unloadedAtUtc, manager);
+      return this.completeWithManager(rotationId, tenantId, unloadedAtUtc, manager, kmTotalAfter);
     });
   }
 
@@ -131,6 +136,7 @@ export class TruckRotationService {
     tenantId: string,
     unloadedAtUtc: Date,
     manager: EntityManager,
+    kmTotalAfter?: string | null,
   ): Promise<TruckRotation> {
     const repo = manager.getRepository(TruckRotation);
     const rotation = await repo.findOne({
@@ -153,6 +159,9 @@ export class TruckRotationService {
     }
 
     rotation.unloadedAtUtc = unloadedAtUtc;
+    if (kmTotalAfter != null) {
+      rotation.kmTotalAfter = kmTotalAfter;
+    }
     const saved = await repo.save(rotation);
 
     // Same-tx outbox publish (D2-35). P05 worker consumes this event.
@@ -165,12 +174,14 @@ export class TruckRotationService {
         tenant_id: tenantId,
         site_id: saved.siteId,
         rotation_id: saved.id,
+        truck_equipment_id: saved.truckEquipmentId ?? null,
         weighing_ticket_id: saved.weighingTicketId,
         loaded_tonnage_t: saved.loadedTonnageT,
         material_type: saved.materialType,
         stockpile_id_target: saved.unloadedAtZoneId,
         operational_day_id: saved.operationalDayId,
         occurred_at_utc: unloadedAtUtc.toISOString(),
+        km_total_after: saved.kmTotalAfter ?? null,
       },
       manager,
     });

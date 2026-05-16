@@ -55,6 +55,8 @@ export class SiteDirectorDashboardController {
         downtime_today_minutes: 0,
         open_work_orders_count: 0,
         vte_revenue: { weekRevenueXof: '0', monthRevenueXof: '0' } as never,
+        finance_kpi: { cost_per_ton_minor: '0', margin_pct: 0, fuel_cost_month_minor: '0', maintenance_cost_month_minor: '0', currency: 'XOF' } as never,
+        hse_kpi: { incidents_open_count: 0, tf_rolling_12m: 0, audit_conformity_pct: 0 } as never,
       };
     }
   }

@@ -13,6 +13,12 @@ interface OpenWorkOrderDto {
   diagnosis?: string;
   pmPlanId?: string;
   technicianId?: string;
+  /** Phase 8: populated only by the PM scheduler. Optional everywhere else. */
+  preventiveContext?: {
+    severity: 'warning' | 'critical';
+    dueReason: 'hours' | 'km' | 'days';
+    overdueBy: number;
+  };
 }
 
 interface CloseWorkOrderDto {
@@ -24,10 +30,11 @@ interface CloseWorkOrderDto {
 }
 
 /**
- * WorkOrderService (MNT-03).
+ * WorkOrderService (MNT-03, ALT-01).
  *
  * open() — creates WO, transitions production_equipment.status → MAINTENANCE.
  * close() — sets WO.closed, transitions equipment → ACTIVE, refreshes MTBF/MTTR projection.
+ * findOpen() — idempotency primitive for the preventive-maintenance scheduler (D-02).
  */
 @Injectable()
 export class WorkOrderService {
@@ -38,6 +45,36 @@ export class WorkOrderService {
     private readonly events: EventEmitter2,
     private readonly mtbf: MtbfCalculatorService,
   ) {}
+
+  /**
+   * Idempotency primitive for the preventive-maintenance scheduler (D-02).
+   * Returns the most recently opened WO for the given (equipment, pmPlan,
+   * type) tuple with status in ('open','in_progress'), or null.
+   */
+  async findOpen(criteria: {
+    tenantId: string;
+    equipmentId: string;
+    type: WorkOrderType;
+    pmPlanId?: string | null;
+  }): Promise<WorkOrder | null> {
+    const qb = this.ds
+      .createQueryBuilder(WorkOrder, 'wo')
+      .where('wo.tenant_id = :tenantId', { tenantId: criteria.tenantId })
+      .andWhere('wo.equipment_id = :equipmentId', { equipmentId: criteria.equipmentId })
+      .andWhere('wo.type = :type', { type: criteria.type })
+      .andWhere(`wo.status IN ('open','in_progress')`)
+      .orderBy('wo.opened_at_utc', 'DESC')
+      .limit(1);
+
+    if (criteria.pmPlanId === null || criteria.pmPlanId === undefined) {
+      qb.andWhere('wo.pm_plan_id IS NULL');
+    } else {
+      qb.andWhere('wo.pm_plan_id = :pmPlanId', { pmPlanId: criteria.pmPlanId });
+    }
+
+    const row = await qb.getOne();
+    return row ?? null;
+  }
 
   async open(dto: OpenWorkOrderDto): Promise<WorkOrder> {
     return this.ds.transaction(async (manager) => {
@@ -65,6 +102,20 @@ export class WorkOrderService {
         workOrderId: saved.id,
         equipmentId: dto.equipmentId,
       });
+
+      // Phase 8 (D-17): emit preventive_opened for Alert bridge handler.
+      if (dto.type === 'preventive') {
+        this.events.emit('maintenance.work_order.preventive_opened', {
+          tenant_id: dto.tenantId,
+          site_id: dto.siteId,
+          equipment_id: dto.equipmentId,
+          pm_plan_id: dto.pmPlanId ?? null,
+          work_order_id: saved.id,
+          severity: dto.preventiveContext?.severity ?? 'warning',
+          due_reason: dto.preventiveContext?.dueReason ?? null,
+          overdue_by: dto.preventiveContext?.overdueBy ?? null,
+        });
+      }
 
       return saved;
     });

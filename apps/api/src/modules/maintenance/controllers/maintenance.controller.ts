@@ -84,4 +84,13 @@ export class MaintenanceController {
   ) {
     return this.spService.consume({ ...body, sparePartId, tenantId: req.user.tenantId });
   }
+
+  @Post('spare-parts/:id/restock')
+  restockSparePart(
+    @Param('id') sparePartId: string,
+    @Body() body: { quantityAdded: number },
+    @Req() req: AuthedRequest,
+  ) {
+    return this.spService.restock({ ...body, sparePartId, tenantId: req.user.tenantId });
+  }
 }

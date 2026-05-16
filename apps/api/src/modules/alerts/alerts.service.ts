@@ -91,4 +91,23 @@ export class AlertsService {
     row.resolvedBy = userId;
     return this.repo.save(row);
   }
+
+  /**
+   * Silent resolve for recovery events (D-10). No-op when no matching OPEN
+   * alert exists. Scoped strictly by tenantId so cross-tenant payloads
+   * cannot resolve foreign alerts.
+   */
+  async resolveByDedupeKey(
+    tenantId: string,
+    dedupeKey: string,
+  ): Promise<Alert | null> {
+    const row = await this.repo.findOne({
+      where: { tenantId, dedupeKey, status: 'open' },
+    });
+    if (!row) return null;
+    row.status = 'resolved';
+    row.resolvedAtUtc = new Date();
+    // resolvedBy left null — system-triggered recovery, not a user action.
+    return this.repo.save(row);
+  }
 }

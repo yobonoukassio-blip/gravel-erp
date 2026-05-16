@@ -140,6 +140,7 @@ export class EquipmentRefuelService {
       equipmentId: result.equipmentId,
       liters: parseFloat(result.liters),
       refuelId: result.id,
+      equipmentHourMeterReading: result.equipmentHourMeterReading,
     });
 
     return result;

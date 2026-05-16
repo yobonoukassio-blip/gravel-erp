@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { TranslocoModule } from '@jsverse/transloco';
 import { AgGridAngular } from 'ag-grid-angular';
 import type { ColDef } from 'ag-grid-community';
 import { ForationApiService, DrilledHole } from '../services/foration-api.service';
@@ -19,18 +18,18 @@ import { ForationApiService, DrilledHole } from '../services/foration-api.servic
 @Component({
   selector: 'gravel-drilled-hole-review',
   standalone: true,
-  imports: [CommonModule, TranslocoModule, AgGridAngular],
+  imports: [CommonModule, AgGridAngular],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="hole-review">
-      <h1>{{ 'foration.drilled_hole_review_title' | transloco }}</h1>
+      <h1>Trous forés — revue</h1>
       <ag-grid-angular
         class="ag-theme-material"
         style="width: 100%; height: 600px"
         [rowData]="rows()"
         [columnDefs]="columnDefs"
       />
-      <p class="hint">tolerance_violation rows are flagged red.</p>
+      <p class="hint">Les trous hors-tolérance sont en rouge.</p>
     </div>
   `,
   styles: [
@@ -48,31 +47,31 @@ export class DrilledHoleReviewComponent implements OnInit {
   readonly rows = signal<DrilledHole[]>([]);
 
   readonly columnDefs: ColDef<any>[] = [
-    { field: 'holeIndexInPlan', headerName: 'Hole Index', width: 100 },
+    { field: 'holeIndexInPlan', headerName: 'N° trou', width: 100 },
     {
       field: 'gpsPoint',
-      headerName: 'Gps',
+      headerName: 'GPS (lat, lon)',
       width: 220,
       valueFormatter: (p) => {
         const v = p.value as { coordinates: [number, number] } | null;
         return v ? `${v.coordinates[1].toFixed(5)}, ${v.coordinates[0].toFixed(5)}` : '—';
       },
     },
-    { field: 'gpsAccuracyM', headerName: 'Gps Accuracy M', width: 140 },
-    { field: 'actualDepthM', headerName: 'Actual Depth M', width: 140 },
-    { field: 'actualDiameterMm', headerName: 'Actual Diameter Mm', width: 150 },
+    { field: 'gpsAccuracyM', headerName: 'Précision GPS (m)', width: 150 },
+    { field: 'actualDepthM', headerName: 'Profondeur réelle (m)', width: 170 },
+    { field: 'actualDiameterMm', headerName: 'Diamètre réel (mm)', width: 170 },
     {
       field: 'toleranceViolation',
-      headerName: 'Tolerance Violation',
-      width: 160,
+      headerName: 'Tolérance',
+      width: 140,
       cellRenderer: (p: { value: boolean }) =>
         p.value
-          ? `<span class="badge-violation">tolerance_violation</span>`
+          ? `<span class="badge-violation">Hors tolérance</span>`
           : `<span class="badge-ok">OK</span>`,
     },
-    { field: 'operatorId', headerName: 'Operator', width: 160 },
+    { field: 'operatorId', headerName: 'Opérateur', width: 160 },
     { field: 'machineId', headerName: 'Machine', width: 160 },
-    { field: 'fuelLitersConsumed', headerName: 'Fuel Liters', width: 130 },
+    { field: 'fuelLitersConsumed', headerName: 'Carburant (L)', width: 140 },
   ];
 
   ngOnInit(): void {

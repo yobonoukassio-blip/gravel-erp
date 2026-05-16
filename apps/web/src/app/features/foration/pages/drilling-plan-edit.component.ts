@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { TranslocoModule } from '@jsverse/transloco';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormlyModule, FormlyFieldConfig } from '@ngx-formly/core';
@@ -13,7 +12,7 @@ import { ForationApiService, CreateDrillingPlanDto, DrillingPlan } from '../serv
 /**
  * Drilling plan create/edit form. Uses Formly schema.
  * Activate button calls POST /:id/activate; backend rejects if machine
- * status != 'active' (FOR-05 — message keyed `foration.machine_status_not_active`).
+ * status != 'active' (FOR-05).
  */
 @Component({
   selector: 'gravel-drilling-plan-edit',
@@ -22,7 +21,6 @@ import { ForationApiService, CreateDrillingPlanDto, DrillingPlan } from '../serv
     CommonModule,
     ReactiveFormsModule,
     RouterLink,
-    TranslocoModule,
     MatButtonModule,
     FormlyModule,
     FormlyMaterialModule,
@@ -30,26 +28,26 @@ import { ForationApiService, CreateDrillingPlanDto, DrillingPlan } from '../serv
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="plan-edit">
-      <h1>{{ 'foration.drilling_plan_edit_title' | transloco }}</h1>
+      <h1>Plan de foration</h1>
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
         <formly-form [form]="form" [fields]="fields" [model]="model"></formly-form>
         <div class="actions">
           <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
-            {{ 'foration.save' | transloco }}
+            Enregistrer
           </button>
           @if (plan(); as p) {
             @if (p.status === 'draft') {
               <button mat-stroked-button type="button" (click)="activate()">
-                {{ 'foration.activate' | transloco }}
+                Activer le plan
               </button>
             }
             @if (p.status === 'active') {
               <button mat-stroked-button type="button" (click)="close()">
-                {{ 'foration.close' | transloco }}
+                Clôturer le plan
               </button>
             }
           }
-          <a mat-button routerLink="..">{{ 'foration.cancel' | transloco }}</a>
+          <a mat-button routerLink="..">Annuler</a>
         </div>
       </form>
     </div>
@@ -70,50 +68,50 @@ export class DrillingPlanEditComponent implements OnInit {
     {
       key: 'zone_id',
       type: 'input',
-      props: { label: 'foration.fields.zone_id', required: true },
+      props: { label: 'Zone de production', required: true },
     },
     {
       key: 'bench_id',
       type: 'input',
-      props: { label: 'foration.fields.bench_id', required: true },
+      props: { label: 'Banc', required: true },
     },
     {
       key: 'planned_hole_count',
       type: 'input',
-      props: { label: 'foration.fields.planned_hole_count', type: 'number', required: true, min: 1 },
+      props: { label: 'Nombre de trous prévus', type: 'number', required: true, min: 1 },
     },
     {
       key: 'target_depth_m',
       type: 'input',
-      props: { label: 'foration.fields.target_depth_m', type: 'number', required: true, step: 0.1 },
+      props: { label: 'Profondeur cible (m)', type: 'number', required: true, step: 0.1 },
     },
     {
       key: 'diameter_mm',
       type: 'input',
-      props: { label: 'foration.fields.diameter_mm', type: 'number', required: true, min: 1 },
+      props: { label: 'Diamètre (mm)', type: 'number', required: true, min: 1 },
     },
     {
       key: 'assigned_operator_id',
       type: 'input',
-      props: { label: 'foration.fields.assigned_operator_id' },
+      props: { label: 'Opérateur assigné' },
     },
     {
       key: 'assigned_machine_id',
       type: 'input',
       props: {
-        label: 'foration.fields.assigned_machine_id',
-        description: 'foration.machine_must_be_active',
+        label: 'Machine assignée',
+        description: 'La machine doit être en statut actif pour activer le plan',
       },
     },
     {
       key: 'valid_from',
       type: 'input',
-      props: { label: 'foration.fields.valid_from', type: 'datetime-local', required: true },
+      props: { label: 'Valide à partir du', type: 'datetime-local', required: true },
     },
     {
       key: 'valid_to',
       type: 'input',
-      props: { label: 'foration.fields.valid_to', type: 'datetime-local' },
+      props: { label: 'Valide jusqu’au', type: 'datetime-local' },
     },
   ];
 
@@ -156,10 +154,10 @@ export class DrillingPlanEditComponent implements OnInit {
       const error = err as { error?: { code?: string; message?: string }; message?: string };
       const code = error.error?.code;
       if (code === 'EQUIPMENT_NOT_ACTIVE') {
-        // FOR-05: surface the i18n key for machine en panne.
-        this.snack.open('foration.machine_status_not_active', 'OK', { duration: 6000 });
+        // FOR-05: machine en panne ou non disponible.
+        this.snack.open('Plan non activé : la machine assignée n’est pas en statut actif.', 'OK', { duration: 6000 });
       } else {
-        this.snack.open(error.error?.message ?? error.message ?? 'Error', 'OK', { duration: 5000 });
+        this.snack.open(error.error?.message ?? error.message ?? 'Erreur', 'OK', { duration: 5000 });
       }
     }
   }

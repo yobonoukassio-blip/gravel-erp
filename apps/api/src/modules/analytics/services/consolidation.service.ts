@@ -97,66 +97,96 @@ export class ConsolidationService {
       return null;
     };
 
-    const siteAgg = new Map<string, Record<string, unknown>>();
-    const getSite = (siteId: string) => {
-      if (!siteAgg.has(siteId)) {
-        siteAgg.set(siteId, {
+    interface ContractAgg {
+      contractId: string;
+      revenueMinor: bigint;
+      costMinor: bigint;
+      tonnageT: number;
+    }
+    interface CalibreAgg {
+      calibreCode: string;
+      revenueMinor: bigint;
+      costMinor: bigint;
+      tonnageT: number;
+    }
+    interface SiteAgg {
+      siteId: string;
+      fxSnapshotId: string | undefined;
+      revenueMinor: bigint;
+      costMinor: bigint;
+      tonnageT: number;
+      byContract: Map<string, ContractAgg>;
+      byCalibre: Map<string, CalibreAgg>;
+    }
+
+    const siteAgg = new Map<string, SiteAgg>();
+    const getSite = (siteId: string): SiteAgg => {
+      let s = siteAgg.get(siteId);
+      if (!s) {
+        s = {
           siteId,
           fxSnapshotId: undefined,
           revenueMinor: 0n,
           costMinor: 0n,
           tonnageT: 0,
-          byContract: new Map<string, Record<string, unknown>>(),
-          byCalibre: new Map<string, Record<string, unknown>>(),
-        });
+          byContract: new Map<string, ContractAgg>(),
+          byCalibre: new Map<string, CalibreAgg>(),
+        };
+        siteAgg.set(siteId, s);
       }
-      return siteAgg.get(siteId);
+      return s;
     };
 
     for (const r of revRows) {
-      const s = getSite(r.site_id);
-      let rev = BigInt(r.revenue ?? 0);
-      let soldCost = BigInt(r.sold_cost ?? 0);
-      const fx = await getFx(r.currency);
+      const s = getSite(String(r['site_id']));
+      let rev = BigInt(String(r['revenue'] ?? 0));
+      let soldCost = BigInt(String(r['sold_cost'] ?? 0));
+      const fx = await getFx(String(r['currency'] ?? ''));
       if (fx) {
         rev = (rev * fx.rate) / 100_000_000n;
         soldCost = (soldCost * fx.rate) / 100_000_000n;
         s.fxSnapshotId = fx.id;
       }
-      const ton = Number(r.tonnage ?? 0);
+      const ton = Number(r['tonnage'] ?? 0);
       s.revenueMinor += rev;
       s.tonnageT += ton;
 
-      if (!s.byContract.has(r.contract_id)) {
-        s.byContract.set(r.contract_id, { contractId: r.contract_id, revenueMinor: 0n, costMinor: 0n, tonnageT: 0 });
+      const contractId = String(r['contract_id']);
+      let c = s.byContract.get(contractId);
+      if (!c) {
+        c = { contractId, revenueMinor: 0n, costMinor: 0n, tonnageT: 0 };
+        s.byContract.set(contractId, c);
       }
-      const c = s.byContract.get(r.contract_id);
       c.revenueMinor += rev;
       c.costMinor += soldCost;
       c.tonnageT += ton;
 
-      if (!s.byCalibre.has(r.calibre_code)) {
-        s.byCalibre.set(r.calibre_code, { calibreCode: r.calibre_code, revenueMinor: 0n, costMinor: 0n, tonnageT: 0 });
+      const calibreCode = String(r['calibre_code']);
+      let cal = s.byCalibre.get(calibreCode);
+      if (!cal) {
+        cal = { calibreCode, revenueMinor: 0n, costMinor: 0n, tonnageT: 0 };
+        s.byCalibre.set(calibreCode, cal);
       }
-      const cal = s.byCalibre.get(r.calibre_code);
       cal.revenueMinor += rev;
       cal.tonnageT += ton;
     }
 
     for (const c of costRows) {
-      const s = getSite(c.site_id);
-      let cost = BigInt(c.cost ?? 0);
-      const fx = await getFx(c.currency);
+      const s = getSite(String(c['site_id']));
+      let cost = BigInt(String(c['cost'] ?? 0));
+      const fx = await getFx(String(c['currency'] ?? ''));
       if (fx) {
         cost = (cost * fx.rate) / 100_000_000n;
         s.fxSnapshotId = fx.id;
       }
       s.costMinor += cost;
 
-      if (!s.byCalibre.has(c.calibre_code)) {
-        s.byCalibre.set(c.calibre_code, { calibreCode: c.calibre_code, revenueMinor: 0n, costMinor: 0n, tonnageT: 0 });
+      const calibreCode = String(c['calibre_code']);
+      let cal = s.byCalibre.get(calibreCode);
+      if (!cal) {
+        cal = { calibreCode, revenueMinor: 0n, costMinor: 0n, tonnageT: 0 };
+        s.byCalibre.set(calibreCode, cal);
       }
-      const cal = s.byCalibre.get(c.calibre_code);
       cal.costMinor += cost;
     }
 
@@ -166,19 +196,21 @@ export class ConsolidationService {
 
     for (const s of siteAgg.values()) {
       const marginMinor = s.revenueMinor - s.costMinor;
-      
-      const byContract = Array.from(s.byContract.values()).map((c: Record<string, unknown>) => ({
-        ...c,
+
+      const byContract = Array.from(s.byContract.values()).map((c) => ({
+        contractId: c.contractId,
         revenueMinor: c.revenueMinor.toString(),
         costMinor: c.costMinor.toString(),
         marginMinor: (c.revenueMinor - c.costMinor).toString(),
+        tonnageT: c.tonnageT,
       }));
 
-      const byCalibre = Array.from(s.byCalibre.values()).map((cal: Record<string, unknown>) => ({
-        ...cal,
+      const byCalibre = Array.from(s.byCalibre.values()).map((cal) => ({
+        calibreCode: cal.calibreCode,
         revenueMinor: cal.revenueMinor.toString(),
         costMinor: cal.costMinor.toString(),
         marginMinor: (cal.revenueMinor - cal.costMinor).toString(),
+        tonnageT: cal.tonnageT,
       }));
 
       bySite.push({

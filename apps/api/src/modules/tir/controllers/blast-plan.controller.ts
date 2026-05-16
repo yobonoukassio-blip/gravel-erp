@@ -23,6 +23,23 @@ export class BlastPlanController {
     return this.blastPlanService.create(body);
   }
 
+  @Get()
+  @Roles(
+    'CHEF_CARRIERE',
+    'QUARRY_CHIEF',
+    'SITE_MANAGER',
+    'DIRECTEUR_SITE',
+    'DIRECTION_GROUPE',
+    'HSE',
+    'HSE_OFFICER',
+  )
+  async list(
+    @Query('tenantId') tenantId: string,
+    @Query('siteId') siteId: string,
+  ) {
+    return this.blastPlanService.list(tenantId, siteId);
+  }
+
   @Get(':id')
   @Roles(
     'CHEF_CARRIERE',

@@ -63,6 +63,55 @@ export class BlastPlanService {
     return this.mapRow(rows[0]);
   }
 
+  /**
+   * List blast plans for a (tenant, site). Defensive against schema drift:
+   * builds the SELECT from information_schema so it works whether the deployed
+   * table is the canonical entity (operational_day_id / drilling_plan_id /
+   * planned_by / hse_approved_by) or the simpler v1 seed (created_by only).
+   * Absent columns are returned as null on the wire — the frontend
+   * BlastPlanRow shape already allows that.
+   */
+  async list(tenantId: string, siteId: string): Promise<Array<Record<string, unknown>>> {
+    const colRows = (await this.ds.query(
+      `SELECT column_name FROM information_schema.columns
+        WHERE table_schema = current_schema() AND table_name = 'blast_plan'`,
+    )) as Array<{ column_name: string }>;
+    const cols = new Set(colRows.map((r) => r.column_name));
+
+    const pick = (name: string, fallback = 'NULL') => (cols.has(name) ? name : `${fallback} AS ${name}`);
+    const plannedBy = cols.has('planned_by')
+      ? 'planned_by'
+      : cols.has('created_by')
+        ? 'created_by AS planned_by'
+        : 'NULL AS planned_by';
+
+    const rows = (await this.ds.query(
+      `SELECT
+         id,
+         status,
+         created_at_utc,
+         ${pick('operational_day_id')},
+         ${pick('drilling_plan_id')},
+         ${plannedBy},
+         ${pick('hse_approved_by')}
+       FROM blast_plan
+       WHERE tenant_id = $1 AND site_id = $2
+       ORDER BY created_at_utc DESC
+       LIMIT 200`,
+      [tenantId, siteId],
+    )) as Array<Record<string, unknown>>;
+
+    return rows.map((r) => ({
+      id: r['id'],
+      status: r['status'],
+      createdAtUtc: r['created_at_utc'],
+      operationalDayId: r['operational_day_id'] ?? null,
+      drillingPlanId: r['drilling_plan_id'] ?? null,
+      plannedBy: r['planned_by'] ?? null,
+      hseApprovedBy: r['hse_approved_by'] ?? null,
+    }));
+  }
+
   async findById(planId: string, tenantId: string): Promise<BlastPlan> {
     const rows = (await this.ds.query(
       `SELECT * FROM blast_plan WHERE id = $1 AND tenant_id = $2 LIMIT 1`,

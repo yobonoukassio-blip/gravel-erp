@@ -78,6 +78,13 @@
         testId="kpi-extraction-yield"
       />
       <gravel-kpi-tile
+        [label]="t('dashboard.downtime_today')"
+        [value]="d.downtime_today_minutes"
+        unit="min"
+        [highlight]="d.downtime_today_minutes > 120 ? 'warn' : 'ok'"
+        testId="kpi-downtime-today"
+      />
+      <gravel-kpi-tile
         [label]="t('dashboard.tf_rolling_12m')"
         [value]="d.tf_rolling_12m"
         testId="kpi-tf"

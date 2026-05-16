@@ -105,7 +105,7 @@ Requirements pour la première release. Chaque exigence est mappée à une phase
 ### Dashboards, Reporting & Alertes
 
 - [x] **DSH-01**: Chaque profil (Direction Groupe, Directeur Site, Chef Carrière, Maintenance, HSE, Finance) dispose d'un dashboard temps réel adapté à son rôle
-- [ ] **DSH-02**: KPI Production : tonnes produites jour/semaine/mois, rendement forage, rendement concassage, disponibilité équipements, temps d'arrêt
+- [x] **DSH-02**: KPI Production : tonnes produites jour/semaine/mois, rendement forage, rendement concassage, disponibilité équipements, temps d'arrêt
 - [ ] **DSH-03**: KPI Finance : coût/tonne, marge, consommation carburant, coût maintenance
 - [ ] **DSH-04**: KPI HSE : nombre d'incidents, taux fréquence accidents, conformité audits
 - [ ] **DSH-05**: Reporting consolidé groupe avec comparaison sites et drill-down vers détail
@@ -204,7 +204,7 @@ Mapping requirement ↔ phase (validé après création du roadmap).
 | HSE-05 | Phase 3 — Audit module (DEFERRED) | Deferred — stub in docs/phase-03-handoff/hse-rh-deferred-scope.md |
 | HSE-06 | Phase 2 — Vertical Slice Production | Complete |
 | DSH-01 | Phase 2 — Vertical Slice Production | Complete |
-| DSH-02 | Phase 2 — Vertical Slice Production | Pending |
+| DSH-02 | Phase 2 — Vertical Slice Production | Complete — downtime tile added post-audit |
 | TIR-01 | Phase 3 — Operational Completeness | Complete (03-W1-P02) |
 | TIR-02 | Phase 3 — Operational Completeness | Complete (03-W1-P02) |
 | TIR-03 | Phase 3 — Operational Completeness | Complete (03-W1-P02) |

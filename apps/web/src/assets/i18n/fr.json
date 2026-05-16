@@ -33,6 +33,7 @@
   "dashboard.tonnage_month": "Tonnage 30 jours",
   "dashboard.drilling_yield": "Rendement forage",
   "dashboard.extraction_yield": "Rendement extraction",
+  "dashboard.downtime_today": "Temps d'arrêt",
   "dashboard.tf_rolling_12m": "TF (12 mois glissants)",
   "dashboard.cost_per_ton_provisional_label": "Coût par tonne (provisoire — carburant uniquement, coût final Phase 4)",
   "dashboard.no_fuel_tanks": "Aucune cuve carburant configurée.",

@@ -7,13 +7,16 @@ import '../features/alerts/screens/alerts_screen.dart';
 import '../features/concassage/screens/concassage_screen.dart';
 import '../features/criblage/screens/criblage_screen.dart';
 import '../features/dashboard/screens/dashboard_screen.dart';
+import '../features/extraction/screens/extraction_cycle_list.dart';
 import '../features/foration/screens/drilling_plan_list.dart';
 import '../features/fuel/screens/equipment_refuel_form.dart';
+import '../features/hse/screens/incident_list.dart';
 import '../features/maintenance/screens/maintenance_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/stockpile/screens/stockpile_screen.dart';
 import '../features/ventes/screens/ventes_screen.dart';
 import 'common/module_placeholder.dart';
+import 'common/operational_day_provider.dart';
 import 'theme.dart';
 
 /// Gravel Ivoire ERP — root mobile app shell.
@@ -176,13 +179,10 @@ class _ShellState extends State<_Shell> {
       case ModuleId.settings:
         return const SettingsScreen();
       case ModuleId.extraction:
-        return const ModulePlaceholder(
-          title: 'Extraction',
-          subtitle:
-              "Liste des cycles d'extraction à venir. Le formulaire de "
-              "saisie cycle est accessible depuis un plan d'opération.",
-          iconData: Icons.landscape,
-          requirementCode: 'EXT-01 · EXT-02',
+        return ExtractionCycleListScreen(
+          tenantId: GravelApp.tenantId,
+          siteId: GravelApp.siteId,
+          operatorId: GravelApp.userId,
         );
       case ModuleId.transport:
         return const ModulePlaceholder(
@@ -203,13 +203,9 @@ class _ShellState extends State<_Shell> {
           requirementCode: 'TIR-01..07',
         );
       case ModuleId.hse:
-        return const ModulePlaceholder(
-          title: 'HSE',
-          subtitle:
-              'Liste des incidents nécessite le contexte journée opérationnelle '
-              '— branchement à venir avec le sélecteur de jour ops.',
-          iconData: Icons.health_and_safety,
-          requirementCode: 'HSE-01 · HSE-02',
+        return _HseSwitchboard(
+          tenantId: GravelApp.tenantId,
+          siteId: GravelApp.siteId,
         );
       case ModuleId.rh:
         return const ModulePlaceholder(
@@ -508,6 +504,39 @@ class _StatusFooter extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Routes the HSE module to the existing IncidentListScreen once the user
+/// has picked an operational day. Avoids hard-failing the shell if the
+/// context isn't ready yet.
+class _HseSwitchboard extends ConsumerWidget {
+  const _HseSwitchboard({required this.tenantId, required this.siteId});
+
+  final String tenantId;
+  final String siteId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final day = ref.watch(operationalDayProvider);
+    if (day == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('HSE — Incidents'),
+          actions: const [OperationalDayPicker()],
+        ),
+        body: const NoDaySelected(
+          message:
+              "Sélectionnez la journée opérationnelle pour voir les incidents et "
+              'lancer un signalement.',
+        ),
+      );
+    }
+    return IncidentListScreen(
+      tenantId: tenantId,
+      siteId: siteId,
+      operationalDayId: day.id,
     );
   }
 }

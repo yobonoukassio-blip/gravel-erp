@@ -70,7 +70,7 @@ export class CorrectiveActionListComponent implements OnInit {
       field: 'priority',
       headerName: 'Priorité',
       width: 110,
-      cellStyle: (p) => ({
+      cellStyle: (p: { value: unknown }): Record<string, string> => ({
         backgroundColor: PRIORITY_COLOR[p.value as CapaPriority] ?? '#fff',
       }),
     },

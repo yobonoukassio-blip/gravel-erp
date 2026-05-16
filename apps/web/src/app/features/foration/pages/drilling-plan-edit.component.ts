@@ -168,19 +168,21 @@ export class DrillingPlanEditComponent implements OnInit {
   }
 
   private async loadDropdowns(): Promise<void> {
-    const params = this.siteId ? { params: { site_id: this.siteId } } : {};
+    const httpParams = this.siteId ? { params: { site_id: this.siteId } } : {};
 
     const [zones, benches, employees, equipment] = await Promise.all([
       firstValueFrom(
-        this.http.get<ZoneRow[] | { data: ZoneRow[] }>('/api/zones', params as never).pipe(
-          map((r) => (Array.isArray(r) ? r : r.data ?? [])),
-          catchError(() => of([] as ZoneRow[])),
-        ),
+        this.http
+          .get<ZoneRow[] | { data: ZoneRow[] }>('/api/zones', httpParams)
+          .pipe(
+            map((r) => (Array.isArray(r) ? r : r.data ?? [])),
+            catchError(() => of([] as ZoneRow[])),
+          ),
       ),
       firstValueFrom(
-        this.http.get<BenchRow[]>('/api/benches', params as never).pipe(
-          catchError(() => of([] as BenchRow[])),
-        ),
+        this.http
+          .get<BenchRow[]>('/api/benches', httpParams)
+          .pipe(catchError(() => of([] as BenchRow[]))),
       ),
       firstValueFrom(
         this.http
@@ -190,24 +192,28 @@ export class DrillingPlanEditComponent implements OnInit {
           .pipe(catchError(() => of([] as EmployeeRow[]))),
       ),
       firstValueFrom(
-        this.http.get<EquipmentRow[]>('/api/equipment', params as never).pipe(
-          catchError(() => of([] as EquipmentRow[])),
-        ),
+        this.http
+          .get<EquipmentRow[]>('/api/equipment', httpParams)
+          .pipe(catchError(() => of([] as EquipmentRow[]))),
       ),
     ]);
 
-    this.zoneOptions.set(zones.map((z) => ({ label: `${z.code} — ${z.name}`, value: z.id })));
-    this.benchOptions.set(benches.map((b) => ({ label: `${b.code} — ${b.name}`, value: b.id })));
+    this.zoneOptions.set(
+      zones.map((z: ZoneRow) => ({ label: `${z.code} — ${z.name}`, value: z.id })),
+    );
+    this.benchOptions.set(
+      benches.map((b: BenchRow) => ({ label: `${b.code} — ${b.name}`, value: b.id })),
+    );
     this.operatorOptions.set(
       employees
-        .filter((e) => e.is_active)
-        .map((e) => ({
+        .filter((e: EmployeeRow) => e.is_active)
+        .map((e: EmployeeRow) => ({
           label: `${e.first_name} ${e.last_name}${e.role_code ? ` — ${e.role_code}` : ''}`,
           value: e.id,
         })),
     );
     this.machineOptions.set(
-      equipment.map((eq) => ({
+      equipment.map((eq: EquipmentRow) => ({
         label: `${eq.code} — ${eq.label}${eq.status === 'active' ? '' : ` (${eq.status})`}`,
         value: eq.id,
       })),

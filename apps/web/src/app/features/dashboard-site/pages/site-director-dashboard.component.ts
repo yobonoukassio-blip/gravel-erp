@@ -50,6 +50,7 @@ interface SiteDirectorDashboardPayload {
     label: 'cost_per_ton_provisional';
   };
   open_work_orders_count: number;
+  downtime_today_minutes: number;
   vte_revenue: VteRevenue;
 }
 

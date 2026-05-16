@@ -154,7 +154,7 @@ export class StockpileEventsComponent implements OnInit {
       type: 'rightAligned',
       valueFormatter: (p: ValueFormatterParams) =>
         p.value != null ? new Intl.NumberFormat('fr-FR').format(Number(p.value)) : '—',
-      cellStyle: (p) => {
+      cellStyle: (p: { value: unknown }): Record<string, string> => {
         const v = Number(p.value);
         if (!Number.isFinite(v)) return { fontVariantNumeric: 'tabular-nums' };
         return {

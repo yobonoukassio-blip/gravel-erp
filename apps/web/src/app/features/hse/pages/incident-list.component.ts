@@ -105,7 +105,7 @@ export class IncidentListComponent implements OnInit {
       field: 'severity',
       headerName: 'Sévérité',
       width: 110,
-      cellStyle: (p) => ({
+      cellStyle: (p: { value: unknown }): Record<string, string> => ({
         color: '#fff',
         backgroundColor: SEVERITY_COLOR[p.value as number] ?? '#999',
         textAlign: 'center',

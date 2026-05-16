@@ -165,7 +165,7 @@ export class FuelTankListComponent implements OnInit {
       type: 'rightAligned',
       valueFormatter: (p: ValueFormatterParams) =>
         p.value == null ? '—' : `${Number(p.value).toFixed(1)}`,
-      cellStyle: (p): Record<string, string> => {
+      cellStyle: (p: { value: unknown }): Record<string, string> => {
         const v = p.value as number | null;
         if (v == null) return { fontVariantNumeric: 'tabular-nums', color: 'var(--gv-text-muted)', fontWeight: '400' };
         return {

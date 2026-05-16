@@ -18,6 +18,8 @@ import { FuelTankEventService } from '../services/fuel-tank-event.service';
 import { EquipmentRefuelService } from '../services/equipment-refuel.service';
 import { EnergyConsumptionService } from '../services/energy-consumption.service';
 import { EnergyUsageType } from '../entities/energy-consumption-reading.entity';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 interface AuthedRequest {
   user: { sub: string; tenantId: string; siteId?: string; roles?: string[] };
@@ -75,7 +77,28 @@ export class FuelController {
     private readonly fuelEventService: FuelTankEventService,
     private readonly refuelService: EquipmentRefuelService,
     private readonly energyService: EnergyConsumptionService,
+    @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
+
+  // ── Fuel Tanks listing (CAR-01 read) ─────────────────────────────────────
+  @Get('fuel-tanks')
+  async listFuelTanks(@Query('siteId') siteId?: string): Promise<unknown[]> {
+    return this.dataSource.transaction(async (em) => {
+      const params: unknown[] = [];
+      let where = '';
+      if (siteId) { params.push(siteId); where = ' AND site_id = $1'; }
+      return em.query(
+        `SELECT
+           id, tenant_id AS "tenantId", site_id AS "siteId", code, label,
+           capacity_liters AS "capacityLiters", fuel_type AS "fuelType",
+           created_at AS "createdAt"
+         FROM fuel_tank
+         WHERE 1=1${where}
+         ORDER BY code`,
+        params,
+      );
+    });
+  }
 
   // ── Fuel Tank Events ─────────────────────────────────────────────────────
 

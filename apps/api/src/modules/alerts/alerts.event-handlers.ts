@@ -169,6 +169,14 @@ export class AlertsEventHandlers {
   /**
    * Spare-part stock dropped at or below threshold (D-08, D-10, D-13).
    * Deduped: same spare_part + 'below_threshold' = 1 OPEN alert.
+   *
+   * Severity mapping (Phase 8 canonical, see 08-W1-P02-PLAN.md §
+   * "Severity Mapping (canonical for Phase 8)"):
+   *   payload 'warning'  -> Alert.severity 'high'
+   *   payload 'critical' -> Alert.severity 'critical'
+   *
+   * The mapping happens at THIS handler boundary, not inside the emitter,
+   * so emitters stay decoupled from the Alert table's enum.
    */
   @OnEvent('maintenance.spare_part.threshold_crossed')
   async onSparePartThresholdCrossed(evt: {
@@ -178,15 +186,18 @@ export class AlertsEventHandlers {
     sku?: string;
     quantityOnHand: number;
     thresholdMin: number | null;
-    severity: 'high' | 'critical';
+    severity: 'warning' | 'critical';
   }): Promise<void> {
+    const alertSeverity: AlertSeverity =
+      evt.severity === 'critical' ? 'critical' : 'high';
+
     await this.alerts.createFromEvent({
       tenantId: evt.tenantId,
       siteId: evt.siteId,
       sourceEventType: 'maintenance.spare_part.threshold_crossed',
       sourceEventId: null,
       dedupeKey: `spare_part:${evt.sparePartId}:below_threshold`,
-      severity: evt.severity,
+      severity: alertSeverity,
       payload: {
         site_id: evt.siteId,
         spare_part_id: evt.sparePartId,

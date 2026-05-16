@@ -30,17 +30,17 @@
 
 | Requirement | Phase | Status |
 |---|---|---|
-| FIN-R01 | 07 — Finance Real | Pending |
-| FIN-R02 | 07 — Finance Real | Pending |
-| FIN-R03 | 07 — Finance Real | Pending |
-| FIN-R04 | 07 — Finance Real | Pending |
-| FIN-R05 | 07 — Finance Real | Pending |
-| FIN-R06 | 07 — Finance Real | Pending |
-| ALT-01 | 08 — Operational Alerts | Pending |
-| ALT-02 | 08 — Operational Alerts | Pending |
-| NTF-01 | 09 — Notification Delivery | Pending |
-| NTF-02 | 09 — Notification Delivery | Pending |
-| NTF-03 | 09 — Notification Delivery | Pending |
+| FIN-R01 | 07-finance-real | Pending |
+| FIN-R02 | 07-finance-real | Pending |
+| FIN-R03 | 07-finance-real | Pending |
+| FIN-R04 | 07-finance-real | Pending |
+| FIN-R05 | 07-finance-real | Pending |
+| FIN-R06 | 07-finance-real | Pending |
+| ALT-01 | 08-operational-alerts-closure | Pending |
+| ALT-02 | 08-operational-alerts-closure | Pending |
+| NTF-01 | 09-notification-delivery | Pending |
+| NTF-02 | 09-notification-delivery | Pending |
+| NTF-03 | 09-notification-delivery | Pending |
 
 ## Out of Scope (v1.2 / v2)
 
@@ -54,3 +54,4 @@
 
 ---
 *Created: 2026-05-16*
+*Traceability slugs aligned to phase dirs: 2026-05-16*

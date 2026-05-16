@@ -12,6 +12,8 @@ import '../features/foration/screens/drilling_plan_list.dart';
 import '../features/fuel/screens/equipment_refuel_form.dart';
 import '../features/hse/screens/incident_list.dart';
 import '../features/maintenance/screens/maintenance_screen.dart';
+import '../features/rh/screens/shift_entry_list.dart';
+import '../features/transport/screens/rotation_list.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/stockpile/screens/stockpile_screen.dart';
 import '../features/ventes/screens/ventes_screen.dart';
@@ -185,13 +187,10 @@ class _ShellState extends State<_Shell> {
           operatorId: GravelApp.userId,
         );
       case ModuleId.transport:
-        return const ModulePlaceholder(
-          title: 'Transport',
-          subtitle:
-              'Liste des rotations + tickets de pesée à venir. La saisie '
-              'individuelle est accessible depuis une rotation active.',
-          iconData: Icons.local_shipping,
-          requirementCode: 'TRP-01..03',
+        return RotationListScreen(
+          tenantId: GravelApp.tenantId,
+          siteId: GravelApp.siteId,
+          operatorId: GravelApp.userId,
         );
       case ModuleId.tir:
         return const ModulePlaceholder(
@@ -208,13 +207,10 @@ class _ShellState extends State<_Shell> {
           siteId: GravelApp.siteId,
         );
       case ModuleId.rh:
-        return const ModulePlaceholder(
-          title: 'RH — Pointage',
-          subtitle:
-              'Saisie pointage équipe par superviseur. Branchement à venir '
-              'avec le contexte journée opérationnelle + superviseur.',
-          iconData: Icons.badge,
-          requirementCode: 'RH-01..04',
+        return ShiftEntryListScreen(
+          tenantId: GravelApp.tenantId,
+          siteId: GravelApp.siteId,
+          supervisorId: GravelApp.userId,
         );
     }
   }

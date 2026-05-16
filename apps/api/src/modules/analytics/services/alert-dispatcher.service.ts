@@ -110,6 +110,27 @@ export class AlertDispatcherService {
     });
   }
 
+  /** FIN-R06: route fuel-anomaly detector events through alert_rule. */
+  @OnEvent('production.fuel.anomaly_detected')
+  async onFuelAnomaly(payload: {
+    tenantId: string;
+    siteId?: string;
+    tankId?: string;
+    equipmentId?: string;
+    anomalyType?: string;
+  }): Promise<void> {
+    const subject = payload.tankId ?? payload.equipmentId ?? 'inconnu';
+    const reason = payload.anomalyType ?? 'écart détecté';
+    await this.dispatch({
+      tenantId: payload.tenantId,
+      eventType: 'production.fuel.anomaly_detected',
+      severity: 'warning',
+      title: `Anomalie carburant : ${reason}`,
+      body: `Source ${subject} — anomalie carburant détectée`,
+      context: payload,
+    });
+  }
+
   /** Core dispatcher — finds matching rules and routes through channel providers. */
   private async dispatch(alert: AlertPayload): Promise<void> {
     const rules = await this.ds.getRepository(AlertRule).find({

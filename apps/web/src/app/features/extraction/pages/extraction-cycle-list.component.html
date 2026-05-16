@@ -1,54 +1,74 @@
-<header class="toolbar">
-  <h1>{{ 'extraction.extraction_cycle' | transloco }}</h1>
-  <span
-    class="estimated-badge"
-    data-testid="estimated-disclaimer"
-    [attr.aria-label]="'extraction.estimated_disclaimer' | transloco"
-  >
-    {{ 'extraction.estimated_disclaimer' | transloco }}
-  </span>
-</header>
+<div class="page gv-anim-fade">
+  <header class="page-head">
+    <div class="page-head-text">
+      <span class="page-eyebrow">PRODUCTION · EXT-01..02</span>
+      <h1 class="page-title">{{ 'extraction.extraction_cycle' | transloco }}</h1>
+      <p class="page-sub">Cycles d'extraction et rendement par engin et opérateur</p>
+    </div>
+    <span
+      class="estimated-pill"
+      data-testid="estimated-disclaimer"
+      [attr.aria-label]="'extraction.estimated_disclaimer' | transloco"
+    >
+      <span class="estimated-dot"></span>
+      ESTIMÉ — {{ 'extraction.estimated_disclaimer' | transloco }}
+    </span>
+  </header>
 
-<div class="toolbar">
-  <label>
-    Operational day:
-    <input
-      type="text"
-      [value]="operationalDayId()"
-      (change)="onDayChange($any($event.target).value); refresh()"
-      data-testid="filter-operational-day"
-      placeholder="uuid"
-    />
-  </label>
-  <label>
-    {{ 'extraction.equipment' | transloco }}:
-    <input
-      type="text"
-      [value]="equipmentFilter()"
-      (change)="onEquipmentChange($any($event.target).value); refresh()"
-      data-testid="filter-equipment"
-      placeholder="uuid"
-    />
-  </label>
-</div>
+  <section class="filter-bar">
+    <label class="filter-label">
+      <span class="filter-key">Journée opérationnelle</span>
+      <input
+        class="filter-input"
+        type="text"
+        [value]="operationalDayId()"
+        (change)="onDayChange($any($event.target).value); refresh()"
+        data-testid="filter-operational-day"
+        placeholder="uuid"
+      />
+    </label>
+    <label class="filter-label">
+      <span class="filter-key">{{ 'extraction.equipment' | transloco }}</span>
+      <input
+        class="filter-input"
+        type="text"
+        [value]="equipmentFilter()"
+        (change)="onEquipmentChange($any($event.target).value); refresh()"
+        data-testid="filter-equipment"
+        placeholder="uuid"
+      />
+    </label>
+  </section>
 
-<div class="ag-grid-host ag-theme-quartz">
-  <ag-grid-angular
-    style="height: 100%; width: 100%;"
-    data-testid="extraction-cycle-grid"
-    [rowData]="cycles()"
-    [columnDefs]="cycleColumnDefs"
-    [animateRows]="true"
-  ></ag-grid-angular>
-</div>
+  <section class="grid-card">
+    <header class="grid-head">
+      <span class="grid-title">Cycles</span>
+      <span class="grid-count gv-num">{{ cycles().length }}</span>
+    </header>
+    <div class="ag-theme-quartz">
+      <ag-grid-angular
+        style="height: 540px; width: 100%;"
+        data-testid="extraction-cycle-grid"
+        [rowData]="cycles()"
+        [columnDefs]="cycleColumnDefs"
+        [animateRows]="true"
+      ></ag-grid-angular>
+    </div>
+  </section>
 
-<div class="ag-grid-host yield-grid ag-theme-quartz" *ngIf="yieldRows().length > 0">
-  <h2>{{ 'extraction.extraction_cycle' | transloco }} — yield (EXT-02)</h2>
-  <ag-grid-angular
-    style="height: 240px; width: 100%;"
-    data-testid="extraction-yield-grid"
-    [rowData]="yieldRows()"
-    [columnDefs]="yieldColumnDefs"
-    [animateRows]="true"
-  ></ag-grid-angular>
+  <section class="grid-card" *ngIf="yieldRows().length > 0">
+    <header class="grid-head">
+      <span class="grid-title">Rendement par engin (EXT-02)</span>
+      <span class="grid-count gv-num">{{ yieldRows().length }}</span>
+    </header>
+    <div class="ag-theme-quartz">
+      <ag-grid-angular
+        style="height: 260px; width: 100%;"
+        data-testid="extraction-yield-grid"
+        [rowData]="yieldRows()"
+        [columnDefs]="yieldColumnDefs"
+        [animateRows]="true"
+      ></ag-grid-angular>
+    </div>
+  </section>
 </div>

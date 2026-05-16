@@ -9,8 +9,9 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { TranslocoModule } from '@jsverse/transloco';
 import { AgGridAngular } from 'ag-grid-angular';
-import type { ColDef } from 'ag-grid-community';
+import type { ColDef, ValueFormatterParams } from 'ag-grid-community';
 import { firstValueFrom } from 'rxjs';
+import { renderPill, statusPillRenderer } from '../../../shared/ag-grid/status-pill';
 
 interface ExtractionCycleRow {
   id: string;
@@ -50,39 +51,122 @@ interface YieldRow {
   templateUrl: './extraction-cycle-list.component.html',
   styles: [
     `
-      :host {
-        display: block;
-        padding: 16px;
-      }
-      .toolbar {
+      :host { display: block; }
+      .page { display: flex; flex-direction: column; gap: var(--gv-space-5); }
+
+      .page-head {
+        position: relative;
         display: flex;
-        gap: 12px;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: var(--gv-space-4);
+        padding: var(--gv-space-5) var(--gv-space-6);
+        background: linear-gradient(135deg, var(--gv-navy-900), var(--gv-navy-700));
+        border-radius: var(--gv-radius-lg);
+        overflow: hidden;
+        color: oklch(96% 0.005 250);
+        box-shadow: var(--gv-shadow-2);
+      }
+      .page-head::before {
+        content: '';
+        position: absolute;
+        top: -50%; right: -10%;
+        width: 320px; height: 320px;
+        background: radial-gradient(circle, oklch(78% 0.16 85 / 0.26) 0%, transparent 60%);
+        pointer-events: none;
+      }
+      .page-head-text { position: relative; z-index: 1; display: flex; flex-direction: column; gap: var(--gv-space-1); }
+      .page-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.16em; color: var(--gv-gold); }
+      .page-title { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin: 0; color: oklch(98% 0.005 250); }
+      .page-sub { font-size: 13px; color: oklch(82% 0.012 250); margin: 0; }
+
+      .estimated-pill {
+        position: relative; z-index: 1;
+        display: inline-flex;
         align-items: center;
-        margin-bottom: 12px;
+        gap: var(--gv-space-2);
+        padding: 6px var(--gv-space-3);
+        background: var(--gv-gold);
+        color: var(--gv-navy-900);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        border-radius: 999px;
+        box-shadow: 0 2px 8px oklch(58% 0.16 75 / 0.4);
       }
-      .estimated-badge {
-        background: #fff4d6;
-        color: #6b4d00;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 12px;
+      .estimated-dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: var(--gv-navy-900);
+        animation: gv-pulse-dot 1.8s var(--gv-ease) infinite;
+      }
+
+      .filter-bar {
+        display: grid;
+        gap: var(--gv-space-3);
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        padding: var(--gv-space-4);
+        background: var(--gv-surface);
+        border: 1px solid var(--gv-border);
+        border-radius: var(--gv-radius-md);
+        box-shadow: var(--gv-shadow-1);
+      }
+      .filter-label {
+        display: flex;
+        flex-direction: column;
+        gap: var(--gv-space-1);
+      }
+      .filter-key {
+        font-size: 11px;
         font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--gv-text-soft);
       }
-      .downtime-pill {
-        display: inline-block;
-        background: #ffd1d1;
-        color: #8a0000;
-        padding: 2px 8px;
-        border-radius: 12px;
+      .filter-input {
+        appearance: none;
+        padding: 8px 12px;
+        background: var(--gv-surface);
+        border: 1.5px solid var(--gv-border);
+        border-radius: var(--gv-radius);
+        font-family: var(--gv-font-mono);
         font-size: 12px;
+        color: var(--gv-text);
+        transition: border-color var(--gv-duration-1) var(--gv-ease);
       }
-      .ag-grid-host {
-        height: 600px;
-        width: 100%;
+      .filter-input:focus {
+        outline: none;
+        border-color: var(--gv-gold);
+        box-shadow: 0 0 0 3px var(--gv-gold-ring);
       }
-      .yield-grid {
-        height: 280px;
-        margin-top: 24px;
+
+      .grid-card {
+        background: var(--gv-surface);
+        border: 1px solid var(--gv-border);
+        border-radius: var(--gv-radius-md);
+        box-shadow: var(--gv-shadow-1);
+        overflow: hidden;
+      }
+      .grid-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: var(--gv-space-3) var(--gv-space-4);
+        background: var(--gv-surface-2);
+        border-bottom: 1px solid var(--gv-border);
+      }
+      .grid-title {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--gv-text-soft);
+      }
+      .grid-count {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--gv-text);
       }
     `,
   ],
@@ -96,20 +180,62 @@ export class ExtractionCycleListComponent implements OnInit {
   readonly equipmentFilter = signal<string>('');
 
   readonly cycleColumnDefs: ColDef[] = [
-    { field: 'cycleStartedAtLocal', headerName: 'Date', sortable: true, width: 180 },
-    { field: 'benchId', headerName: 'Banc', sortable: true, width: 140 },
-    { field: 'equipmentId', headerName: 'Engin', sortable: true, width: 140 },
-    { field: 'operatorId', headerName: 'Opérateur', sortable: true, width: 140 },
-    { field: 'materialType', headerName: 'Matériau', sortable: true, width: 140 },
+    {
+      field: 'cycleStartedAtLocal',
+      headerName: 'Date',
+      sortable: true,
+      width: 180,
+      valueFormatter: (p: ValueFormatterParams) =>
+        p.value ? new Date(p.value as string).toLocaleString('fr-CI') : '—',
+      cellStyle: { fontVariantNumeric: 'tabular-nums', fontSize: '12px' },
+    },
+    {
+      field: 'benchId',
+      headerName: 'Banc',
+      sortable: true,
+      width: 140,
+      valueFormatter: (p: ValueFormatterParams) =>
+        p.value ? `${String(p.value).slice(0, 8)}…` : '—',
+      cellStyle: { fontFamily: 'var(--gv-font-mono)', fontSize: '12px' },
+    },
+    {
+      field: 'equipmentId',
+      headerName: 'Engin',
+      sortable: true,
+      width: 140,
+      valueFormatter: (p: ValueFormatterParams) =>
+        p.value ? `${String(p.value).slice(0, 8)}…` : '—',
+      cellStyle: { fontFamily: 'var(--gv-font-mono)', fontSize: '12px' },
+    },
+    {
+      field: 'operatorId',
+      headerName: 'Opérateur',
+      sortable: true,
+      width: 140,
+      valueFormatter: (p: ValueFormatterParams) =>
+        p.value ? `${String(p.value).slice(0, 8)}…` : '—',
+      cellStyle: { fontFamily: 'var(--gv-font-mono)', fontSize: '12px' },
+    },
+    {
+      field: 'materialType',
+      headerName: 'Matériau',
+      sortable: true,
+      width: 160,
+      cellRenderer: statusPillRenderer<string>({
+        granite_brut: { tone: 'navy', label: 'Granite brut' },
+        tout_venant: { tone: 'info', label: 'Tout-venant' },
+        sterile: { tone: 'neutral', label: 'Stérile' },
+      }),
+    },
     {
       field: 'estimatedTonnageT',
       headerName: 'Tonnage estimé (t)',
       sortable: true,
       width: 170,
-      // Estimated label is announced in the toolbar; here we just print
-      // the numeric value to keep the grid scannable.
-      cellRenderer: (params: { value: number }) =>
-        params.value != null ? `${params.value.toFixed(1)}` : '—',
+      type: 'rightAligned',
+      valueFormatter: (p: ValueFormatterParams) =>
+        p.value != null ? Number(p.value).toFixed(1) : '—',
+      cellStyle: { fontVariantNumeric: 'tabular-nums', fontWeight: '600' },
     },
     {
       field: 'downtimeMinutes',
@@ -118,19 +244,69 @@ export class ExtractionCycleListComponent implements OnInit {
       width: 140,
       cellRenderer: (params: { value: number | null }) => {
         if (params.value == null || params.value === 0) return '—';
-        return `<span class="downtime-pill">${params.value}</span>`;
+        return renderPill(`${params.value} min`, 'danger');
       },
     },
-    { field: 'notes', headerName: 'Notes', flex: 1 },
+    { field: 'notes', headerName: 'Notes', flex: 1, minWidth: 200 },
   ];
 
   readonly yieldColumnDefs: ColDef[] = [
-    { field: 'equipmentId', headerName: 'Engin', sortable: true, width: 160 },
-    { field: 'operatorId', headerName: 'Opérateur', sortable: true, width: 160 },
-    { field: 'cycleCount', headerName: 'Cycles', sortable: true, width: 100 },
-    { field: 'totalEstimatedT', headerName: 'Total estimé (t)', sortable: true, width: 170 },
-    { field: 'productiveHours', headerName: 'Heures productives', sortable: true, width: 170 },
-    { field: 'yieldTPerH', headerName: 'Rendement (t/h)', sortable: true, width: 170 },
+    {
+      field: 'equipmentId',
+      headerName: 'Engin',
+      sortable: true,
+      width: 160,
+      valueFormatter: (p: ValueFormatterParams) =>
+        p.value ? `${String(p.value).slice(0, 8)}…` : '—',
+      cellStyle: { fontFamily: 'var(--gv-font-mono)', fontSize: '12px' },
+    },
+    {
+      field: 'operatorId',
+      headerName: 'Opérateur',
+      sortable: true,
+      width: 160,
+      valueFormatter: (p: ValueFormatterParams) =>
+        p.value ? `${String(p.value).slice(0, 8)}…` : '—',
+      cellStyle: { fontFamily: 'var(--gv-font-mono)', fontSize: '12px' },
+    },
+    {
+      field: 'cycleCount',
+      headerName: 'Cycles',
+      sortable: true,
+      width: 110,
+      type: 'rightAligned',
+      cellStyle: { fontVariantNumeric: 'tabular-nums', fontWeight: '600' },
+    },
+    {
+      field: 'totalEstimatedT',
+      headerName: 'Total estimé (t)',
+      sortable: true,
+      width: 170,
+      type: 'rightAligned',
+      valueFormatter: (p: ValueFormatterParams) =>
+        p.value != null ? Number(p.value).toFixed(1) : '—',
+      cellStyle: { fontVariantNumeric: 'tabular-nums' },
+    },
+    {
+      field: 'productiveHours',
+      headerName: 'Heures productives',
+      sortable: true,
+      width: 180,
+      type: 'rightAligned',
+      valueFormatter: (p: ValueFormatterParams) =>
+        p.value != null ? Number(p.value).toFixed(1) : '—',
+      cellStyle: { fontVariantNumeric: 'tabular-nums', color: 'var(--gv-text-muted)' },
+    },
+    {
+      field: 'yieldTPerH',
+      headerName: 'Rendement (t/h)',
+      sortable: true,
+      width: 170,
+      type: 'rightAligned',
+      valueFormatter: (p: ValueFormatterParams) =>
+        p.value != null ? Number(p.value).toFixed(2) : '—',
+      cellStyle: { fontVariantNumeric: 'tabular-nums', fontWeight: '600', color: 'oklch(38% 0.14 152)' },
+    },
   ];
 
   async ngOnInit(): Promise<void> {

@@ -101,5 +101,22 @@ This document evolves at phase transitions and milestone boundaries.
 3. Audit Out of Scope — reasons still valid?
 4. Update Context with current state
 
+## Current State (v1.0 shipped)
+
+**Version:** v1.0 tagged 2026-05-16
+**Scope delivered:** Foundation + Production vertical slice + Operational completeness + Finance backend + IoT ingestion model
+**Stats:** 5 phases, 23 plans, 237 commits, 828 files, 107k LOC
+**Requirements:** 58/71 satisfied (13 deferred to v1.1 as known tech debt)
+**Deploy:** Vercel (Angular web) + Railway (NestJS API) + Supabase (PostgreSQL)
+
+## Next Milestone Goals (v1.1)
+
+- Close remaining wiring stubs (MNT-02 scheduler, MNT-04 alert handler)
+- Finance UI controllers + dashboards (DSH-03..06 user-facing)
+- Arabic i18n for web + mobile
+- FND-07 money 3-representation ledger storage
+- Mobile maintenance + ventes real screens (replace placeholder shells)
+- Production deploy hardening (seed alert_rules, email/SMS provider)
+
 ---
-*Last updated: 2026-05-12 after Phase 1 (Foundation)*
+*Last updated: 2026-05-16 after v1.0 milestone completion*

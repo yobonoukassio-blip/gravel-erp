@@ -149,9 +149,14 @@ export class HseIncidentService {
 
       const saved = this.mapRow(rows[0]);
 
+      // SF-013 (audit 2026-05-16): consumer (AlertsEventHandlers.onHseIncidentCreated)
+      // reads `severity_numeric` — previously sent `severity`, so the numeric
+      // was undefined and EVERY HSE incident was misclassified as `low` alert
+      // severity. A severity-5 fatal accident triggered a `low`-priority alert
+      // and the critical notification gate never opened.
       this.events.emit('hse.incident.created', {
         incident_id: saved.id,
-        severity: saved.severity,
+        severity_numeric: saved.severity,
         category: saved.category,
         site_id: saved.siteId,
         tenant_id: saved.tenantId,

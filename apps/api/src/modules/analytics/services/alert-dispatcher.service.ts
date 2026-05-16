@@ -84,38 +84,49 @@ export class AlertDispatcherService {
     });
   }
 
+  // SF-013 (audit 2026-05-16): payload uses snake_case (canonical event
+  // contract) — was reading camelCase `tenantId`/`siteId`/`severity`/`incidentId`
+  // which were all undefined. Severity dispatch was always 'warning' because
+  // `undefined >= 4` is false; HSE notifications never went out by email/SMS.
   @OnEvent('hse.incident.created')
   async onHseIncident(payload: {
-    tenantId: string;
-    siteId?: string;
-    severity: number;
-    incidentId: string;
+    tenant_id: string;
+    site_id?: string;
+    severity_numeric: number;
+    incident_id: string;
   }): Promise<void> {
     await this.dispatch({
-      tenantId: payload.tenantId,
-      siteId: payload.siteId,
+      tenantId: payload.tenant_id,
+      siteId: payload.site_id,
       eventType: 'hse.incident.created',
-      severity: payload.severity >= 4 ? 'critical' : 'warning',
-      title: `Incident HSE sévérité ${payload.severity}`,
-      body: `Incident ${payload.incidentId} créé — investigation requise`,
+      severity: payload.severity_numeric >= 4 ? 'critical' : 'warning',
+      title: `Incident HSE sévérité ${payload.severity_numeric}`,
+      body: `Incident ${payload.incident_id} créé — investigation requise`,
       context: payload,
     });
   }
 
-  @OnEvent('tir.explosives.reconciliation_gap')
+  // SF-014 (audit 2026-05-16): event name was `tir.explosives.reconciliation_gap`
+  // but the emitter (`ExplosivesReconciliationJob`) emits
+  // `tir.reconciliation.gap_detected` with payload { tenantId, siteId, gapG,
+  // operationalDayId }. Email/SMS dispatch for explosives reconciliation gaps
+  // therefore NEVER fired — only the in-app alert in AlertsEventHandlers did.
+  // Aligned to the canonical event name and field shape.
+  @OnEvent('tir.reconciliation.gap_detected')
   async onExplosivesGap(payload: {
     tenantId: string;
     siteId?: string;
-    date: string;
-    gapKg: number;
+    gapG: number;
+    operationalDayId: string;
   }): Promise<void> {
+    const gapKg = (payload.gapG / 1000).toFixed(3);
     await this.dispatch({
       tenantId: payload.tenantId,
       siteId: payload.siteId,
-      eventType: 'tir.explosives.reconciliation_gap',
+      eventType: 'tir.reconciliation.gap_detected',
       severity: 'critical',
       title: 'Écart de réconciliation explosifs',
-      body: `${payload.date} : écart de ${payload.gapKg} kg — clôture bloquée`,
+      body: `Jour ${payload.operationalDayId} : écart de ${gapKg} kg — clôture bloquée`,
       context: payload,
     });
   }

@@ -50,24 +50,13 @@ export class CostPerTonAggregatorService {
     const tonnageKg = BigInt(tonnageRow?.tonnage_kg ?? 0);
     const tonnageT = Number(tonnageKg) / 1000;
 
-    // 2. Fuel cost.
-    // P0-6 (audit 2026-05-16): column names fixed — was `litres_dispensed`
-    // (non-existent, real name is `liters`) and `refueled_at_utc` (non-existent,
-    // real name is `created_at_utc`). The whole query previously crashed silently
-    // inside a catch-block, so every snapshot was computed with fuel cost = 0.
-    // The hardcoded 800 XOF/L rate remains a known issue (SF-006, P1) — to be
-    // replaced with a read from analytical_entry.cost_center='CAR'.
-    const [fuelRow] = await this.ds.query<Array<{ cost: string | null }>>(
-      `SELECT COALESCE(SUM(er.liters * 800), 0)::bigint AS cost
-       FROM equipment_refuel er
-       WHERE er.tenant_id = $1
-         AND er.created_at_utc::date = $2
-         AND er.equipment_id IN (
-           SELECT id FROM production_equipment WHERE site_id = $3
-         )`,
-      [dto.tenantId, dto.snapshotDate, dto.siteId],
-    );
-    const costCarburantMinor = BigInt(fuelRow?.cost ?? 0);
+    // 2. Fuel cost is now read from `analytical_entry` below (CAR cost center)
+    //    along with the other domain-event-driven cost components. SF-006
+    //    (audit 2026-05-16) removed the previous hardcoded `liters * 800 XOF`
+    //    pipeline that disagreed with `AnalyticalEntryWriterHandler.onFuelRefuelAppended`,
+    //    which already writes CAR entries using `equipment_fuel_consumption.cost_per_liter_minor_units`.
+    //    Two divergent fuel-cost figures from the same DB used to surface on
+    //    Finance dashboards vs OHADA export — now unified on the ledger.
 
     // 3. Maintenance/labor cost from work orders closed that day
     const [woRow] = await this.ds.query<Array<{ labor_hours: string | null }>>(
@@ -84,18 +73,20 @@ export class CostPerTonAggregatorService {
     const hourlyRateMinor = 2500_00n; // 2500 XOF/h placeholder — replace via RH rate config
     const costMainOeuvreMinor = BigInt(Math.round(laborHours * 100)) * hourlyRateMinor / 100n;
 
-    // FIN-R01: 4-7. Read cost components from analytical_entry ledger.
+    // FIN-R01 + SF-006: Read cost components from analytical_entry ledger.
     // Writers in AnalyticalEntryWriterHandler emit entries per domain event
     // (extraction.cycle_recorded, transport.rotation_completed,
-    //  crusher.session_completed, screening.session_completed).
-    // The aggregator now sums the ledger instead of re-deriving formulas.
+    //  crusher.session_completed, screening.session_completed,
+    //  production.fuel.refuel_appended). The aggregator sums the ledger
+    // instead of re-deriving formulas — guarantees Finance dashboard and
+    // OHADA export read the same numbers.
     const componentRows = await this.ds.query<
       Array<{ cost_center: string; cost: string | null }>
     >(
       `SELECT cost_center, COALESCE(SUM(amount_minor_units::bigint), 0)::bigint AS cost
        FROM analytical_entry
        WHERE tenant_id = $1 AND site_id = $2 AND entry_date = $3
-         AND cost_center IN ('EXT', 'TRA', 'CON', 'CRI')
+         AND cost_center IN ('EXT', 'TRA', 'CON', 'CRI', 'CAR')
        GROUP BY cost_center`,
       [dto.tenantId, dto.siteId, dto.snapshotDate],
     );
@@ -107,6 +98,7 @@ export class CostPerTonAggregatorService {
     const costTransportMinor = componentByCenter.get('TRA') ?? 0n;
     const costConcassageMinor = componentByCenter.get('CON') ?? 0n;
     const costCriblageMinor = componentByCenter.get('CRI') ?? 0n;
+    const costCarburantMinor = componentByCenter.get('CAR') ?? 0n;
 
     // FIN-R01: 8. Amortissement — production_equipment lacks purchase_cost_minor
     // and useful_life_years columns (see DDL 1715000200000). Until a

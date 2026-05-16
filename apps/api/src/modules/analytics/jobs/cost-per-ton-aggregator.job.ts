@@ -17,6 +17,34 @@ interface CalibreRow {
 }
 
 /**
+ * PERF-002 (audit 2026-05-16): bounded-concurrency executor.
+ * Hand-rolled, zero deps. Replaces the previous fully-sequential
+ * `for (...) await ...` triple loop that saturated the event loop at scale
+ * (~48s for 10 tenants × 6 sites × 8 calibres = 480 tuples sequentially).
+ */
+async function runWithLimit<T>(
+  items: readonly T[],
+  limit: number,
+  fn: (item: T) => Promise<void>,
+): Promise<void> {
+  const queue: T[] = [...items];
+  const workerCount = Math.min(Math.max(1, limit), items.length);
+  const workers = Array.from({ length: workerCount }, async () => {
+    while (queue.length > 0) {
+      const item = queue.shift();
+      if (item !== undefined) await fn(item);
+    }
+  });
+  await Promise.all(workers);
+}
+
+interface Tuple {
+  tenantId: string;
+  siteId: string;
+  calibreCode: string;
+}
+
+/**
  * CostPerTonAggregatorJob (FIN-R02).
  *
  * Runs daily at 04:00 UTC, aggregating yesterday's cost-per-ton snapshot
@@ -50,8 +78,13 @@ export class CostPerTonAggregatorJob {
 
   /**
    * Public entry-point usable by ops scripts to re-aggregate a specific date.
+   *
+   * PERF-002: Tuple enumeration is sequential (cheap meta-queries on
+   * tenants/sites/stockpile per tenant) but tuple aggregation runs with
+   * bounded concurrency to keep wall-clock low on multi-tenant runs.
    */
   async runForDate(snapshotDate: string): Promise<void> {
+    const start = Date.now();
     this.logger.log(
       `[CostPerTon] starting daily aggregation for ${snapshotDate}`,
     );
@@ -61,70 +94,61 @@ export class CostPerTonAggregatorJob {
       `SELECT id FROM tenants WHERE status = 'active' AND archived_at IS NULL`,
     )) as TenantRow[];
 
-    let successCount = 0;
-    let failureCount = 0;
-
+    // Build the full (tenant × site × calibre) tuple set in one pass.
+    const tuples: Tuple[] = [];
     for (const tenant of tenants) {
-      const result = await this.aggregateForTenant(tenant.id, snapshotDate);
-      successCount += result.success;
-      failureCount += result.failure;
-    }
-
-    this.logger.log(
-      `[CostPerTon] completed: tenants=${tenants.length} success=${successCount} failure=${failureCount}`,
-    );
-  }
-
-  private async aggregateForTenant(
-    tenantId: string,
-    snapshotDate: string,
-  ): Promise<{ success: number; failure: number }> {
-    let success = 0;
-    let failure = 0;
-
-    try {
-      // master-data uses sites.status='active' (no is_active column).
-      const sites = (await this.ds.query(
-        `SELECT id FROM sites
-         WHERE tenant_id = $1 AND status = 'active' AND archived_at IS NULL`,
-        [tenantId],
-      )) as SiteRow[];
-
-      // Distinct calibre_codes that have produced stockpile inflows recently.
-      // If a tenant has no production yet, this returns 0 rows and the job
-      // is a no-op for that tenant.
-      const calibres = (await this.ds.query(
-        `SELECT DISTINCT calibre_code
-         FROM stockpile
-         WHERE tenant_id = $1 AND calibre_code IS NOT NULL`,
-        [tenantId],
-      )) as CalibreRow[];
-
-      for (const site of sites) {
-        for (const calibre of calibres) {
-          try {
-            await this.aggregator.aggregateForDate({
-              tenantId,
+      try {
+        const sites = (await this.ds.query(
+          `SELECT id FROM sites
+           WHERE tenant_id = $1 AND status = 'active' AND archived_at IS NULL`,
+          [tenant.id],
+        )) as SiteRow[];
+        const calibres = (await this.ds.query(
+          `SELECT DISTINCT calibre_code
+           FROM stockpile
+           WHERE tenant_id = $1 AND calibre_code IS NOT NULL`,
+          [tenant.id],
+        )) as CalibreRow[];
+        for (const site of sites) {
+          for (const calibre of calibres) {
+            tuples.push({
+              tenantId: tenant.id,
               siteId: site.id,
-              snapshotDate,
               calibreCode: calibre.calibre_code,
             });
-            success++;
-          } catch (err) {
-            failure++;
-            this.logger.error(
-              `aggregate failed tenant=${tenantId} site=${site.id} calibre=${calibre.calibre_code}: ${(err as Error).message}`,
-            );
           }
         }
+      } catch (err) {
+        this.logger.error(
+          `tenant ${tenant.id} tuple enumeration failed: ${(err as Error).message}`,
+        );
       }
-    } catch (err) {
-      failure++;
-      this.logger.error(
-        `tenant ${tenantId} aggregation failed: ${(err as Error).message}`,
-      );
     }
 
-    return { success, failure };
+    let success = 0;
+    let failure = 0;
+    const CONCURRENCY = 10;
+
+    await runWithLimit(tuples, CONCURRENCY, async (t) => {
+      try {
+        await this.aggregator.aggregateForDate({
+          tenantId: t.tenantId,
+          siteId: t.siteId,
+          snapshotDate,
+          calibreCode: t.calibreCode,
+        });
+        success++;
+      } catch (err) {
+        failure++;
+        this.logger.error(
+          `aggregate failed tenant=${t.tenantId} site=${t.siteId} calibre=${t.calibreCode}: ${(err as Error).message}`,
+        );
+      }
+    });
+
+    const elapsedMs = Date.now() - start;
+    this.logger.log(
+      `[CostPerTon] completed: tenants=${tenants.length} tuples=${tuples.length} success=${success} failure=${failure} elapsedMs=${elapsedMs}`,
+    );
   }
 }

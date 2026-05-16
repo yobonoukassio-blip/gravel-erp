@@ -8,13 +8,25 @@ interface TankIdRow {
   id: string;
 }
 
+interface TenantIdRow {
+  id: string;
+}
+
 /**
  * FuelReconciliationJob (CAR-01, D2-53).
  *
  * Nightly cron at 03:30 UTC (approximate site-tz — per-site TZ scheduling
  * lands Phase 4 when consolidation engine matures).
  *
- * Iterates all fuel tanks and runs FuelReconciliationService.runForTank.
+ * Iterates active tenants, then per-tenant fuel tanks, and runs
+ * FuelReconciliationService.runForTank.
+ *
+ * PERF-004 / SF-017 (audit 2026-05-16): previously `SELECT id FROM fuel_tank`
+ * had NO tenant filter. Under RLS the cron returned 0 rows (no tenant
+ * context in CLS); without RLS it returned tanks across all tenants
+ * indiscriminately. Now enumerates tenants explicitly and queries each
+ * tenant's tanks with `WHERE tenant_id = $1` — works whether or not RLS
+ * is active in this code path.
  */
 @Injectable()
 export class FuelReconciliationJob {
@@ -39,19 +51,42 @@ export class FuelReconciliationJob {
 
   /** Returns count of tanks with drift above threshold. */
   async reconcileAll(): Promise<number> {
-    const tanks = (await this.ds.query(
-      `SELECT id FROM fuel_tank`,
-    )) as TankIdRow[];
+    const tenants = (await this.ds.query(
+      `SELECT id FROM tenants WHERE status = 'active' AND archived_at IS NULL`,
+    )) as TenantIdRow[];
 
-    let count = 0;
-    for (const tank of tanks) {
+    let drifted = 0;
+    let processed = 0;
+
+    for (const tenant of tenants) {
       try {
-        const drifted = await this.reconciliationService.runForTank(tank.id);
-        if (drifted) count++;
+        const tanks = (await this.ds.query(
+          `SELECT id FROM fuel_tank WHERE tenant_id = $1`,
+          [tenant.id],
+        )) as TankIdRow[];
+
+        for (const tank of tanks) {
+          try {
+            processed++;
+            const d = await this.reconciliationService.runForTank(tank.id);
+            if (d) drifted++;
+          } catch (err) {
+            this.logger.error(
+              `Reconciliation failed for tank ${tank.id} (tenant ${tenant.id})`,
+              err,
+            );
+          }
+        }
       } catch (err) {
-        this.logger.error(`Reconciliation failed for tank ${tank.id}`, err);
+        this.logger.error(
+          `Tank enumeration failed for tenant ${tenant.id}: ${(err as Error).message}`,
+        );
       }
     }
-    return count;
+
+    this.logger.log(
+      `[FuelReconciliation] tenants=${tenants.length} tanks=${processed} drifted=${drifted}`,
+    );
+    return drifted;
   }
 }

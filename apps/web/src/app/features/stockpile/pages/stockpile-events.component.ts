@@ -30,7 +30,7 @@ export class StockpileEventsComponent implements OnInit {
 
   readonly rows = signal<StockpileEventRow[]>([]);
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     { field: 'occurredAtUtc', headerName: 'Date', width: 180 },
     { field: 'eventType', headerName: 'Type', width: 180 },
     { field: 'calibreCode', headerName: 'Calibre', width: 120 },

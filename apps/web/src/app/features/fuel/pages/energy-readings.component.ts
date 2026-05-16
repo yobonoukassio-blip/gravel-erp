@@ -115,7 +115,7 @@ export class EnergyReadingsComponent implements OnInit {
     source_meter_code: [null as string | null],
   });
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     { field: 'yearMonth', headerName: 'Mois', width: 110 },
     { field: 'usageType', headerName: 'Usage', width: 130 },
     {

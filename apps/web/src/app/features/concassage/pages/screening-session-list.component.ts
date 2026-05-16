@@ -86,7 +86,7 @@ export class ScreeningSessionListComponent implements OnInit {
   private tenantId = ''; // Stub: from auth context
   private statusFilter: 'ACTIVE' | 'PAUSED' | 'COMPLETED' | '' = '';
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     {
       field: 'sessionStartUtc',
       headerName: 'Session Start',

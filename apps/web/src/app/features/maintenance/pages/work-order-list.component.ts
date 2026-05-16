@@ -30,7 +30,7 @@ export class WorkOrderListComponent implements OnInit {
 
   readonly rows = signal<WorkOrder[]>([]);
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     { field: 'id', headerName: 'ID', width: 100 },
     { field: 'equipmentId', headerName: 'Équipement', width: 160 },
     { field: 'type', headerName: 'Type', width: 120 },

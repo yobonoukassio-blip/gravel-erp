@@ -36,7 +36,7 @@ export class WeighingTicketListComponent implements OnInit {
   readonly rows = signal<WeighingTicket[]>([]);
   readonly operationalDayId = signal<string>('current');
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     { field: 'ticketNumber', headerName: 'Ticket Number', width: 220 },
     { field: 'grossKg', headerName: 'Gross Kg', width: 110 },
     { field: 'tareKg', headerName: 'Tare Kg', width: 110 },

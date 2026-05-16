@@ -28,7 +28,7 @@ export class CustomerListComponent implements OnInit {
 
   readonly rows = signal<Customer[]>([]);
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     { field: 'code', headerName: 'Code', width: 120 },
     { field: 'name', headerName: 'Nom', flex: 2 },
     { field: 'defaultCurrency', headerName: 'Devise', width: 100 },

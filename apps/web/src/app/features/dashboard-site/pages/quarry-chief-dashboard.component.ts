@@ -65,9 +65,10 @@ export class QuarryChiefDashboardComponent implements OnInit, OnDestroy {
 
   private sseSubscription: Subscription | null = null;
 
-  private readonly siteId = 'current';
-  private readonly operationalDayId = 'current';
-  private readonly tenantId = 'current';
+  // Demo: hardcoded Gravel Ivoire / Carrière Mobaye / today's opday.
+  private readonly siteId = '5213953c-3820-4da4-97ed-89bfbd605c07';
+  private readonly operationalDayId = '60000000-0000-0000-0000-000000000016';
+  private readonly tenantId = '24cd97f8-0170-453e-89da-e9213dd710d7';
 
   ngOnInit(): void {
     void this.loadSnapshot();

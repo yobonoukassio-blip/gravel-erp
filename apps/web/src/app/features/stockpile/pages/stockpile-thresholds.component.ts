@@ -28,7 +28,7 @@ export class StockpileThresholdsComponent implements OnInit {
 
   readonly rows = signal<StockpileThreshold[]>([]);
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     { field: 'stockpileId', headerName: 'Stockpile', flex: 1 },
     { field: 'calibreCode', headerName: 'Calibre', width: 120 },
     { field: 'minTonnageKg', headerName: 'Min Kg', width: 140 },

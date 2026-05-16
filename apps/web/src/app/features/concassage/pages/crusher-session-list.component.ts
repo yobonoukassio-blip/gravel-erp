@@ -78,13 +78,13 @@ export class CrusherSessionListComponent implements OnInit {
   readonly rows = signal<CrusherSession[]>([]);
   readonly loading = signal(false);
 
-  private tenantId = ''; // Stub: wired from auth context in downstream plans
+  private tenantId = '24cd97f8-0170-453e-89da-e9213dd710d7'; // Demo: Gravel Ivoire
   private statusFilter: 'ACTIVE' | 'PAUSED' | 'COMPLETED' | '' = '';
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     {
-      field: 'sessionStartUtc',
-      headerName: 'Session Start',
+      field: 'session_start_utc',
+      headerName: 'Début session',
       valueFormatter: (p) => p.value ? new Date(p.value as string).toLocaleString('fr-FR') : '',
       width: 180,
     },
@@ -97,37 +97,42 @@ export class CrusherSessionListComponent implements OnInit {
         return `<span style="color:${colors[p.value] ?? 'grey'};font-weight:600">${p.value}</span>`;
       },
     },
-    { field: 'crusherId', headerName: 'Crusher Id', width: 150 },
-    { field: 'calibreCode', headerName: 'Calibre', width: 120 },
     {
-      field: 'inputTonnageKg',
-      headerName: 'Input Tonnage Kg',
+      field: 'crusher_id',
+      headerName: 'Concasseur',
       width: 150,
-      valueFormatter: (p) => `${Number(p.value).toLocaleString('fr-FR')} kg`,
+      valueFormatter: (p) => p.value ? String(p.value).slice(0, 8) : '—',
+    },
+    { field: 'calibre_code', headerName: 'Calibre', width: 120 },
+    {
+      field: 'input_tonnage_kg',
+      headerName: 'Tonnage entrée',
+      width: 150,
+      valueFormatter: (p) => p.value != null ? `${(Number(p.value)/1000).toFixed(1)} t` : '—',
     },
     {
-      field: 'outputTonnageKg',
-      headerName: 'Output Tonnage Kg',
+      field: 'output_tonnage_kg',
+      headerName: 'Tonnage sortie',
       width: 160,
-      valueFormatter: (p) => `${Number(p.value).toLocaleString('fr-FR')} kg`,
+      valueFormatter: (p) => p.value != null ? `${(Number(p.value)/1000).toFixed(1)} t` : '—',
     },
     {
-      field: 'performancePct',
-      headerName: 'Performance Pct',
+      field: 'performance_pct',
+      headerName: 'Performance',
       width: 130,
-      valueFormatter: (p) => `${Number(p.value).toFixed(1)} %`,
+      valueFormatter: (p) => p.value != null ? `${Number(p.value).toFixed(1)} %` : '—',
     },
     {
-      field: 'energyKwh',
-      headerName: 'Energy Kwh',
+      field: 'energy_kwh',
+      headerName: 'Énergie',
       width: 120,
-      valueFormatter: (p) => `${Number(p.value).toFixed(2)} kWh`,
+      valueFormatter: (p) => p.value != null ? `${Number(p.value).toFixed(2)} kWh` : '—',
     },
     {
-      field: 'operatingHours',
-      headerName: 'Operating Hours',
+      field: 'operating_hours',
+      headerName: 'Heures',
       width: 130,
-      valueFormatter: (p) => `${Number(p.value).toFixed(2)} h`,
+      valueFormatter: (p) => p.value != null ? `${Number(p.value).toFixed(2)} h` : '—',
     },
   ];
 

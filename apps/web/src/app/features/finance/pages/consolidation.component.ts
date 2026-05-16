@@ -79,7 +79,7 @@ export class ConsolidationComponent implements OnInit {
   readonly pnl = signal<ConsolidatedPnL | null>(null);
   readonly rows = signal<SiteRow[]>([]);
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     { field: 'siteId', headerName: 'Site', flex: 1 },
     { field: 'revenueMinor', headerName: 'Revenue', width: 160 },
     { field: 'costMinor', headerName: 'Cost', width: 160 },

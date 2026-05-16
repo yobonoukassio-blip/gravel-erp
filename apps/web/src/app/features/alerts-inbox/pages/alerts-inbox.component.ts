@@ -51,7 +51,7 @@ export class AlertsInboxComponent implements OnInit {
 
   private gridApi: GridApi<AlertRow> | null = null;
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     {
       field: 'severity',
       headerName: 'Sévérité',

@@ -46,7 +46,7 @@ export class DrilledHoleReviewComponent implements OnInit {
 
   readonly rows = signal<DrilledHole[]>([]);
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     { field: 'holeIndexInPlan', headerName: 'N° trou', width: 100 },
     {
       field: 'gpsPoint',

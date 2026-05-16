@@ -52,18 +52,18 @@ export class EmployeeListComponent implements OnInit {
 
   readonly rows = signal<EmployeeRow[]>([]);
 
-  readonly columnDefs: ColDef<any>[] = [
-    { field: 'employeeNumber', headerName: 'Matricule', width: 130 },
-    { field: 'lastName', headerName: 'Nom', flex: 1 },
-    { field: 'firstName', headerName: 'Prénom', flex: 1 },
+  readonly columnDefs: ColDef[] = [
+    { field: 'employee_number', headerName: 'Matricule', width: 130 },
+    { field: 'last_name', headerName: 'Nom', flex: 1 },
+    { field: 'first_name', headerName: 'Prénom', flex: 1 },
     {
-      field: 'contractType',
+      field: 'contract_type',
       headerName: 'Contrat',
       width: 110,
     },
-    { field: 'roleCode', headerName: 'Rôle métier', flex: 1 },
+    { field: 'role_code', headerName: 'Rôle métier', flex: 1 },
     {
-      field: 'isActive',
+      field: 'is_active',
       headerName: 'Actif',
       width: 90,
       cellStyle: (p) => ({
@@ -75,8 +75,8 @@ export class EmployeeListComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    // TODO: inject tenant/site from auth context
-    this.api.listEmployees({ tenantId: '', isActive: true }).subscribe({
+    // Demo: hardcoded Gravel Ivoire tenant. Real app reads from AuthService claims.
+    this.api.listEmployees({ tenantId: '24cd97f8-0170-453e-89da-e9213dd710d7', isActive: true }).subscribe({
       next: (rs) => this.rows.set(rs),
       error: (err) =>
         this.snack.open(`Erreur: ${(err as Error).message}`, 'OK', { duration: 5000 }),

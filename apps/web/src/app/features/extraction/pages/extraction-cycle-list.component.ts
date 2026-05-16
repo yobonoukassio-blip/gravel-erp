@@ -95,7 +95,7 @@ export class ExtractionCycleListComponent implements OnInit {
   readonly operationalDayId = signal<string>('');
   readonly equipmentFilter = signal<string>('');
 
-  readonly cycleColumnDefs: ColDef<any>[] = [
+  readonly cycleColumnDefs: ColDef[] = [
     { field: 'cycleStartedAtLocal', headerName: 'Date', sortable: true, width: 180 },
     { field: 'benchId', headerName: 'Banc', sortable: true, width: 140 },
     { field: 'equipmentId', headerName: 'Engin', sortable: true, width: 140 },
@@ -124,7 +124,7 @@ export class ExtractionCycleListComponent implements OnInit {
     { field: 'notes', headerName: 'Notes', flex: 1 },
   ];
 
-  readonly yieldColumnDefs: ColDef<any>[] = [
+  readonly yieldColumnDefs: ColDef[] = [
     { field: 'equipmentId', headerName: 'Engin', sortable: true, width: 160 },
     { field: 'operatorId', headerName: 'Opérateur', sortable: true, width: 160 },
     { field: 'cycleCount', headerName: 'Cycles', sortable: true, width: 100 },

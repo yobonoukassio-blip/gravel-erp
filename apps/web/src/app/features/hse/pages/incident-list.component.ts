@@ -94,7 +94,7 @@ export class IncidentListComponent implements OnInit {
 
   readonly rows = signal<HseIncidentRow[]>([]);
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     {
       field: 'category',
       headerName: 'Catégorie',

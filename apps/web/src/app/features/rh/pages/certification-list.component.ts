@@ -65,7 +65,7 @@ export class CertificationListComponent implements OnInit {
 
   readonly rows = signal<CertificationRow[]>([]);
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     {
       headerName: 'Employé',
       flex: 2,

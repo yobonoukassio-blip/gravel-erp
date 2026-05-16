@@ -50,7 +50,7 @@ export class BudgetComparisonComponent implements OnInit {
 
   readonly rows = signal<BudgetVsActual[]>([]);
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     { field: 'category', headerName: 'Catégorie', flex: 1 },
     { field: 'budgetMinor', headerName: 'Budget', width: 160 },
     { field: 'actualMinor', headerName: 'Réel', width: 160 },

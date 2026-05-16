@@ -38,7 +38,7 @@ export class StockpileListComponent implements OnInit {
 
   readonly rows = signal<StockpileRow[]>([]);
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     { field: 'name', headerName: 'Nom', flex: 2 },
     { field: 'materialType', headerName: 'Matériau', width: 140 },
     { field: 'calibreCode', headerName: 'Calibre', width: 140 },

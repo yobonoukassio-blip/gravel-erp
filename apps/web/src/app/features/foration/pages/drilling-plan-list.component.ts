@@ -50,7 +50,7 @@ export class DrillingPlanListComponent implements OnInit {
 
   readonly rows = signal<DrillingPlan[]>([]);
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     { field: 'id', headerName: 'ID', width: 90, valueFormatter: (p) => p.value?.slice(0, 8) ?? '' },
     { field: 'zoneId' as never, headerName: 'Zone', width: 140, valueGetter: (p) => (p.data as unknown as { zoneId?: string })?.zoneId?.slice(0, 8) ?? '' },
     { field: 'benchId' as never, headerName: 'Banc', width: 140, valueGetter: (p) => (p.data as unknown as { benchId?: string })?.benchId?.slice(0, 8) ?? '' },

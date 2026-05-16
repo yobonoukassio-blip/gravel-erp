@@ -53,7 +53,7 @@ export class FuelTankListComponent implements OnInit {
 
   readonly rows = signal<FuelTankRow[]>([]);
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     { field: 'code', headerName: 'Code', width: 120 },
     { field: 'label', headerName: 'Libellé', flex: 2 },
     { field: 'capacityLiters', headerName: 'Capacité (L)', width: 140 },

@@ -41,7 +41,7 @@ export class EquipmentAvailabilityComponent implements OnInit {
 
   readonly rows = signal<EquipmentAvailability[]>([]);
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     { field: 'equipmentLabel', headerName: 'Équipement', flex: 2 },
     { field: 'status', headerName: 'Statut', width: 140 },
     {

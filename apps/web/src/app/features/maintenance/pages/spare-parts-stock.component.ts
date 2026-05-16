@@ -36,7 +36,7 @@ export class SparePartsStockComponent implements OnInit {
 
   readonly rows = signal<SparePart[]>([]);
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     { field: 'sku', headerName: 'Sku', width: 160 },
     { field: 'label', headerName: 'Libellé', flex: 2 },
     { field: 'quantityOnHand', headerName: 'Qty', width: 130 },

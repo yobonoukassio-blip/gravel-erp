@@ -30,7 +30,7 @@ export class InvoiceListComponent implements OnInit {
 
   readonly rows = signal<Invoice[]>([]);
 
-  readonly columnDefs: ColDef<any>[] = [
+  readonly columnDefs: ColDef[] = [
     { field: 'number', headerName: 'Number', width: 180 },
     { field: 'customerId', headerName: 'Client', width: 160 },
     { field: 'issueDate', headerName: 'Date', width: 140 },

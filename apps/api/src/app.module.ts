@@ -49,9 +49,14 @@ import { IotModule } from './modules/iot/iot.module';
         type: 'postgres',
         url: cfg.getOrThrow<string>('DATABASE_URL'),
         autoLoadEntities: true,
-        // TYPEORM_SYNCHRONIZE=true override for initial production setup
+        // P0-7 (audit 2026-05-16): synchronize MUST be explicit opt-in only.
+        // Previously inferred from `NODE_ENV !== 'production'`, which meant
+        // any Railway deploy where NODE_ENV was unset (or set to anything but
+        // 'production') silently re-synced the schema and could drop columns.
+        // Now requires TYPEORM_SYNCHRONIZE=true explicitly AND NODE_ENV is not
+        // 'production' — never enabled on prod regardless of the env var.
         synchronize:
-          cfg.get('TYPEORM_SYNCHRONIZE') === 'true' ||
+          cfg.get('TYPEORM_SYNCHRONIZE') === 'true' &&
           cfg.get('NODE_ENV') !== 'production',
         logging: cfg.get('TYPEORM_LOGGING') === 'true',
         ssl: { rejectUnauthorized: false },

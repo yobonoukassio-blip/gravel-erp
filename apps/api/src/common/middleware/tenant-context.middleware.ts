@@ -22,7 +22,13 @@ export class TenantContextMiddleware implements NestMiddleware {
 
   use(req: Request & { user?: JwtClaims }, _res: Response, next: NextFunction): void {
     // DEV_BYPASS_JWT: middleware runs before guards, so inject claims directly here.
-    if (process.env['DEV_BYPASS_JWT'] === 'true' && !req.user) {
+    // SECURITY P0-4 (audit 2026-05-16): bypass is forbidden in production regardless
+    // of the env var — defense against a leaked DEV_BYPASS_JWT in Railway env vars.
+    if (
+      process.env['DEV_BYPASS_JWT'] === 'true' &&
+      process.env['NODE_ENV'] !== 'production' &&
+      !req.user
+    ) {
       req.user = {
         userId: '00000000-0000-0000-0000-000000000001',
         tenantId: '24cd97f8-0170-453e-89da-e9213dd710d7',

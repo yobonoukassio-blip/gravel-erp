@@ -1,8 +1,27 @@
 // Phase 7 / FIN-R critère #5 : seed 5 alert_rule rows.
 // (stockpile threshold, spare part low, HSE severity>=4, explosifs gap, fuel anomaly)
+//
+// P0-2 (audit 2026-05-16): no hardcoded credentials. Run with the same
+// DATABASE_URL the API uses:
+//   $env:DATABASE_URL = (Get-Content apps/api/.env | Select-String DATABASE_URL).Line.Split('=', 2)[1]
+//   node apps/api/seed_alert_rules.mjs
+// or POSIX:
+//   set -a; source apps/api/.env; set +a; node apps/api/seed_alert_rules.mjs
 import { Client } from 'pg';
-const TENANT = '24cd97f8-0170-453e-89da-e9213dd710d7';
-const c = new Client({ connectionString: 'postgresql://postgres:Waliyatb123@db.qrkfkfhzavqjorhrlluj.supabase.co:5432/postgres' });
+
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  console.error('DATABASE_URL is not set. Source apps/api/.env first.');
+  process.exit(1);
+}
+
+const TENANT = process.env.SEED_TENANT_ID;
+if (!TENANT) {
+  console.error('SEED_TENANT_ID must be set (target tenant uuid).');
+  process.exit(1);
+}
+
+const c = new Client({ connectionString: DATABASE_URL });
 await c.connect();
 
 const rules = [

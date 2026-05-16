@@ -50,12 +50,18 @@ export class CostPerTonAggregatorService {
     const tonnageKg = BigInt(tonnageRow?.tonnage_kg ?? 0);
     const tonnageT = Number(tonnageKg) / 1000;
 
-    // 2. Fuel cost (uses FuelCostAllocator pattern from Phase 2 W3-P06 SUMMARY)
+    // 2. Fuel cost.
+    // P0-6 (audit 2026-05-16): column names fixed — was `litres_dispensed`
+    // (non-existent, real name is `liters`) and `refueled_at_utc` (non-existent,
+    // real name is `created_at_utc`). The whole query previously crashed silently
+    // inside a catch-block, so every snapshot was computed with fuel cost = 0.
+    // The hardcoded 800 XOF/L rate remains a known issue (SF-006, P1) — to be
+    // replaced with a read from analytical_entry.cost_center='CAR'.
     const [fuelRow] = await this.ds.query<Array<{ cost: string | null }>>(
-      `SELECT COALESCE(SUM(er.litres_dispensed * 800), 0)::bigint AS cost
+      `SELECT COALESCE(SUM(er.liters * 800), 0)::bigint AS cost
        FROM equipment_refuel er
        WHERE er.tenant_id = $1
-         AND er.refueled_at_utc::date = $2
+         AND er.created_at_utc::date = $2
          AND er.equipment_id IN (
            SELECT id FROM production_equipment WHERE site_id = $3
          )`,

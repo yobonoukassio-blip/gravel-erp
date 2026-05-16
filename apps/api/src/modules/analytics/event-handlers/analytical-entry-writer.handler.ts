@@ -227,16 +227,20 @@ export class AnalyticalEntryWriterHandler {
   @OnEvent('production.fuel.refuel_appended')
   async onFuelRefuelAppended(evt: FuelRefuelAppendedEvent): Promise<void> {
     try {
+      // P0-6 (audit 2026-05-16): column name fixed — `od.day_local` did not
+      // exist (real name is `business_date`). The whole query previously
+      // raised `column does not exist`, was swallowed by the catch block,
+      // and EVERY CAR analytical_entry was dropped silently.
       const rows = await this.ds.query<
         Array<{
           cost_per_liter_minor_units: string | null;
           currency: string | null;
-          op_day_local: string | null;
+          op_business_date: string | null;
         }>
       >(
         `SELECT efc.cost_per_liter_minor_units,
                 efc.currency,
-                od.day_local AS op_day_local
+                od.business_date AS op_business_date
          FROM equipment_fuel_consumption efc
          JOIN operational_days od ON od.id = efc.operational_day_id
          WHERE efc.refuel_id = $1 AND efc.tenant_id = $2
@@ -262,7 +266,7 @@ export class AnalyticalEntryWriterHandler {
       const costMinor = (litersScaled * costPerLiter) / 100n;
       const currency = row.currency ?? 'XOF';
       const entryDate =
-        row.op_day_local ?? new Date().toISOString().split('T')[0];
+        row.op_business_date ?? new Date().toISOString().split('T')[0];
 
       await this.ds.query(
         `INSERT INTO analytical_entry

@@ -1,8 +1,8 @@
 /**
  * Production environment — deployed on Vercel.
  *
- * mockAuth=true : utilise DEV_USER (DIRECTION_GROUPE, tenant fixe) sans Keycloak.
- * Remplacer par false + vraie config Keycloak quand l'instance est disponible.
+ * mockAuth=false : SECURITY P0-3 (audit 2026-05-16). Previously `true` auto-logged
+ * every visitor as DIRECTION_GROUPE without Keycloak. NEVER restore to true on prod.
  *
  * apiBaseUrl='' : URLs relatives — Vercel proxie /api/* vers Railway via vercel.json.
  */
@@ -15,5 +15,5 @@ export const environment = {
   keycloakUrl: 'https://keycloak.placeholder.invalid',
   keycloakRealm: 'gravel-prod',
   otelEndpoint: '',
-  mockAuth: true,
+  mockAuth: false,
 };

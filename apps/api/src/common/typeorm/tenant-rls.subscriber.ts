@@ -46,8 +46,18 @@ export class TenantRlsSubscriber implements EntitySubscriberInterface {
 
     // PgBouncer transaction-mode SAFE: third arg `true` makes the setting local
     // to the current transaction. Connection is returned to pool without leak.
+    //
+    // P0-5 (audit 2026-05-16): Phase-1 RLS policies key on `app.tenant_id`,
+    // but Phase-2+ migrations introduced 35+ tables whose policies key on
+    // `app.current_tenant`. Set BOTH GUCs so every RLS policy resolves.
+    // Remove `app.tenant_id` only after migrating every Phase-1 policy to the
+    // canonical `app.current_tenant` name.
     await event.queryRunner.query('SELECT set_config($1, $2, true)', [
       'app.tenant_id',
+      tenantId,
+    ]);
+    await event.queryRunner.query('SELECT set_config($1, $2, true)', [
+      'app.current_tenant',
       tenantId,
     ]);
   }

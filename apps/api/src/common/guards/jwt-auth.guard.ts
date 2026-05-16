@@ -45,7 +45,13 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     ]);
     if (isPublic) return true;
 
-    if (process.env['DEV_BYPASS_JWT'] === 'true') {
+    // SECURITY P0-4 (audit 2026-05-16): DEV_BYPASS_JWT MUST be ignored in production.
+    // Even with the env var set, NODE_ENV=production aborts the bypass — defense
+    // against env-var leakage from a misconfigured Railway deploy.
+    if (
+      process.env['DEV_BYPASS_JWT'] === 'true' &&
+      process.env['NODE_ENV'] !== 'production'
+    ) {
       const req = ctx.switchToHttp().getRequest<{ user: JwtClaims }>();
       req.user = DEV_USER;
       return true;

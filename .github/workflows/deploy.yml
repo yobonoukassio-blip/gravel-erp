@@ -33,6 +33,8 @@ jobs:
       - run: pnpm install --no-frozen-lockfile
       - name: Run SQL migrations in order
         # Run from apps/api/ so the resolver finds the workspace-installed `pg`.
+        # Tracks applied migrations in `_ci_applied_migrations` so the workflow
+        # re-running on every push doesn't re-apply non-idempotent CREATEs.
         working-directory: apps/api
         run: |
           node -e "
@@ -44,12 +46,45 @@ jobs:
           (async () => {
             const client = new Client({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
             await client.connect();
+
+            await client.query(\`CREATE TABLE IF NOT EXISTS _ci_applied_migrations (
+              file_name TEXT PRIMARY KEY,
+              applied_at TIMESTAMPTZ NOT NULL DEFAULT now()
+            )\`);
+
+            const { rows: appliedRows } = await client.query('SELECT file_name FROM _ci_applied_migrations');
+            const applied = new Set(appliedRows.map(r => r.file_name));
+
+            let applied_now = 0, skipped = 0;
             for (const f of files) {
-              console.log('Running', f);
-              await client.query(fs.readFileSync(path.join(dir, f), 'utf8'));
+              if (applied.has(f)) { skipped++; continue; }
+              console.log('Applying', f);
+              const sql = fs.readFileSync(path.join(dir, f), 'utf8');
+              try {
+                await client.query('BEGIN');
+                await client.query(sql);
+                await client.query('INSERT INTO _ci_applied_migrations (file_name) VALUES (\$1) ON CONFLICT DO NOTHING', [f]);
+                await client.query('COMMIT');
+                applied_now++;
+              } catch (err) {
+                await client.query('ROLLBACK');
+                // If the artifact already exists, mark the migration as applied
+                // anyway — the schema reached the desired state out-of-band
+                // (e.g. seeded manually) and re-running would never succeed.
+                const msg = (err && err.message) || '';
+                const reapplyable = /already exists|duplicate_object|duplicate key|extension .* is already/i.test(msg);
+                if (reapplyable) {
+                  console.log('  -> already present, marking as applied without re-running');
+                  await client.query('INSERT INTO _ci_applied_migrations (file_name) VALUES (\$1) ON CONFLICT DO NOTHING', [f]);
+                  applied_now++;
+                } else {
+                  console.error('FATAL migration', f, ':', msg);
+                  throw err;
+                }
+              }
             }
             await client.end();
-            console.log('All migrations done.');
+            console.log('Migrations done. applied=' + applied_now + ' skipped=' + skipped);
           })().catch(e => { console.error(e); process.exit(1); });
           "
 

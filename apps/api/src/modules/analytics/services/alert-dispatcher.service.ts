@@ -3,6 +3,12 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { AlertChannel, AlertRule, AlertSeverity } from '../entities/alert-rule.entity';
+import {
+  EmailProvider,
+  NotificationMessage,
+  Recipient,
+  SmsProvider,
+} from './notification-providers';
 
 export interface AlertPayload {
   tenantId: string;
@@ -18,62 +24,88 @@ export interface AlertPayload {
  *
  * Listens to a broad set of domain events and routes them to configured channels
  * (email / sms / in_app) per `alert_rule` config. Recipients are resolved from
- * role_codes + user_ids.
+ * `rule.user_ids` + `rule.role_codes` against the `user` table.
  *
- * Provider adapters (email, SMS) are pluggable — Phase 4 ships in_app only;
- * email/SMS providers are wired via DI in Phase 6 (per CLAUDE.md staged delivery).
+ * Channel providers are injected:
+ *   - in_app : direct INSERT into the alert table
+ *   - email  : EmailProvider (SendGrid REST when SENDGRID_API_KEY is set,
+ *              otherwise structured `notification.email.queued` log line)
+ *   - sms    : SmsProvider (Twilio REST when TWILIO_* env vars are set,
+ *              otherwise structured `notification.sms.queued` log line)
+ *
+ * The "log-fallback" path is intentional: it preserves audit + lets ops
+ * wire a sidecar consumer without forcing a vendor choice into the API.
  */
 @Injectable()
 export class AlertDispatcherService {
   private readonly logger = new Logger(AlertDispatcherService.name);
 
-  constructor(@InjectDataSource() private readonly ds: DataSource) {}
+  constructor(
+    @InjectDataSource() private readonly ds: DataSource,
+    private readonly emailProvider: EmailProvider,
+    private readonly smsProvider: SmsProvider,
+  ) {}
 
-  // Listen to multiple critical event types and route through alert_rule config
   @OnEvent('production.stockpile.threshold_crossed')
-  async onStockpileThreshold(payload: { tenantId: string; stockpileId: string; level: string }) {
+  async onStockpileThreshold(payload: {
+    tenantId: string;
+    stockpileId: string;
+    level: string;
+  }): Promise<void> {
     await this.dispatch({
       tenantId: payload.tenantId,
       eventType: 'production.stockpile.threshold_crossed',
       severity: payload.level === 'critical_low' ? 'critical' : 'warning',
-      title: `Stock threshold ${payload.level}`,
-      body: `Stockpile ${payload.stockpileId} crossed ${payload.level}`,
+      title: `Seuil stockpile ${payload.level}`,
+      body: `Le stockpile ${payload.stockpileId} a franchi le seuil ${payload.level}`,
       context: payload,
     });
   }
 
   @OnEvent('maintenance.spare_part.threshold_crossed')
-  async onSparePartLow(payload: { tenantId: string; sku: string; quantityOnHand: number }) {
+  async onSparePartLow(payload: {
+    tenantId: string;
+    sku: string;
+    quantityOnHand: number;
+  }): Promise<void> {
     await this.dispatch({
       tenantId: payload.tenantId,
       eventType: 'maintenance.spare_part.threshold_crossed',
       severity: 'warning',
-      title: `Spare part low: ${payload.sku}`,
-      body: `Quantity on hand: ${payload.quantityOnHand}`,
+      title: `Pièce de rechange basse : ${payload.sku}`,
+      body: `Quantité en stock : ${payload.quantityOnHand}`,
       context: payload,
     });
   }
 
   @OnEvent('hse.incident.created')
-  async onHseIncident(payload: { tenantId: string; severity: number; incidentId: string }) {
+  async onHseIncident(payload: {
+    tenantId: string;
+    severity: number;
+    incidentId: string;
+  }): Promise<void> {
     await this.dispatch({
       tenantId: payload.tenantId,
       eventType: 'hse.incident.created',
       severity: payload.severity >= 4 ? 'critical' : 'warning',
-      title: `HSE incident sev=${payload.severity}`,
-      body: `Incident ${payload.incidentId} created`,
+      title: `Incident HSE sévérité ${payload.severity}`,
+      body: `Incident ${payload.incidentId} créé — investigation requise`,
       context: payload,
     });
   }
 
   @OnEvent('tir.explosives.reconciliation_gap')
-  async onExplosivesGap(payload: { tenantId: string; date: string; gapKg: number }) {
+  async onExplosivesGap(payload: {
+    tenantId: string;
+    date: string;
+    gapKg: number;
+  }): Promise<void> {
     await this.dispatch({
       tenantId: payload.tenantId,
       eventType: 'tir.explosives.reconciliation_gap',
       severity: 'critical',
-      title: 'Explosives reconciliation gap',
-      body: `${payload.date}: gap of ${payload.gapKg} kg blocks closure`,
+      title: 'Écart de réconciliation explosifs',
+      body: `${payload.date} : écart de ${payload.gapKg} kg — clôture bloquée`,
       context: payload,
     });
   }
@@ -83,6 +115,8 @@ export class AlertDispatcherService {
     const rules = await this.ds.getRepository(AlertRule).find({
       where: { tenantId: alert.tenantId, eventType: alert.eventType, isActive: true },
     });
+
+    if (rules.length === 0) return;
 
     for (const rule of rules) {
       if (rule.severityFilter && rule.severityFilter !== alert.severity) continue;
@@ -105,7 +139,6 @@ export class AlertDispatcherService {
   ): Promise<void> {
     switch (channel) {
       case 'in_app':
-        // Insert into existing alerts table (Phase 2 W0-P01)
         await this.ds.query(
           `INSERT INTO alert (tenant_id, type, severity, title, body, context, status)
            VALUES ($1, $2, $3, $4, $5, $6, 'open')
@@ -120,14 +153,86 @@ export class AlertDispatcherService {
           ],
         );
         return;
+
       case 'email':
-        this.logger.log(
-          `[email-stub] would send to ${rule.userIds.length} users + roles ${rule.roleCodes.join(',')}: ${alert.title}`,
-        );
+      case 'sms': {
+        const recipients = await this.resolveRecipients(rule);
+        if (recipients.length === 0) {
+          this.logger.warn(
+            `no recipients resolved for rule ${rule.id} (event=${alert.eventType} channel=${channel})`,
+          );
+          return;
+        }
+        const message: NotificationMessage = {
+          tenantId: alert.tenantId,
+          eventType: alert.eventType,
+          severity: alert.severity,
+          title: alert.title,
+          body: alert.body,
+          recipients,
+        };
+        const provider = channel === 'email' ? this.emailProvider : this.smsProvider;
+        const result = await provider.send(message);
+        if (result.failed > 0) {
+          this.logger.error(
+            `${channel} delivery: ${result.delivered}/${result.delivered + result.failed} succeeded — errors: ${result.errors.join('; ')}`,
+          );
+        }
         return;
-      case 'sms':
-        this.logger.log(`[sms-stub] would SMS: ${alert.title}`);
-        return;
+      }
+    }
+  }
+
+  /**
+   * Resolve recipients from rule.user_ids + rule.role_codes against the
+   * `user` table. Deduplicates by user_id.
+   */
+  private async resolveRecipients(rule: AlertRule): Promise<Recipient[]> {
+    const userIds = rule.userIds ?? [];
+    const roleCodes = rule.roleCodes ?? [];
+    if (userIds.length === 0 && roleCodes.length === 0) return [];
+
+    const conditions: string[] = [];
+    const params: unknown[] = [rule.tenantId];
+
+    if (userIds.length > 0) {
+      params.push(userIds);
+      conditions.push(`u.id = ANY($${params.length}::uuid[])`);
+    }
+    if (roleCodes.length > 0) {
+      params.push(roleCodes);
+      conditions.push(`u.role_code = ANY($${params.length}::text[])`);
+    }
+
+    try {
+      const rows = await this.ds.query<
+        Array<{
+          id: string;
+          email: string | null;
+          phone: string | null;
+          display_name: string | null;
+          preferred_locale: string | null;
+        }>
+      >(
+        `SELECT DISTINCT u.id, u.email, u.phone, u.display_name, u.preferred_locale
+         FROM "user" u
+         WHERE u.tenant_id = $1
+           AND u.is_active = true
+           AND (${conditions.join(' OR ')})`,
+        params,
+      );
+      return rows.map((r) => ({
+        userId: r.id,
+        email: r.email,
+        phone: r.phone,
+        displayName: r.display_name ?? r.email ?? r.id.slice(0, 8),
+        locale: r.preferred_locale ?? 'fr-CI',
+      }));
+    } catch (err) {
+      this.logger.warn(
+        `recipient lookup failed for rule ${rule.id}: ${(err as Error).message}`,
+      );
+      return [];
     }
   }
 }

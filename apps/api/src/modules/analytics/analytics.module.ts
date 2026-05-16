@@ -13,6 +13,7 @@ import { AlertDispatcherService } from './services/alert-dispatcher.service';
 import { ConsolidationService } from './services/consolidation.service';
 import { AnalyticsController } from './controllers/analytics.controller';
 import { AnalyticalEntryWriterHandler } from './event-handlers/analytical-entry-writer.handler';
+import { EmailProvider, SmsProvider } from './services/notification-providers';
 
 /**
  * AnalyticsModule (Phase 4).
@@ -39,6 +40,8 @@ import { AnalyticalEntryWriterHandler } from './event-handlers/analytical-entry-
     AlertDispatcherService,
     ConsolidationService,
     AnalyticalEntryWriterHandler,
+    EmailProvider,
+    SmsProvider,
   ],
   exports: [
     CostPerTonAggregatorService,

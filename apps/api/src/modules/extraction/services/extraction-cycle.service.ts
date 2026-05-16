@@ -4,6 +4,7 @@ import {
   MethodNotAllowedException,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
@@ -47,6 +48,7 @@ export class ExtractionCycleService {
     @InjectRepository(ExtractionCycle)
     private readonly repo: Repository<ExtractionCycle>,
     private readonly equipmentService: ProductionEquipmentService,
+    private readonly events: EventEmitter2,
   ) {}
 
   async create(input: CreateExtractionCycleInput): Promise<ExtractionCycle> {
@@ -72,7 +74,24 @@ export class ExtractionCycleService {
       correctsId: input.correctsId ?? null,
       createdBy: input.createdBy,
     });
-    return this.repo.save(row);
+    const saved = await this.repo.save(row);
+
+    // FIN-04: signal analytics writer so the cycle gets an analytical_entry
+    // (extraction labor / downtime cost — booked at amount=0 until rates
+    // are configured in the FIN-07 refinement sprint).
+    this.events.emit('production.extraction.cycle_recorded', {
+      tenantId: saved.tenantId,
+      siteId: saved.siteId,
+      cycleId: saved.id,
+      operationalDayId: saved.operationalDayId,
+      equipmentId: saved.equipmentId,
+      operatorId: saved.operatorId,
+      materialType: saved.materialType,
+      estimatedTonnageT: saved.estimatedTonnageT,
+      downtimeMinutes: saved.downtimeMinutes,
+    });
+
+    return saved;
   }
 
   async findById(id: string, tenantId: string): Promise<ExtractionCycle> {

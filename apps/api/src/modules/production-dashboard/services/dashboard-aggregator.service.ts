@@ -451,7 +451,7 @@ export class DashboardAggregatorService {
          AND dh.tenant_id = dp.tenant_id
          AND dh.corrects_hole_id IS NULL
        WHERE dp.tenant_id = $1 AND dp.site_id = $2
-         AND dp.status IN ('active', 'in_progress')
+         AND dp.status = 'active'
        GROUP BY dp.id, dp.label, dp.planned_holes
        ORDER BY dp.created_at_utc DESC`,
       [tenantId, siteId],
@@ -486,16 +486,15 @@ export class DashboardAggregatorService {
     siteId: string,
     operationalDayId: string,
   ): Promise<number> {
+    // Use the persisted tolerance_violation flag — computed at hole creation,
+    // avoids re-deriving from depth/inclination columns that vary by schema rev.
     const rows = (await this.ds.query(
       `SELECT COUNT(*)::int AS violations
        FROM drilled_hole
        WHERE tenant_id = $1 AND site_id = $2
          AND operational_day_id = $3
          AND corrects_hole_id IS NULL
-         AND (
-           ABS(COALESCE(actual_depth_m, planned_depth_m) - planned_depth_m) > planned_depth_m * 0.1
-           OR ABS(COALESCE(actual_inclination_deg, planned_inclination_deg) - planned_inclination_deg) > 5
-         )`,
+         AND tolerance_violation = true`,
       [tenantId, siteId, operationalDayId],
     )) as Array<{ violations: number }>;
     return rows[0]?.violations ?? 0;
@@ -509,8 +508,8 @@ export class DashboardAggregatorService {
     const rows = (await this.ds.query(
       `SELECT
          COUNT(*)::int AS total,
-         COUNT(*) FILTER (WHERE status = 'in_progress')::int AS in_progress,
-         COUNT(*) FILTER (WHERE status = 'completed')::int   AS completed
+         COUNT(*) FILTER (WHERE LOWER(status) = 'in_progress')::int AS in_progress,
+         COUNT(*) FILTER (WHERE LOWER(status) = 'completed')::int   AS completed
        FROM truck_rotation
        WHERE tenant_id = $1 AND site_id = $2
          AND operational_day_id = $3`,
@@ -535,12 +534,17 @@ export class DashboardAggregatorService {
     tenantId: string,
     siteId: string,
   ): Promise<number> {
+    // Queue = weighing tickets created in the last hour NOT yet linked to a truck_rotation.
+    // (truck_rotation owns the FK weighing_ticket_id; ticket has no rotation_id column.)
     const rows = (await this.ds.query(
       `SELECT COUNT(*)::int AS queue_size
-       FROM weighing_ticket
-       WHERE tenant_id = $1 AND site_id = $2
-         AND rotation_id IS NULL
-         AND created_at_utc > now() - INTERVAL '1 hour'`,
+       FROM weighing_ticket wt
+       WHERE wt.tenant_id = $1 AND wt.site_id = $2
+         AND wt.created_at_utc > now() - INTERVAL '1 hour'
+         AND NOT EXISTS (
+           SELECT 1 FROM truck_rotation tr
+           WHERE tr.weighing_ticket_id = wt.id
+         )`,
       [tenantId, siteId],
     )) as Array<{ queue_size: number }>;
     return rows[0]?.queue_size ?? 0;

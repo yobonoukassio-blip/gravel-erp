@@ -32,7 +32,7 @@ Donner a un groupe minier une visibilite temps reel consolidee sur la production
 **Plans**: 2 plans
 Plans:
 - [x] 07-01-PLAN.md --- Backend: cost writers + @Cron aggregator + alert_rule seed (2026-05-16)
-- [ ] 07-02-PLAN.md --- Frontend: Finance/HSE tiles + Group consolidation page
+- [x] 07-02-PLAN.md --- Frontend: Finance/HSE tiles + Group consolidation page
 **UI hint**: yes
 
 ### Phase 8: Operational Alerts Closure
@@ -43,7 +43,11 @@ Plans:
   1. Quand l'intervalle PM d'un equipement est franchi (heures moteur, km, ou date calendaire), un `WorkOrder` apparait automatiquement dans l'inbox maintenance sans action humaine — verifiable en avancant l'horloge ou en forcant un compteur.
   2. Quand un mouvement de stock fait passer une `spare_part` sous son seuil min, une alerte `maintenance.spare_part.threshold_crossed` est emise et visible dans l'inbox alertes du Chef Maintenance.
   3. Les deux jobs s'executent sur le scheduler @Cron NestJS sans crash sur 24h continues (observable dans Grafana / logs).
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 08-W1-P01-PLAN.md --- Equipment meter denormalization + event-driven updaters (hour/km columns, backfill, MeterUpdateHandler)
+- [ ] 08-W1-P02-PLAN.md --- Spare-part threshold event flow (payload enrichment, recovery event, AlertsEventHandler subscribers)
+- [ ] 08-W2-P01-PLAN.md --- PreventiveMaintenanceSchedulerJob @Cron + findOpen idempotency + alert_rule seed
 
 ### Phase 9: Notification Delivery
 **Goal**: Les alertes arrivent aux bons destinataires par email et SMS, avec retry/backoff et badge in-app — fin des stubs `logger.log()` dans `AlertDispatcherService`.
@@ -68,7 +72,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 7. Finance Real | 0/2 | Planned | - |
+| 7. Finance Real | 2/2 | Complete   | 2026-05-16 |
 | 8. Operational Alerts Closure | 0/? | Not started | - |
 | 9. Notification Delivery | 0/? | Not started | - |
 

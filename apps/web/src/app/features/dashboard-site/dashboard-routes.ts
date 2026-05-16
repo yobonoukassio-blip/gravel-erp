@@ -26,4 +26,12 @@ export const DASHBOARD_ROUTES: Routes = [
       ),
     title: 'Dashboard Chef Carrière',
   },
+  {
+    path: 'group',
+    loadComponent: () =>
+      import('../dashboard-group/dashboard-group.component').then(
+        (m) => m.DashboardGroupComponent,
+      ),
+    title: 'Dashboard Groupe',
+  },
 ];

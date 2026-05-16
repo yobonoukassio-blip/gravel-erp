@@ -1,0 +1,94 @@
+<div class="dashboard-shell" *transloco="let t">
+
+  <div *ngIf="loading()" class="loading-overlay">
+    <mat-progress-spinner mode="indeterminate" diameter="48" />
+  </div>
+
+  <ng-container *ngIf="data() as d">
+
+    <div class="dashboard-header">
+      <h1 class="dashboard-title">Dashboard Groupe — P&L Consolide</h1>
+      <span class="provisional-badge">PROVISOIRE</span>
+      <span class="period-label">{{ d.periodLabel }} · {{ d.pivotCurrency }}</span>
+    </div>
+
+    <!-- KPI summary row -->
+    <div class="kpi-grid">
+      <gravel-kpi-tile
+        label="CA Total"
+        [value]="formatMinor(d.totalRevenueMinor)"
+        [unit]="d.pivotCurrency"
+        testId="kpi-group-revenue"
+      />
+      <gravel-kpi-tile
+        label="Cout Total"
+        [value]="formatMinor(d.totalCostMinor)"
+        [unit]="d.pivotCurrency"
+        testId="kpi-group-cost"
+      />
+      <gravel-kpi-tile
+        label="Marge Totale"
+        [value]="formatMinor(d.totalMarginMinor)"
+        [unit]="d.pivotCurrency"
+        testId="kpi-group-margin"
+      />
+      <gravel-kpi-tile
+        label="Marge %"
+        [value]="d.marginPct"
+        unit="%"
+        [highlight]="d.marginPct < 10 ? 'warn' : 'ok'"
+        testId="kpi-group-margin-pct"
+      />
+    </div>
+
+    <!-- Per-site breakdown table -->
+    <section class="section-title">Detail par site</section>
+    <mat-card>
+      <table mat-table [dataSource]="d.sites" class="group-table">
+
+        <ng-container matColumnDef="siteId">
+          <th mat-header-cell *matHeaderCellDef>Site</th>
+          <td mat-cell *matCellDef="let row">{{ row.siteId }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="revenue">
+          <th mat-header-cell *matHeaderCellDef>CA</th>
+          <td mat-cell *matCellDef="let row">{{ formatMinor(row.revenueMinor) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="cost">
+          <th mat-header-cell *matHeaderCellDef>Cout</th>
+          <td mat-cell *matCellDef="let row">{{ formatMinor(row.costMinor) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="margin">
+          <th mat-header-cell *matHeaderCellDef>Marge</th>
+          <td mat-cell *matCellDef="let row">{{ formatMinor(row.marginMinor) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="tonnage">
+          <th mat-header-cell *matHeaderCellDef>Tonnage (t)</th>
+          <td mat-cell *matCellDef="let row">{{ row.tonnageT | number:'1.0-0' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="marginPct">
+          <th mat-header-cell *matHeaderCellDef>Marge %</th>
+          <td mat-cell *matCellDef="let row" [class.warn]="row.marginPct < 10">
+            {{ row.marginPct }}%
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </mat-card>
+
+  </ng-container>
+
+  <div *ngIf="!loading() && !data()" class="api-error-banner">
+    <mat-card style="border-left: 4px solid #EF4444; background: #FEF2F2; padding: 16px;">
+      <p style="color:#991B1B; margin:0">Impossible de charger les donnees de consolidation.</p>
+    </mat-card>
+  </div>
+
+</div>

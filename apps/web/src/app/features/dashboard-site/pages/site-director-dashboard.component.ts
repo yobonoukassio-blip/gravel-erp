@@ -32,6 +32,20 @@ interface VteRevenue {
   isProvisional: true;
 }
 
+interface FinanceKpi {
+  cost_per_ton_minor: string;
+  margin_pct: number;
+  fuel_cost_month_minor: string;
+  maintenance_cost_month_minor: string;
+  currency: string;
+}
+
+interface HseKpi {
+  incidents_open_count: number;
+  tf_rolling_12m: number;
+  audit_conformity_pct: number;
+}
+
 interface SiteDirectorDashboardPayload {
   tonnage_today_kg: string;
   tonnage_yesterday_kg: string;
@@ -52,6 +66,8 @@ interface SiteDirectorDashboardPayload {
   open_work_orders_count: number;
   downtime_today_minutes: number;
   vte_revenue: VteRevenue;
+  finance_kpi: FinanceKpi;
+  hse_kpi: HseKpi;
 }
 
 type SseDelta = { kind: 'kpi.delta'; updated_keys: string[] };
@@ -151,6 +167,14 @@ export class SiteDirectorDashboardComponent implements OnInit, OnDestroy {
     if (!kg) return '—';
     const t = Number(kg) / 1000;
     return t >= 1000 ? `${(t / 1000).toFixed(1)} kt` : `${t.toFixed(1)} t`;
+  }
+
+  formatMinor(minor: string | undefined, currency?: string): string {
+    if (!minor || minor === '0') return '—';
+    const v = Number(minor);
+    if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)} M ${currency ?? 'XOF'}`;
+    if (v >= 1_000) return `${Math.round(v / 1_000)} k ${currency ?? 'XOF'}`;
+    return `${v.toLocaleString('fr-CI')} ${currency ?? 'XOF'}`;
   }
 
   incidentCount(severity: string): number {

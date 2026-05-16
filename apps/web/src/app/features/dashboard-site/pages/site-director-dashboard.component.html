@@ -103,6 +103,61 @@
     </div>
 
     <!-- ------------------------------------------------------------------ -->
+    <!-- Finance KPIs (DSH-03 / FIN-R04)                                   -->
+    <!-- ------------------------------------------------------------------ -->
+    <section class="section-title">{{ t('dashboard.section.finance') }}</section>
+    <div class="kpi-grid">
+      <gravel-kpi-tile
+        [label]="t('dashboard.finance.cost_per_ton')"
+        [value]="formatMinor(d.finance_kpi?.cost_per_ton_minor)"
+        unit="/t"
+        testId="kpi-finance-cost-per-ton"
+      />
+      <gravel-kpi-tile
+        [label]="t('dashboard.finance.margin')"
+        [value]="d.finance_kpi?.margin_pct ?? 0"
+        unit="%"
+        [highlight]="(d.finance_kpi?.margin_pct ?? 0) < 10 ? 'warn' : 'ok'"
+        testId="kpi-finance-margin"
+      />
+      <gravel-kpi-tile
+        [label]="t('dashboard.finance.fuel_cost_month')"
+        [value]="formatMinor(d.finance_kpi?.fuel_cost_month_minor)"
+        testId="kpi-finance-fuel"
+      />
+      <gravel-kpi-tile
+        [label]="t('dashboard.finance.maintenance_cost_month')"
+        [value]="formatMinor(d.finance_kpi?.maintenance_cost_month_minor)"
+        testId="kpi-finance-maintenance"
+      />
+    </div>
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- HSE KPIs (DSH-04 / FIN-R05)                                       -->
+    <!-- ------------------------------------------------------------------ -->
+    <section class="section-title">{{ t('dashboard.section.hse') }}</section>
+    <div class="kpi-grid">
+      <gravel-kpi-tile
+        [label]="t('dashboard.hse.incidents_open')"
+        [value]="d.hse_kpi?.incidents_open_count ?? 0"
+        [highlight]="(d.hse_kpi?.incidents_open_count ?? 0) > 0 ? 'warn' : 'ok'"
+        testId="kpi-hse-incidents"
+      />
+      <gravel-kpi-tile
+        [label]="t('dashboard.hse.tf_12m')"
+        [value]="d.hse_kpi?.tf_rolling_12m ?? 0"
+        testId="kpi-hse-tf"
+      />
+      <gravel-kpi-tile
+        [label]="t('dashboard.hse.audit_conformity')"
+        [value]="d.hse_kpi?.audit_conformity_pct ?? 0"
+        unit="%"
+        [highlight]="(d.hse_kpi?.audit_conformity_pct ?? 0) < 80 ? 'warn' : 'ok'"
+        testId="kpi-hse-conformity"
+      />
+    </div>
+
+    <!-- ------------------------------------------------------------------ -->
     <!-- Ventes — revenus provisoires (Phase 3)                            -->
     <!-- ------------------------------------------------------------------ -->
     <section class="section-title">

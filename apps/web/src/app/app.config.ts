@@ -21,6 +21,7 @@ import { routes } from './app.routes';
 import { oidcConfig } from './core/auth/oidc.config';
 import { provideAppTransloco } from './core/i18n/transloco.config';
 import { startWebOtel } from './core/otel/otel';
+import { silentErrorInterceptor } from './core/http/silent-error.interceptor';
 
 // Start OTel BEFORE the Angular bootstrap so the document-load instrumentation
 // captures the cold-start span. Idempotent on repeat calls (HMR / SSR replay).
@@ -38,7 +39,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withInterceptorsFromDi(), withInterceptors([authInterceptor()])),
+    provideHttpClient(withInterceptorsFromDi(), withInterceptors([authInterceptor(), silentErrorInterceptor])),
     provideAnimationsAsync(),
     importProvidersFrom(AuthModule.forRoot({ config: oidcConfig })),
     importProvidersFrom(

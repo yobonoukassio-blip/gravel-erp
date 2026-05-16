@@ -1,18 +1,12 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { AgGridAngular } from 'ag-grid-angular';
-import type {
-  ColDef,
-  GridOptions,
-  GridReadyEvent,
-  IServerSideDatasource,
-  IServerSideGetRowsParams,
-} from 'ag-grid-community';
+import type { ColDef, GridOptions } from 'ag-grid-community';
 
 interface TenantAwareApiResponse<T> {
   data: T[];
-  meta: { total: number; offset: number; limit: number };
+  meta?: { total: number; offset: number; limit: number };
 }
 
 /**
@@ -35,8 +29,8 @@ interface TenantAwareApiResponse<T> {
       class="ag-theme-material"
       style="width:100%;height:600px;"
       [columnDefs]="columnDefs"
+      [rowData]="rows()"
       [gridOptions]="gridOptions"
-      (gridReady)="onGridReady($event)"
     />
   `,
 })
@@ -46,44 +40,25 @@ export class TenantAwareGridComponent implements OnInit {
   @Input({ required: true }) endpoint!: string;
   @Input({ required: true }) columnDefs!: ColDef[];
 
+  readonly rows = signal<unknown[]>([]);
+
   gridOptions: GridOptions = {
-    rowModelType: 'serverSide',
-    cacheBlockSize: 50,
     pagination: true,
     paginationPageSize: 50,
   };
 
   ngOnInit(): void {
     if (!this.endpoint) throw new Error('TenantAwareGrid requires an [endpoint] input');
-  }
-
-  onGridReady(event: GridReadyEvent): void {
-    event.api.setGridOption('serverSideDatasource', this.buildDatasource());
-  }
-
-  private buildDatasource(): IServerSideDatasource {
-    const http = this.http;
-    const endpoint = this.endpoint;
-    return {
-      getRows: (params: IServerSideGetRowsParams) => {
-        const startRow = params.request.startRow ?? 0;
-        const endRow = params.request.endRow ?? startRow + 50;
-        const limit = endRow - startRow;
-        const httpParams = new HttpParams()
-          .set('offset', String(startRow))
-          .set('limit', String(limit));
-
-        http.get<TenantAwareApiResponse<unknown>>(endpoint, { params: httpParams }).subscribe({
-          next: (res) => {
-            params.success({ rowData: res.data, rowCount: res.meta.total });
-          },
-          error: (err: unknown) => {
-            // eslint-disable-next-line no-console
-            console.error('[TenantAwareGrid] datasource error', err);
-            params.fail();
-          },
-        });
+    this.http.get<TenantAwareApiResponse<unknown> | unknown[]>(this.endpoint).subscribe({
+      next: (res) => {
+        const data = Array.isArray(res) ? res : res.data;
+        this.rows.set(data ?? []);
       },
-    };
+      error: (err: unknown) => {
+        // eslint-disable-next-line no-console
+        console.error('[TenantAwareGrid] load failed', err);
+        this.rows.set([]);
+      },
+    });
   }
 }

@@ -156,6 +156,11 @@ export const routes: Routes = [
             (m) => m.ActivityLogListComponent,
           ),
       },
+      {
+        path: '**',
+        loadComponent: () =>
+          import('./shared/not-found.component').then((m) => m.NotFoundComponent),
+      },
     ],
   },
 ];

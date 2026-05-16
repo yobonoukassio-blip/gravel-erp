@@ -7,6 +7,8 @@ export type AlertSeverity = 'info' | 'warning' | 'critical';
  * AlertRule (DSH-06) — configurable rule routing alerts to channels.
  * Triggered by event type + optional severity filter.
  * Recipients: user_ids[] or role_codes[] resolved at dispatch time.
+ *
+ * site_id is optional: null means the rule applies to ALL sites in the tenant.
  */
 @Entity({ name: 'alert_rule' })
 @Index('alert_rule_tenant_event_idx', ['tenantId', 'eventType'])
@@ -16,6 +18,10 @@ export class AlertRule {
 
   @Column({ type: 'uuid', name: 'tenant_id' })
   tenantId!: string;
+
+  /** Scope rule to a specific site. NULL = applies to all sites in the tenant. */
+  @Column({ type: 'uuid', name: 'site_id', nullable: true })
+  siteId!: string | null;
 
   @Column({ type: 'varchar', length: 100, name: 'event_type' })
   eventType!: string;

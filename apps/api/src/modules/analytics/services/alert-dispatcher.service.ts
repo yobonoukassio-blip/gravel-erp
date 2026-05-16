@@ -12,6 +12,8 @@ import {
 
 export interface AlertPayload {
   tenantId: string;
+  /** Optional: scopes rule matching to a specific site. NULL matches tenant-wide rules only. */
+  siteId?: string | null;
   eventType: string;
   severity: AlertSeverity;
   title: string;
@@ -49,11 +51,13 @@ export class AlertDispatcherService {
   @OnEvent('production.stockpile.threshold_crossed')
   async onStockpileThreshold(payload: {
     tenantId: string;
+    siteId?: string;
     stockpileId: string;
     level: string;
   }): Promise<void> {
     await this.dispatch({
       tenantId: payload.tenantId,
+      siteId: payload.siteId,
       eventType: 'production.stockpile.threshold_crossed',
       severity: payload.level === 'critical_low' ? 'critical' : 'warning',
       title: `Seuil stockpile ${payload.level}`,
@@ -65,11 +69,13 @@ export class AlertDispatcherService {
   @OnEvent('maintenance.spare_part.threshold_crossed')
   async onSparePartLow(payload: {
     tenantId: string;
+    siteId?: string;
     sku: string;
     quantityOnHand: number;
   }): Promise<void> {
     await this.dispatch({
       tenantId: payload.tenantId,
+      siteId: payload.siteId,
       eventType: 'maintenance.spare_part.threshold_crossed',
       severity: 'warning',
       title: `Pièce de rechange basse : ${payload.sku}`,
@@ -81,11 +87,13 @@ export class AlertDispatcherService {
   @OnEvent('hse.incident.created')
   async onHseIncident(payload: {
     tenantId: string;
+    siteId?: string;
     severity: number;
     incidentId: string;
   }): Promise<void> {
     await this.dispatch({
       tenantId: payload.tenantId,
+      siteId: payload.siteId,
       eventType: 'hse.incident.created',
       severity: payload.severity >= 4 ? 'critical' : 'warning',
       title: `Incident HSE sévérité ${payload.severity}`,
@@ -97,11 +105,13 @@ export class AlertDispatcherService {
   @OnEvent('tir.explosives.reconciliation_gap')
   async onExplosivesGap(payload: {
     tenantId: string;
+    siteId?: string;
     date: string;
     gapKg: number;
   }): Promise<void> {
     await this.dispatch({
       tenantId: payload.tenantId,
+      siteId: payload.siteId,
       eventType: 'tir.explosives.reconciliation_gap',
       severity: 'critical',
       title: 'Écart de réconciliation explosifs',
@@ -133,9 +143,15 @@ export class AlertDispatcherService {
 
   /** Core dispatcher — finds matching rules and routes through channel providers. */
   private async dispatch(alert: AlertPayload): Promise<void> {
-    const rules = await this.ds.getRepository(AlertRule).find({
+    const allRules = await this.ds.getRepository(AlertRule).find({
       where: { tenantId: alert.tenantId, eventType: alert.eventType, isActive: true },
     });
+
+    // Site-scoped filtering: keep rules that are tenant-wide (siteId = null)
+    // OR specifically scoped to the event's site.
+    const rules = allRules.filter(
+      (r) => r.siteId === null || r.siteId === (alert.siteId ?? null),
+    );
 
     if (rules.length === 0) return;
 
@@ -146,7 +162,7 @@ export class AlertDispatcherService {
           await this.deliverThroughChannel(channel, rule, alert);
         } catch (err) {
           this.logger.error(
-            `alert delivery failed channel=${channel} event=${alert.eventType}: ${(err as Error).message}`,
+            `alert delivery failed channel=${channel} event=${alert.eventType} site=${alert.siteId ?? 'all'}: ${(err as Error).message}`,
           );
         }
       }

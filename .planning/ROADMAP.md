@@ -13,7 +13,7 @@ Donner a un groupe minier une visibilite temps reel consolidee sur la production
 
 ## v1.1 Phases
 
-- [ ] **Phase 7: Finance Real** — Cost writers DI + daily @Cron aggregation + DSH-03/04/05/06 Angular tiles + alert_rule seed
+- [~] **Phase 7: Finance Real** — Plan 01 complete (cost writers + @Cron + alert seed). Plan 02 (UI tiles) pending.
 - [ ] **Phase 8: Operational Alerts Closure** — Preventive maintenance scheduler + spare-part threshold handler firing real alerts
 - [ ] **Phase 9: Notification Delivery** — BullMQ workers + Brevo email + Twilio SMS + in-app notifications replacing logger.log stubs
 
@@ -31,7 +31,7 @@ Donner a un groupe minier une visibilite temps reel consolidee sur la production
   5. Au moins 5 `alert_rule` rows existent en base apres migration (stockpile threshold, spare part low, HSE severity≥4, explosifs gap, fuel anomaly) et le moteur d'alertes les evalue sans config manuelle.
 **Plans**: 2 plans
 Plans:
-- [ ] 07-01-PLAN.md --- Backend: cost writers + @Cron aggregator + alert_rule seed
+- [x] 07-01-PLAN.md --- Backend: cost writers + @Cron aggregator + alert_rule seed (2026-05-16)
 - [ ] 07-02-PLAN.md --- Frontend: Finance/HSE tiles + Group consolidation page
 **UI hint**: yes
 

@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: polish-and-gaps
-status: planning
-stopped_at: v1.1 roadmap drafted (phases 7-9) — ready for /gsd:plan-phase 7
-last_updated: "2026-05-16T16:00:00.000Z"
+status: executing
+stopped_at: Completed 07-01-PLAN.md (Finance Real — cost writers + cron + alert seed)
+last_updated: "2026-05-16T16:30:00.000Z"
 progress:
   total_phases: 8
   completed_phases: 5
@@ -24,13 +24,13 @@ progress:
 
 ## Current Position
 
-**Milestone v1.1 STARTED — roadmap drafted, planning Phase 7 next.**
+**Milestone v1.1 EXECUTING — Phase 7 Plan 01 complete (FIN-R01/R02/R06).**
 
 - **Goal:** Passer de v1.0 code-complete a v1.1 production-ready pour le premier client reel
 - **Scope (80/20 cut):** Finance Real + Operational Alerts Closure + Notification Delivery
 - **Phases:** 7 (Finance Real), 8 (Operational Alerts Closure), 9 (Notification Delivery)
 - **REQ coverage:** 11/11 mapped (6 FIN-R + 2 ALT + 3 NTF)
-- **Last activity:** 2026-05-16 — ROADMAP.md drafted with success criteria
+- **Last activity:** 2026-05-16 — Phase 7 Plan 01 shipped: 4 cost writers, daily @Cron, 5 seeded alert_rules
 
 ### v1.0 (previous, complete)
 - **Shipped:** 2026-05-16, archived to `.planning/milestones/v1.0-*`
@@ -46,7 +46,7 @@ progress:
 | 4 | Analytics, Consolidation & Finance | Complete (2026-05-13) — backend services, partial UI |
 | 5 | IoT Integration | Complete (2026-05-13) — 3-layer model, no MQTT infra |
 | 6 | Hardening & Multi-Country Rollout | Deferred (v2) |
-| 7 | Finance Real | Planned (v1.1) |
+| 7 | Finance Real | In Progress (v1.1) — Plan 01 complete (cost writers + @Cron + alert seed) |
 | 8 | Operational Alerts Closure | Planned (v1.1) — depends on Phase 7 alert_rule seed |
 | 9 | Notification Delivery | Planned (v1.1) — depends on Phase 8 alerts firing |
 
@@ -67,9 +67,14 @@ Tech debt deferred to v2: IOT MQTT pipeline (Phase 6).
 - Phase numbering continues from v1.0 end (5) → 7, 8, 9 ; Phase 6 reserved v2.
 - Phase 8 depends on Phase 7 because alert_rule seed migration must land before handlers can match rules.
 - Phase 9 depends on Phase 8 because dispatchers need real alerts to dispatch.
+- **Phase 7 Plan 01:** Aggregator pulls cost components from analytical_entry ledger (single source of truth). Writers emit per domain event. Idempotent via UNIQUE(tenant, source_table, source_id, cost_center).
+- **Phase 7 Plan 01:** Bound to existing event name `production.extraction.cycle_recorded` (not the `cycle_created` suggested in plan — kept Phase 4 FIN-04 wiring).
+- **Phase 7 Plan 01:** Amortissement stays 0n until production_equipment gains `purchase_cost_minor` + `useful_life_years` columns (deferred to FIN-07).
 
 ### Todos
-- [ ] `/gsd:plan-phase 7` — derive plans for Finance Real
+- [x] `/gsd:plan-phase 7` — derived 07-01 (cost writers + @Cron + alert seed)
+- [x] Phase 7 Plan 01 execution — FIN-R01/R02/R06 shipped
+- [ ] Phase 7 Plan 02+ — DSH-03/04/05 dashboard tiles (FIN-R03/R04/R05)
 - [ ] `/gsd:plan-phase 8` — derive plans for Operational Alerts Closure
 - [ ] `/gsd:plan-phase 9` — derive plans for Notification Delivery
 

@@ -16,6 +16,7 @@ import { EmployeeController } from './controllers/employee.controller';
 import { ShiftEntryController } from './controllers/shift-entry.controller';
 import { ShiftRosterController } from './controllers/shift-roster.controller';
 import { SubcontractorController } from './controllers/subcontractor.controller';
+import { CertificationController } from './controllers/certification.controller';
 
 /**
  * RhModule (Phase 3 W0-P01).
@@ -47,6 +48,7 @@ import { SubcontractorController } from './controllers/subcontractor.controller'
     ShiftEntryController,
     ShiftRosterController,
     SubcontractorController,
+    CertificationController,
   ],
   providers: [
     RhHabilitationService,

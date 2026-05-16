@@ -23,6 +23,7 @@ import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { CamelCaseInterceptor } from './common/interceptors/camel-case.interceptor';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
@@ -33,6 +34,9 @@ async function bootstrap(): Promise<void> {
       transform: true,
     }),
   );
+  // CamelCaseInterceptor désactivé — frontend mixte snake/camel difficile à unifier
+  // sans casser le build. Endpoints raw servent du camelCase via aliases SQL.
+  // app.useGlobalInterceptors(new CamelCaseInterceptor());
   app.setGlobalPrefix('api', { exclude: ['/health/live', '/health/ready', '/health/metrics'] });
   app.enableShutdownHooks();
   app.enableCors({

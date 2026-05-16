@@ -65,7 +65,16 @@ export class StockpileController {
       let where = '';
       if (sid) { params.push(sid); where = ' AND site_id = $1'; }
       return em.query(
-        `SELECT * FROM stockpile WHERE is_active${where} ORDER BY code`,
+        `SELECT
+           id, tenant_id AS "tenantId", site_id AS "siteId",
+           zone_id AS "zoneId", code, label, name,
+           default_calibre_code AS "defaultCalibreCode",
+           default_calibre_code AS "calibreCode",
+           is_active AS "isActive", created_at AS "createdAt",
+           'granite_brut' AS "materialType"
+         FROM stockpile
+         WHERE is_active${where}
+         ORDER BY code`,
         params,
       );
     });

@@ -80,12 +80,33 @@ interface ScreeningSessionCompletedEvent {
   completed_at_utc: string;
 }
 
-// Placeholder unit costs (XOF per unit), centime minor units.
+interface TirBlastFiredEvent {
+  tenantId: string;
+  siteId: string;
+  blastPlanId: string;
+  operationalDayId: string;
+  /** Total explosives quantity in kg for cost calculation */
+  totalExplosivesKg?: number;
+  firedAtUtc: string;
+}
+
+interface HseIncidentCreatedEvent {
+  tenant_id: string;
+  site_id: string;
+  incident_id: string;
+  severity: number;
+  category: string;
+}
+
+// Placeholder unit costs (XOF, centime minor units).
 // Replace via rate-config service in FIN-07 refinement sprint.
 const EXTRACTION_HOURLY_RATE_MINOR = 3500_00n; // 3500 XOF/h equipment placeholder
 const TRANSPORT_PER_ROTATION_MINOR = 5000_00n; // 5000 XOF/rotation placeholder
-const CONCASSAGE_PER_KWH_MINOR = 120_00n; // 120 XOF/kWh placeholder
-const CRIBLAGE_HOURLY_RATE_MINOR = 2000_00n; // 2000 XOF/h placeholder
+const CONCASSAGE_PER_KWH_MINOR = 120_00n;       // 120 XOF/kWh placeholder
+const CRIBLAGE_HOURLY_RATE_MINOR = 2000_00n;    // 2000 XOF/h placeholder
+const MNT_LABOR_HOURLY_RATE_MINOR = 4000_00n;   // 4000 XOF/h maintenance labor
+const HSE_BASE_COST_MINOR = 50_000_00n;          // 50 000 XOF base response cost
+const TIR_PER_KG_EXPLOSIVE_MINOR = 2500_00n;    // 2500 XOF/kg explosives placeholder
 
 /**
  * AnalyticalEntryWriterHandler (FIN-04 + FIN-R01).
@@ -102,6 +123,8 @@ const CRIBLAGE_HOURLY_RATE_MINOR = 2000_00n; // 2000 XOF/h placeholder
  *   production.transport.rotation_completed   → DEBIT  TRA transport        (FIN-R01)
  *   production.crusher.session_completed      → DEBIT  CON concassage       (FIN-R01)
  *   production.screening.session_completed    → DEBIT  CRI criblage         (FIN-R01)
+ *   tir.blast_plan.fire_requested             → DEBIT  TIR explosifs        (FIN-R01)
+ *   hse.incident.created                      → DEBIT  HSE incident         (FIN-R01)
  *
  * Idempotency is enforced by UNIQUE(tenant_id, source_table, source_id, cost_center).
  */
@@ -167,20 +190,22 @@ export class AnalyticalEntryWriterHandler {
   @OnEvent('maintenance.work_order.closed')
   async onWorkOrderClosed(evt: WorkOrderClosedEvent): Promise<void> {
     try {
-      // Amount=0 until labor rates are configured (Phase 6 FIN-07).
-      // Entry is still written so the OHADA export carries the WO close event;
-      // the rate-config refinement sprint will UPDATE amount_minor_units in-place.
+      // Labor cost = hours × MNT_LABOR_HOURLY_RATE_MINOR (configured via FIN-07).
+      const hoursScaled = BigInt(Math.round(parseFloat(evt.laborHours) * 100));
+      const costMinor = (hoursScaled * MNT_LABOR_HOURLY_RATE_MINOR) / 100n;
+
       await this.ds.query(
         `INSERT INTO analytical_entry
            (tenant_id, site_id, entry_date, cost_center, activity, label,
             amount_minor_units, currency, debit_credit, source_table, source_id)
-         VALUES ($1, $2, $3, 'MNT', 'maintenance', $4, '0', 'XOF', 'D', 'work_order', $5)
+         VALUES ($1, $2, $3, 'MNT', 'maintenance', $4, $5, 'XOF', 'D', 'work_order', $6)
          ON CONFLICT (tenant_id, source_table, source_id, cost_center) DO NOTHING`,
         [
           evt.tenantId,
           evt.siteId,
           new Date(evt.closedAtUtc).toISOString().split('T')[0],
           `OT clôture — ${evt.laborHours}h`,
+          costMinor.toString(),
           evt.workOrderId,
         ],
       );
@@ -492,6 +517,85 @@ export class AnalyticalEntryWriterHandler {
       this.logger.error(
         `analytical entry screening session ${evt.session_id}: ${(err as Error).message}`,
       );
+    }
+  }
+  /**
+   * FIN-R01: TIR blast plan fired → DEBIT TIR entry.
+   *
+   * Records explosives consumption cost.
+   * Amount = totalExplosivesKg × TIR_PER_KG_EXPLOSIVE_MINOR (placeholder).
+   * Fallback: sums quantity_kg from blast_plan_item if not in event payload.
+   */
+  @OnEvent('tir.blast_plan.fire_requested')
+  async onTirBlastFired(evt: TirBlastFiredEvent): Promise<void> {
+    try {
+      let explosivesKg = evt.totalExplosivesKg ?? 0;
+      if (explosivesKg === 0) {
+        const rows = await this.ds.query<Array<{ total_kg: string }>>(
+          `SELECT COALESCE(SUM(quantity_kg), 0) AS total_kg
+           FROM blast_plan_item
+           WHERE blast_plan_id = $1 AND tenant_id = $2`,
+          [evt.blastPlanId, evt.tenantId],
+        );
+        explosivesKg = parseFloat(rows[0]?.total_kg ?? '0');
+      }
+      const entryDate = new Date(evt.firedAtUtc).toISOString().split('T')[0];
+      const kgScaled = BigInt(Math.round(explosivesKg * 100));
+      const costMinor = (kgScaled * TIR_PER_KG_EXPLOSIVE_MINOR) / 100n;
+
+      await this.ds.query(
+        `INSERT INTO analytical_entry
+           (tenant_id, site_id, entry_date, cost_center, activity, label,
+            amount_minor_units, currency, debit_credit, source_table, source_id)
+         VALUES ($1, $2, $3, 'TIR', 'tir', $4, $5, 'XOF', 'D', 'blast_plan', $6)
+         ON CONFLICT (tenant_id, source_table, source_id, cost_center) DO NOTHING`,
+        [
+          evt.tenantId, evt.siteId, entryDate,
+          `TIR explosifs ${explosivesKg.toFixed(2)} kg`,
+          costMinor.toString(),
+          evt.blastPlanId,
+        ],
+      );
+    } catch (err) {
+      this.logger.error(`analytical entry TIR ${evt.blastPlanId}: ${(err as Error).message}`);
+    }
+  }
+
+  /**
+   * FIN-R01: HSE incident created → DEBIT HSE entry.
+   *
+   * Cost = HSE_BASE_COST_MINOR × severity_multiplier:
+   *   sev 1→1×, 2→2×, 3→3×, 4→5×, 5→10×
+   */
+  @OnEvent('hse.incident.created')
+  async onHseIncidentCreated(evt: HseIncidentCreatedEvent): Promise<void> {
+    try {
+      const SEVERITY_MUL: Record<number, bigint> = { 1: 1n, 2: 2n, 3: 3n, 4: 5n, 5: 10n };
+      const costMinor = HSE_BASE_COST_MINOR * (SEVERITY_MUL[evt.severity] ?? 1n);
+
+      const rows = await this.ds.query<Array<{ occurred_at_local: string }>>(
+        `SELECT occurred_at_local FROM hse_incident WHERE id = $1 AND tenant_id = $2 LIMIT 1`,
+        [evt.incident_id, evt.tenant_id],
+      );
+      const entryDate = rows.length > 0
+        ? new Date(rows[0].occurred_at_local).toISOString().split('T')[0]
+        : new Date().toISOString().split('T')[0];
+
+      await this.ds.query(
+        `INSERT INTO analytical_entry
+           (tenant_id, site_id, entry_date, cost_center, activity, label,
+            amount_minor_units, currency, debit_credit, source_table, source_id)
+         VALUES ($1, $2, $3, 'HSE', 'hse', $4, $5, 'XOF', 'D', 'hse_incident', $6)
+         ON CONFLICT (tenant_id, source_table, source_id, cost_center) DO NOTHING`,
+        [
+          evt.tenant_id, evt.site_id, entryDate,
+          `Incident HSE sév.${evt.severity} — ${evt.category}`,
+          costMinor.toString(),
+          evt.incident_id,
+        ],
+      );
+    } catch (err) {
+      this.logger.error(`analytical entry HSE ${evt.incident_id}: ${(err as Error).message}`);
     }
   }
 }

@@ -1,7 +1,28 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+
+/**
+ * HSE-04 (audit 2026-05-16): thrown when a caller attempts an operation
+ * requiring a certification that the employee does NOT hold as of the
+ * operational date. Surfaces as a 403 with a structured error so the UI
+ * can render a "habilitation manquante" guard instead of a generic 500.
+ *
+ * Emits `hse.habilitation.gap` for the alert dispatcher to route as a
+ * compliance alert (severity=critical for explosives, warning otherwise).
+ */
+export class HabilitationGapException extends ForbiddenException {
+  constructor(employeeId: string, certCode: string, asOfDate: string) {
+    super({
+      code: 'HABILITATION_MISSING',
+      employeeId,
+      certCode,
+      asOfDate,
+      message: `L'employé ${employeeId} ne détient pas la certification ${certCode} valide au ${asOfDate}.`,
+    });
+  }
+}
 
 export interface CertificationExpiry {
   employeeId: string;
@@ -69,6 +90,33 @@ export class RhHabilitationService {
     )) as Array<Record<string, unknown>>;
 
     return rows.length > 0;
+  }
+
+  /**
+   * HSE-04 hard gate: same query as {@link isValidAt} but THROWS
+   * {@link HabilitationGapException} on failure. Use this in domain
+   * services (blast charge loading, work-order closure, equipment refuel)
+   * so the violation is a 403 — not a silent skip.
+   *
+   * Also emits `hse.habilitation.gap` for the alert dispatcher.
+   */
+  async assertValidAt(
+    employeeId: string,
+    certCode: string,
+    asOfDate: Date,
+  ): Promise<void> {
+    const valid = await this.isValidAt(employeeId, certCode, asOfDate);
+    if (valid) return;
+    const asOfStr = asOfDate.toISOString().slice(0, 10);
+    this.events.emit('hse.habilitation.gap', {
+      employeeId,
+      certCode,
+      asOfDate: asOfStr,
+    });
+    this.logger.warn(
+      `[RhHabilitation] gate blocked employee=${employeeId} cert=${certCode} as_of=${asOfStr}`,
+    );
+    throw new HabilitationGapException(employeeId, certCode, asOfStr);
   }
 
   /**

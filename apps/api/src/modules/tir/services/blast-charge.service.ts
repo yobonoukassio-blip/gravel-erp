@@ -5,6 +5,7 @@ import {
 import { InjectDataSource } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
 import { DataSource } from 'typeorm';
+import { RhHabilitationService } from '../../rh/services/rh-habilitation.service';
 import { BlastCharge } from '../entities/blast-charge.entity';
 import { ExplosivesProductType } from '../entities/explosives-event.entity';
 import { BlastPlanService } from './blast-plan.service';
@@ -33,6 +34,7 @@ export class BlastChargeService {
     @InjectDataSource() private readonly ds: DataSource,
     private readonly blastPlanService: BlastPlanService,
     private readonly detonatorService: DetonatorService,
+    private readonly habilitation: RhHabilitationService,
   ) {}
 
   async recordCharge(input: RecordBlastChargeInput): Promise<BlastCharge> {
@@ -46,6 +48,16 @@ export class BlastChargeService {
         message: `Cannot record charge: blast plan ${input.blastPlanId} is in status=${plan.status}; expected LOADED.`,
       });
     }
+
+    // HSE-04 gate (audit 2026-05-16): block explosives loading by anyone
+    // who does not hold a valid PERMIS_EXPLOSIFS as of today. The blast
+    // plan service already checks TIR_MINE_CI at LOAD time; this is the
+    // safety net at the per-hole charge level.
+    await this.habilitation.assertValidAt(
+      input.operatorId,
+      'PERMIS_EXPLOSIFS',
+      new Date(),
+    );
 
     const id = randomUUID();
     const rows = (await this.ds.query(

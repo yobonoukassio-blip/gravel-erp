@@ -56,7 +56,7 @@ describe('WorkOrderService — Phase 8 W2-P01', () => {
       findOneOrFail: jest.fn(),
     };
 
-    mockTransaction = jest.fn(async (cb: any) => cb(mockManager));
+    mockTransaction = jest.fn(async (cb: (m: unknown) => unknown) => cb(mockManager));
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -307,8 +307,8 @@ describe('WorkOrderService — Phase 8 W2-P01', () => {
       laborHours: 2,
     };
 
-    function wireFindOne(workOrder: any, plan: any | null, equipment: any | null = null) {
-      mockManager.findOne.mockImplementation((entity: any) => {
+    function wireFindOne(workOrder: unknown, plan: unknown | null, equipment: unknown | null = null) {
+      mockManager.findOne.mockImplementation((entity: unknown) => {
         if (entity === WorkOrder) return Promise.resolve(workOrder);
         if (entity === PreventiveMaintenancePlan) return Promise.resolve(plan);
         if (entity === ProductionEquipment) return Promise.resolve(equipment);

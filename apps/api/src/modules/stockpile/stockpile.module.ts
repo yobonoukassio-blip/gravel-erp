@@ -15,6 +15,7 @@ import { RotationCompletedHandler } from './event-handlers/rotation-completed.ha
 import { BalanceProjectionHandler } from './event-handlers/balance-projection.handler';
 import { CrusherSessionCompletedHandler } from './event-handlers/crusher-session-completed.handler';
 import { ScreeningSessionCompletedHandler } from './event-handlers/screening-session-completed.handler';
+import { BlSignedHandler } from './event-handlers/bl-signed.handler';
 import { BalanceRecomputeJob } from './jobs/balance-recompute.job';
 import { FuelModule } from '../fuel/fuel.module';
 
@@ -49,6 +50,7 @@ import { FuelModule } from '../fuel/fuel.module';
     BalanceProjectionHandler,
     CrusherSessionCompletedHandler,
     ScreeningSessionCompletedHandler,
+    BlSignedHandler,
     BalanceRecomputeJob,
   ],
   exports: [

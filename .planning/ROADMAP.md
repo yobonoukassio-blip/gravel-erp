@@ -29,7 +29,10 @@ Donner a un groupe minier une visibilite temps reel consolidee sur la production
   3. Le dashboard Finance Groupe (DSH-05) affiche un P&L consolide multi-site avec drill-down par site/contrat/matiere depuis l'UI Angular.
   4. Le dashboard HSE (DSH-04) affiche les KPI incidents, taux frequence, conformite en tiles temps reel.
   5. Au moins 5 `alert_rule` rows existent en base apres migration (stockpile threshold, spare part low, HSE severity≥4, explosifs gap, fuel anomaly) et le moteur d'alertes les evalue sans config manuelle.
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 07-01-PLAN.md --- Backend: cost writers + @Cron aggregator + alert_rule seed
+- [ ] 07-02-PLAN.md --- Frontend: Finance/HSE tiles + Group consolidation page
 **UI hint**: yes
 
 ### Phase 8: Operational Alerts Closure
@@ -65,7 +68,7 @@ Donner a un groupe minier une visibilite temps reel consolidee sur la production
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 7. Finance Real | 0/? | Not started | - |
+| 7. Finance Real | 0/2 | Planned | - |
 | 8. Operational Alerts Closure | 0/? | Not started | - |
 | 9. Notification Delivery | 0/? | Not started | - |
 

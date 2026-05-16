@@ -78,21 +78,35 @@ export class CostPerTonAggregatorService {
     const hourlyRateMinor = 2500_00n; // 2500 XOF/h placeholder — replace via RH rate config
     const costMainOeuvreMinor = BigInt(Math.round(laborHours * 100)) * hourlyRateMinor / 100n;
 
-    // 4. Transport rotation cost (basic: 5000 XOF/rotation placeholder)
-    const [rotRow] = await this.ds.query<Array<{ c: string | null }>>(
-      `SELECT COUNT(*) AS c FROM truck_rotation
-       WHERE tenant_id = $1
-         AND operational_day_id IN (
-           SELECT id FROM operational_day WHERE date = $2 AND site_id = $3
-         )`,
-      [dto.tenantId, dto.snapshotDate, dto.siteId],
+    // FIN-R01: 4-7. Read cost components from analytical_entry ledger.
+    // Writers in AnalyticalEntryWriterHandler emit entries per domain event
+    // (extraction.cycle_recorded, transport.rotation_completed,
+    //  crusher.session_completed, screening.session_completed).
+    // The aggregator now sums the ledger instead of re-deriving formulas.
+    const componentRows = await this.ds.query<
+      Array<{ cost_center: string; cost: string | null }>
+    >(
+      `SELECT cost_center, COALESCE(SUM(amount_minor_units::bigint), 0)::bigint AS cost
+       FROM analytical_entry
+       WHERE tenant_id = $1 AND site_id = $2 AND entry_date = $3
+         AND cost_center IN ('EXT', 'TRA', 'CON', 'CRI')
+       GROUP BY cost_center`,
+      [dto.tenantId, dto.siteId, dto.snapshotDate],
     );
-    const costTransportMinor = BigInt(rotRow?.c ?? 0) * 5000_00n;
+    const componentByCenter = new Map<string, bigint>();
+    for (const row of componentRows) {
+      componentByCenter.set(row.cost_center, BigInt(row.cost ?? 0));
+    }
+    const costExtractionMinor = componentByCenter.get('EXT') ?? 0n;
+    const costTransportMinor = componentByCenter.get('TRA') ?? 0n;
+    const costConcassageMinor = componentByCenter.get('CON') ?? 0n;
+    const costCriblageMinor = componentByCenter.get('CRI') ?? 0n;
 
-    // Other components stubbed at 0 (refined in subsequent iterations)
-    const costExtractionMinor = 0n;
-    const costConcassageMinor = 0n;
-    const costCriblageMinor = 0n;
+    // FIN-R01: 8. Amortissement — production_equipment lacks purchase_cost_minor
+    // and useful_life_years columns (see DDL 1715000200000). Until a
+    // master-data extension lands (planned FIN-07), keep this at 0 rather
+    // than wiring a partial calculation that could mislead dashboards.
+    // TODO(FIN-07): linear depreciation pro-rata once purchase_cost_minor exists.
     const costAmortissementMinor = 0n;
 
     const totalCostMinor =

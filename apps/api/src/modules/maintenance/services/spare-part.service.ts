@@ -77,8 +77,13 @@ export class SparePartService {
       });
 
       // Edge-triggered alert — enriched payload per D-08, D-13, D-17.
+      // Severity is the canonical Phase-8 payload label ('warning'|'critical');
+      // the boundary mapping 'warning' -> Alert.severity 'high' is applied in
+      // AlertsEventHandlers, not here. Stockout comparator is `<= 0` (not
+      // `=== 0`) so any negative running balance from concurrent consumes is
+      // still escalated to 'critical'.
       if (!wasBelow && nowBelow) {
-        const severity: 'high' | 'critical' = newQuantity === 0 ? 'critical' : 'high';
+        const severity: 'warning' | 'critical' = newQuantity <= 0 ? 'critical' : 'warning';
         this.events.emit('maintenance.spare_part.threshold_crossed', {
           tenantId,
           siteId: part.siteId,

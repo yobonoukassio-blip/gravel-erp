@@ -15,14 +15,25 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with: { node-version: 24 }
+      - name: Verify DATABASE_URL secret is set
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::Repository secret DATABASE_URL is empty or missing."
+            echo "Set it under: GitHub repo → Settings → Secrets and variables → Actions → New repository secret."
+            echo "Format: postgresql://postgres.<ref>:<password>@<region>.pooler.supabase.com:6543/postgres?sslmode=require"
+            exit 1
+          fi
+          echo "DATABASE_URL secret is present (length=${#DATABASE_URL})."
       - run: pnpm install --no-frozen-lockfile
       - name: Run SQL migrations in order
+        # Run from apps/api/ so the resolver finds the workspace-installed `pg`.
+        working-directory: apps/api
         run: |
           node -e "
           const { Client } = require('pg');
           const fs   = require('fs');
           const path = require('path');
-          const dir  = 'apps/api/src/migrations';
+          const dir  = 'src/migrations';
           const files = fs.readdirSync(dir).filter(f => f.endsWith('.sql')).sort();
           (async () => {
             const client = new Client({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });

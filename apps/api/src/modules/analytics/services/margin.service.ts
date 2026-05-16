@@ -31,17 +31,33 @@ export class MarginService {
     const pivot = params.pivotCurrency ?? 'XOF';
 
     const [rev] = await this.ds.query<Array<{ revenue: string | null }>>(
-      `SELECT COALESCE(SUM((bl.tonnage_kg * sc.unit_price_minor_units) / 1000)::bigint, 0) AS revenue
+      `SELECT COALESCE(SUM(
+          ((bl.tonnage_kg * sc.unit_price_minor_units) / 1000) * 
+          COALESCE((SELECT rate FROM fx_rate_snapshot fx 
+                    WHERE fx.tenant_id = bl.tenant_id 
+                      AND fx.currency_from = sc.currency 
+                      AND fx.currency_to = $4 
+                      AND fx.snapshot_date <= bl.delivery_date 
+                    ORDER BY fx.snapshot_date DESC LIMIT 1), 1)
+        )::bigint, 0) AS revenue
        FROM bon_de_livraison bl
        JOIN sale_contract sc ON sc.id = bl.sale_contract_id
        WHERE bl.tenant_id = $1 AND bl.sale_contract_id = $2
          AND bl.status = 'signed'
          AND bl.delivery_date <= $3`,
-      [params.tenantId, params.contractId, params.asOfDate],
+      [params.tenantId, params.contractId, params.asOfDate, pivot],
     );
 
     const [cost] = await this.ds.query<Array<{ cost: string | null }>>(
-      `SELECT COALESCE(SUM((bl.tonnage_kg / 1000) * cpt.cost_per_ton_minor)::bigint, 0) AS cost
+      `SELECT COALESCE(SUM(
+          ((bl.tonnage_kg / 1000) * cpt.cost_per_ton_minor) *
+          COALESCE((SELECT rate FROM fx_rate_snapshot fx 
+                    WHERE fx.tenant_id = bl.tenant_id 
+                      AND fx.currency_from = cpt.currency 
+                      AND fx.currency_to = $3 
+                      AND fx.snapshot_date <= bl.delivery_date 
+                    ORDER BY fx.snapshot_date DESC LIMIT 1), 1)
+        )::bigint, 0) AS cost
        FROM bon_de_livraison bl
        JOIN cost_per_ton_snapshot cpt
          ON cpt.tenant_id = bl.tenant_id
@@ -50,7 +66,7 @@ export class MarginService {
         AND cpt.snapshot_date = bl.delivery_date
        WHERE bl.tenant_id = $1 AND bl.sale_contract_id = $2
          AND bl.status = 'signed'`,
-      [params.tenantId, params.contractId],
+      [params.tenantId, params.contractId, pivot],
     );
 
     const revenueMinor = BigInt(rev?.revenue ?? 0);
@@ -81,20 +97,36 @@ export class MarginService {
   }): Promise<MarginReport> {
     const pivot = params.pivotCurrency ?? 'XOF';
     const [rev] = await this.ds.query<Array<{ revenue: string | null }>>(
-      `SELECT COALESCE(SUM((bl.tonnage_kg * sc.unit_price_minor_units) / 1000)::bigint, 0) AS revenue
+      `SELECT COALESCE(SUM(
+          ((bl.tonnage_kg * sc.unit_price_minor_units) / 1000) * 
+          COALESCE((SELECT rate FROM fx_rate_snapshot fx 
+                    WHERE fx.tenant_id = bl.tenant_id 
+                      AND fx.currency_from = sc.currency 
+                      AND fx.currency_to = $5 
+                      AND fx.snapshot_date <= bl.delivery_date 
+                    ORDER BY fx.snapshot_date DESC LIMIT 1), 1)
+        )::bigint, 0) AS revenue
        FROM bon_de_livraison bl
        JOIN sale_contract sc ON sc.id = bl.sale_contract_id
        WHERE bl.tenant_id = $1 AND bl.site_id = $2
          AND bl.status = 'signed'
          AND bl.delivery_date BETWEEN $3 AND $4`,
-      [params.tenantId, params.siteId, params.periodFrom, params.periodTo],
+      [params.tenantId, params.siteId, params.periodFrom, params.periodTo, pivot],
     );
     const [cost] = await this.ds.query<Array<{ cost: string | null }>>(
-      `SELECT COALESCE(SUM(total_cost_minor), 0)::bigint AS cost
-       FROM cost_per_ton_snapshot
+      `SELECT COALESCE(SUM(
+          total_cost_minor *
+          COALESCE((SELECT rate FROM fx_rate_snapshot fx 
+                    WHERE fx.tenant_id = cpt.tenant_id 
+                      AND fx.currency_from = cpt.currency 
+                      AND fx.currency_to = $5 
+                      AND fx.snapshot_date <= cpt.snapshot_date 
+                    ORDER BY fx.snapshot_date DESC LIMIT 1), 1)
+        ), 0)::bigint AS cost
+       FROM cost_per_ton_snapshot cpt
        WHERE tenant_id = $1 AND site_id = $2
          AND snapshot_date BETWEEN $3 AND $4`,
-      [params.tenantId, params.siteId, params.periodFrom, params.periodTo],
+      [params.tenantId, params.siteId, params.periodFrom, params.periodTo, pivot],
     );
 
     const revenueMinor = BigInt(rev?.revenue ?? 0);
@@ -108,6 +140,74 @@ export class MarginService {
     return {
       scope: 'site',
       scopeId: params.siteId,
+      revenueMinor: revenueMinor.toString(),
+      costMinor: costMinor.toString(),
+      marginMinor: marginMinor.toString(),
+      marginPct: Number(marginPct.toFixed(2)),
+      currency: pivot,
+    };
+  }
+
+  async marginByCustomer(params: {
+    tenantId: string;
+    customerId: string;
+    periodFrom: string;
+    periodTo: string;
+    pivotCurrency?: string;
+  }): Promise<MarginReport> {
+    const pivot = params.pivotCurrency ?? 'XOF';
+    
+    const [rev] = await this.ds.query<Array<{ revenue: string | null }>>(
+      `SELECT COALESCE(SUM(
+          ((bl.tonnage_kg * sc.unit_price_minor_units) / 1000) * 
+          COALESCE((SELECT rate FROM fx_rate_snapshot fx 
+                    WHERE fx.tenant_id = bl.tenant_id 
+                      AND fx.currency_from = sc.currency 
+                      AND fx.currency_to = $5 
+                      AND fx.snapshot_date <= bl.delivery_date 
+                    ORDER BY fx.snapshot_date DESC LIMIT 1), 1)
+        )::bigint, 0) AS revenue
+       FROM bon_de_livraison bl
+       JOIN sale_contract sc ON sc.id = bl.sale_contract_id
+       WHERE bl.tenant_id = $1 AND sc.customer_id = $2
+         AND bl.status = 'signed'
+         AND bl.delivery_date BETWEEN $3 AND $4`,
+      [params.tenantId, params.customerId, params.periodFrom, params.periodTo, pivot],
+    );
+    const [cost] = await this.ds.query<Array<{ cost: string | null }>>(
+      `SELECT COALESCE(SUM(
+          ((bl.tonnage_kg / 1000) * cpt.cost_per_ton_minor) *
+          COALESCE((SELECT rate FROM fx_rate_snapshot fx 
+                    WHERE fx.tenant_id = bl.tenant_id 
+                      AND fx.currency_from = cpt.currency 
+                      AND fx.currency_to = $5 
+                      AND fx.snapshot_date <= bl.delivery_date 
+                    ORDER BY fx.snapshot_date DESC LIMIT 1), 1)
+        )::bigint, 0) AS cost
+       FROM bon_de_livraison bl
+       JOIN sale_contract sc ON sc.id = bl.sale_contract_id
+       JOIN cost_per_ton_snapshot cpt
+         ON cpt.tenant_id = bl.tenant_id
+        AND cpt.site_id = bl.site_id
+        AND cpt.calibre_code = bl.calibre_code
+        AND cpt.snapshot_date = bl.delivery_date
+       WHERE bl.tenant_id = $1 AND sc.customer_id = $2
+         AND bl.status = 'signed'
+         AND bl.delivery_date BETWEEN $3 AND $4`,
+      [params.tenantId, params.customerId, params.periodFrom, params.periodTo, pivot],
+    );
+
+    const revenueMinor = BigInt(rev?.revenue ?? 0);
+    const costMinor = BigInt(cost?.cost ?? 0);
+    const marginMinor = revenueMinor - costMinor;
+    const marginPct =
+      revenueMinor === 0n
+        ? 0
+        : Number((marginMinor * 10000n) / revenueMinor) / 100;
+
+    return {
+      scope: 'customer',
+      scopeId: params.customerId,
       revenueMinor: revenueMinor.toString(),
       costMinor: costMinor.toString(),
       marginMinor: marginMinor.toString(),

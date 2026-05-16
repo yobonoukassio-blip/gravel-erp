@@ -1,15 +1,20 @@
-import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { CostPerTonAggregatorService } from '../services/cost-per-ton-aggregator.service';
 import { BudgetComparisonService } from '../services/budget-comparison.service';
 import { MarginService } from '../services/margin.service';
 import { ConsolidationService } from '../services/consolidation.service';
 import { OhadaExportService, OhadaTarget } from '../services/ohada-export.service';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { TenantGuard } from '../../../common/guards/tenant.guard';
+import { Role, RoleGuard } from '../../identity/role.decorator';
 
 interface AuthedRequest {
   user: { userId: string; tenantId: string; role: string };
 }
 
 /** Analytics + Finance REST endpoints (Phase 4). */
+@UseGuards(JwtAuthGuard, TenantGuard, RoleGuard)
+@Role('DIRECTION_GROUPE', 'FINANCE', 'DIRECTEUR_SITE')
 @Controller('analytics')
 export class AnalyticsController {
   constructor(

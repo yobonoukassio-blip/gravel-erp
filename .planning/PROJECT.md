@@ -109,14 +109,28 @@ This document evolves at phase transitions and milestone boundaries.
 **Requirements:** 58/71 satisfied (13 deferred to v1.1 as known tech debt)
 **Deploy:** Vercel (Angular web) + Railway (NestJS API) + Supabase (PostgreSQL)
 
-## Next Milestone Goals (v1.1)
+## Current Milestone: v1.1 polish-and-gaps
 
-- Close remaining wiring stubs (MNT-02 scheduler, MNT-04 alert handler)
-- Finance UI controllers + dashboards (DSH-03..06 user-facing)
-- Arabic i18n for web + mobile
-- FND-07 money 3-representation ledger storage
-- Mobile maintenance + ventes real screens (replace placeholder shells)
-- Production deploy hardening (seed alert_rules, email/SMS provider)
+**Goal:** Passer de "v1.0 code-complete" à "v1.1 production-ready" pour le premier client réel — Finance utilisable de bout en bout, alertes opérationnelles qui se déclenchent vraiment, et notifications email/SMS livrées (plus de `logger.log()` stubs).
+
+**Started:** 2026-05-16
+**Status:** Defining requirements
+
+**Target features (80/20 — scope cut décidé) :**
+- **Finance Real** — Finance UI utilisable (DSH-03/04/05/06) + 4/7 cost components avec vrais writers DI + @Cron daily aggregation. Sans ça, le dashboard Finance affiche `0` (déal-breaker démo client).
+- **Operational Alerts Closure** — MNT-02 scheduler @Cron qui ouvre WorkOrder quand intervalle franchi, MNT-04 spare_part alert handler, alert_rule seed migration. Sans ça, les alertes ne se déclenchent jamais.
+- **Notification Delivery** — BullMQ + provider email (Brevo) + provider SMS (Twilio), remplace les stubs `logger.log()`. Sans ça, les alertes sont silencieuses (invisible pour les ops).
+
+**Explicitly deferred to v1.2/v2 :**
+- FND-07 money 3-representation ledger (architectural, 1-2j refactor profond — non bloquant client)
+- AR i18n web + mobile (FR/EN couvre les premiers clients CI/BF/ML)
+- Mobile maintenance/ventes real screens (placeholder shells acceptables court terme)
+- IoT MQTT pipeline IOT-01/02/03 (3 semaines infra — v2 Hardening)
+
+**Key context:**
+- v1.0 livré : 58/71 REQs satisfaits, 5 phases (1-5), 23 plans, 107k LOC
+- Phase 6 réservée v2 Hardening
+- v1.1 démarre à **phase 7** (continue numbering, preserve historique)
 
 ---
-*Last updated: 2026-05-16 after v1.0 milestone completion*
+*Last updated: 2026-05-16 — v1.1 milestone started*

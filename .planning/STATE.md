@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: polish-and-gaps
-status: not_started
-stopped_at: v1.0 milestone archived and tagged
-last_updated: "2026-05-16T14:00:00.000Z"
+status: defining_requirements
+stopped_at: v1.1 scope confirmed (80/20 cut) — REQUIREMENTS.md generation next
+last_updated: "2026-05-16T15:30:00.000Z"
 progress:
-  total_phases: 6
-  completed_phases: 5
-  total_plans: 23
-  completed_plans: 23
-  percent: 100
+  total_phases: 3
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # STATE: Gravel Ivoire — ERP Carriere de Granite
@@ -18,18 +18,22 @@ progress:
 ## Project Reference
 
 - **Core Value:** Donner a un groupe minier une visibilite temps reel consolidee sur la production, les couts a la tonne et la securite de chaque site/pays, avec saisie terrain mobile fiable meme en mode offline.
-- **Current Focus:** v1.0 shipped — preparing v1.1
+- **Current Focus:** v1.1 polish-and-gaps — defining requirements
 - **Domain:** Mining / Quarry ERP — multi-site, multi-country (West Africa / OHADA)
 - **Stack:** NestJS 11 / Node 24, PostgreSQL 18 + PostGIS + TimescaleDB, Flutter + PowerSync + Drift, Angular 20, Keycloak 26
 
 ## Current Position
 
-**Milestone v1.0 COMPLETE — tagged and archived.**
+**Milestone v1.1 STARTED — defining requirements.**
 
-- **v1.0 scope:** Foundation + Vertical Slice Production + Operational Completeness + Finance backend + IoT ingestion model
-- **Shipped:** 2026-05-16
-- **Stats:** 5 phases, 23 plans, 237 commits, 828 files, 107k LOC, 58/71 REQs satisfied
-- **Archive:** `.planning/milestones/v1.0-ROADMAP.md`, `v1.0-REQUIREMENTS.md`, `v1.0-MILESTONE-AUDIT.md`
+- **Goal:** Passer de v1.0 code-complete à v1.1 production-ready pour le premier client réel
+- **Scope (80/20 cut):** Finance Real + Operational Alerts Closure + Notification Delivery
+- **Phases planned:** 7, 8, 9 (continue numbering from v1.0 end at 5)
+- **Last activity:** 2026-05-16 — v1.1 scope confirmed, PROJECT.md updated
+
+### v1.0 (previous, complete)
+- **Shipped:** 2026-05-16, archived to `.planning/milestones/v1.0-*`
+- **Stats:** 5 phases, 23 plans, 237 commits, 107k LOC, 58/71 REQs satisfied
 
 ## Phase Map (v1.0)
 
@@ -50,7 +54,9 @@ Key items: FND-07 3-rep money, MNT-02/04 stubs, Phase 4 cost hardcoded, AR i18n,
 
 ## Next Steps
 
-Run `/gsd:new-milestone` to define v1.1 scope, requirements, and roadmap.
+1. Generate `.planning/REQUIREMENTS.md` (~12 REQ-IDs across 3 phases)
+2. Spawn `gsd-roadmapper` to derive phases 7-9 with success criteria
+3. Run `/gsd:plan-phase 7` to start execution
 
 ---
-*State updated: 2026-05-16 — v1.0 milestone archived*
+*State updated: 2026-05-16 — v1.1 milestone started, scope confirmed*

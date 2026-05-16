@@ -136,11 +136,16 @@ export class HseIncidentService {
           input.locationText,
           input.gpsPoint ?? null,
           JSON.stringify(input.peopleImpacted),
-          equipmentIds.length > 0 ? `{${equipmentIds.map((id) => `"${id}"`).join(',')}}` : '{}',
+          // FINDING-008 (audit 2026-05-16): array injection risk fixed.
+          // Previous code interpolated `equipmentIds` into the array literal
+          // string ('{"id1","id2"}') via map+join. A malicious id containing
+          // `","evil","` could break out and inject array elements. Now we
+          // pass the JS array straight through — the `pg` driver serialises
+          // it through the protocol as a `text[]` parameter, immune to
+          // literal-parsing tricks.
+          equipmentIds,
           input.chronologyMd,
-          attachments.length > 0
-            ? `{${attachments.map((h) => `"${h}"`).join(',')}}`
-            : '{}',
+          attachments,
           'open',
           prev,
           rowHash,

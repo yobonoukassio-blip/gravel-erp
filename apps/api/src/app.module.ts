@@ -59,7 +59,16 @@ import { IotModule } from './modules/iot/iot.module';
           cfg.get('TYPEORM_SYNCHRONIZE') === 'true' &&
           cfg.get('NODE_ENV') !== 'production',
         logging: cfg.get('TYPEORM_LOGGING') === 'true',
-        ssl: { rejectUnauthorized: false },
+        // FINDING-009 (audit 2026-05-16): TLS verification configurable.
+        // Default: verify on (rejectUnauthorized=true). To use a self-signed
+        // cert (rare — Supabase serves a CA-signed cert), explicitly set
+        // PG_SSL_REJECT_UNAUTHORIZED=false. Never trust env-var absence to
+        // silently disable verification — previous code hardcoded `false`
+        // which accepted any cert and exposed MITM risk on the DB link.
+        ssl: {
+          rejectUnauthorized:
+            cfg.get('PG_SSL_REJECT_UNAUTHORIZED') !== 'false',
+        },
         extra: { application_name: 'gravel-api', family: 4 },
         retryAttempts: 10,
         retryDelay: 3000,

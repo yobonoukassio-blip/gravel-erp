@@ -10,6 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      # Supabase pooler uses a chain anchored at an internal CA that Node
+      # doesn't ship. The migration script already sets ssl.rejectUnauthorized
+      # to false, but pg v8 honours NODE_TLS_REJECT_UNAUTHORIZED in addition.
+      # Matches the Railway runtime env. Acceptable for migrations that
+      # connect through the encrypted pooler hostname.
+      NODE_TLS_REJECT_UNAUTHORIZED: '0'
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

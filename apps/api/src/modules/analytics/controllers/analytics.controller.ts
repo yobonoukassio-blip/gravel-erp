@@ -6,7 +6,7 @@ import { ConsolidationService } from '../services/consolidation.service';
 import { OhadaExportService, OhadaTarget } from '../services/ohada-export.service';
 
 interface AuthedRequest {
-  user: { userId: string; tenantId: string; roles?: string[] };
+  user: { userId: string; tenantId: string; role: string };
 }
 
 /** Analytics + Finance REST endpoints (Phase 4). */

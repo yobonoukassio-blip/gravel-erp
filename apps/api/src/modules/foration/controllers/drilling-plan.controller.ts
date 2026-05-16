@@ -15,7 +15,7 @@ interface AuthedRequest {
   user: {
     userId: string;
     tenantId: string;
-    roles?: string[];
+    role: string;
   };
 }
 
@@ -111,7 +111,7 @@ export class DrillingPlanController {
     @Param('id') id: string,
     @Req() req: AuthedRequest,
   ): Promise<DrillingPlan> {
-    const isManager = (req.user.roles ?? []).includes('SITE_MANAGER');
+    const isManager = req.user.role === 'SITE_MANAGER';
     return this.service.closePlan(id, req.user.tenantId, req.user.userId, isManager);
   }
 

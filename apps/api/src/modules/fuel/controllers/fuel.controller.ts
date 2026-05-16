@@ -22,7 +22,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 interface AuthedRequest {
-  user: { userId: string; tenantId: string; siteId?: string; roles?: string[] };
+  user: { userId: string; tenantId: string; siteId?: string; role: string };
 }
 
 interface AppendFuelTankEventDto {
@@ -107,7 +107,7 @@ export class FuelController {
     @Body() dto: AppendFuelTankEventDto,
     @Req() req: AuthedRequest,
   ): Promise<FuelTankEvent> {
-    const role = pickPrimaryRole(req.user.roles);
+    const role = req.user.role;
     return this.fuelEventService.append({
       tenantId: req.user.tenantId,
       siteId: dto.site_id,
@@ -204,8 +204,3 @@ export class FuelController {
   }
 }
 
-function pickPrimaryRole(roles: string[] | undefined): string {
-  if (!roles || roles.length === 0) return 'UNKNOWN';
-  if (roles.includes('SITE_MANAGER')) return 'SITE_MANAGER';
-  return roles[0];
-}

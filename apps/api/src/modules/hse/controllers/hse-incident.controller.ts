@@ -17,7 +17,7 @@ import { HseIncidentService, CreateHseIncidentInput } from '../services/hse-inci
 import { HseAttachmentService } from '../services/hse-attachment.service';
 
 interface AuthedRequest {
-  user: { userId: string; tenantId: string; roles?: string[] };
+  user: { userId: string; tenantId: string; role: string };
 }
 
 interface CreateHseIncidentDto {

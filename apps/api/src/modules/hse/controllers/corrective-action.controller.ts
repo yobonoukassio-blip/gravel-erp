@@ -17,7 +17,7 @@ import {
 } from '../services/corrective-action.service';
 
 interface AuthedRequest {
-  user: { userId: string; tenantId: string; roles?: string[] };
+  user: { userId: string; tenantId: string; role: string };
 }
 
 interface CreateCapaDto {
@@ -60,7 +60,7 @@ export class CorrectiveActionController {
       ianaTimezone: dto.iana_timezone,
       priority: dto.priority,
       createdBy: req.user.userId,
-      actorRole: pickPrimaryRole(req.user.roles),
+      actorRole: req.user.role,
     };
     return this.service.create(input);
   }
@@ -94,16 +94,10 @@ export class CorrectiveActionController {
       capaId: id,
       newStatus: dto.status,
       userId: req.user.userId,
-      actorRole: pickPrimaryRole(req.user.roles),
+      actorRole: req.user.role,
       closedEvidenceAttachments: dto.closed_evidence_attachments,
     };
     return this.service.transition(input);
   }
 }
 
-function pickPrimaryRole(roles: string[] | undefined): string {
-  if (!roles || roles.length === 0) return 'UNKNOWN';
-  if (roles.includes('SITE_MANAGER')) return 'SITE_MANAGER';
-  if (roles.includes('HSE_OFFICER')) return 'HSE_OFFICER';
-  return roles[0];
-}

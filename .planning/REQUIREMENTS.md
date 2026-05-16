@@ -17,7 +17,7 @@
 
 ### Operational Alerts Closure (MNT-02, MNT-04)
 
-- [ ] **ALT-01**: Un @Cron (`PreventiveMaintenanceSchedulerJob`) ouvre un WorkOrder automatiquement quand l'intervalle PM d'un equipement est franchi (heures, km, ou calendaire)
+- [x] **ALT-01**: Un @Cron (`PreventiveMaintenanceSchedulerJob`) ouvre un WorkOrder automatiquement quand l'intervalle PM d'un equipement est franchi (heures, km, ou calendaire)
 - [ ] **ALT-02**: Un handler `maintenance.spare_part.threshold_crossed` ecoute les evenements de stock pieces et cree une alerte quand le seuil min est atteint
 
 ### Notification Delivery (email + SMS)
@@ -36,7 +36,7 @@
 | FIN-R04 | 07-finance-real | Pending |
 | FIN-R05 | 07-finance-real | Pending |
 | FIN-R06 | 07-finance-real | Done (Plan 01 — 3924856) |
-| ALT-01 | 08-operational-alerts-closure | Pending |
+| ALT-01 | 08-operational-alerts-closure | Complete |
 | ALT-02 | 08-operational-alerts-closure | Pending |
 | NTF-01 | 09-notification-delivery | Pending |
 | NTF-02 | 09-notification-delivery | Pending |

@@ -45,7 +45,7 @@ Plans:
   3. Les deux jobs s'executent sur le scheduler @Cron NestJS sans crash sur 24h continues (observable dans Grafana / logs).
 **Plans**: 3 plans
 Plans:
-- [ ] 08-W1-P01-PLAN.md --- Equipment meter denormalization + event-driven updaters (hour/km columns, backfill, MeterUpdateHandler)
+- [x] 08-W1-P01-PLAN.md --- Equipment meter denormalization + event-driven updaters (hour/km columns, backfill, MeterUpdateHandler)
 - [ ] 08-W1-P02-PLAN.md --- Spare-part threshold event flow (payload enrichment, recovery event, AlertsEventHandler subscribers)
 - [ ] 08-W2-P01-PLAN.md --- PreventiveMaintenanceSchedulerJob @Cron + findOpen idempotency + alert_rule seed
 

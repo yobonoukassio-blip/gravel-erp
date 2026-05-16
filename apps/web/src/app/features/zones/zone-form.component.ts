@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { TranslocoModule } from '@jsverse/transloco';
 import { MatButtonModule } from '@angular/material/button';
 import { FormlyModule, type FormlyFieldConfig } from '@ngx-formly/core';
 import { FormlyMaterialModule } from '@ngx-formly/material';
@@ -14,7 +13,7 @@ export const zoneFormSchema: FormlyFieldConfig[] = [
     key: 'code',
     type: 'input',
     props: {
-      label: 'zones.fields.code',
+      label: 'Code de la zone',
       required: true,
       pattern: '^[a-zA-Z0-9-_]{1,30}$',
       attributes: { 'data-testid': 'zone-code-input' },
@@ -24,7 +23,7 @@ export const zoneFormSchema: FormlyFieldConfig[] = [
     key: 'name',
     type: 'input',
     props: {
-      label: 'zones.fields.name',
+      label: 'Nom de la zone',
       required: true,
       attributes: { 'data-testid': 'zone-name-input' },
     },
@@ -32,7 +31,7 @@ export const zoneFormSchema: FormlyFieldConfig[] = [
   {
     key: 'geometry',
     type: 'polygon-picker-leaflet',
-    props: { label: 'zones.fields.boundary', required: true },
+    props: { label: 'Périmètre (polygone)', required: true },
   },
 ];
 
@@ -42,7 +41,6 @@ export const zoneFormSchema: FormlyFieldConfig[] = [
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    TranslocoModule,
     MatButtonModule,
     FormlyModule,
     FormlyMaterialModule,
@@ -50,7 +48,7 @@ export const zoneFormSchema: FormlyFieldConfig[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form [formGroup]="form" (ngSubmit)="onSubmit()" data-testid="zone-form" class="zone-form">
-      <h1>{{ 'zones.form.titleNew' | transloco }}</h1>
+      <h1>Nouvelle zone de production</h1>
 
       <formly-form [form]="form" [fields]="fields" [model]="model()"></formly-form>
 
@@ -61,7 +59,7 @@ export const zoneFormSchema: FormlyFieldConfig[] = [
         [disabled]="form.invalid || submitting()"
         data-testid="zone-submit"
       >
-        {{ 'zones.form.submit' | transloco }}
+        Enregistrer la zone
       </button>
     </form>
   `,

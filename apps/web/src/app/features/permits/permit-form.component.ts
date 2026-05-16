@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { TranslocoModule } from '@jsverse/transloco';
 import { MatButtonModule } from '@angular/material/button';
 import { FormlyModule, type FormlyFieldConfig } from '@ngx-formly/core';
 import { FormlyMaterialModule } from '@ngx-formly/material';
@@ -11,14 +10,21 @@ import { firstValueFrom } from 'rxjs';
 
 const PERMIT_TYPES = ['exploration', 'exploitation', 'environnemental', 'explosifs'];
 
+const PERMIT_TYPE_LABELS: Record<string, string> = {
+  exploration: 'Exploration',
+  exploitation: 'Exploitation',
+  environnemental: 'Environnemental',
+  explosifs: 'Explosifs',
+};
+
 export const permitFormSchema: FormlyFieldConfig[] = [
   {
     key: 'type',
     type: 'select',
     props: {
-      label: 'permits.fields.type',
+      label: 'Type de permis',
       required: true,
-      options: PERMIT_TYPES.map((t) => ({ label: t, value: t })),
+      options: PERMIT_TYPES.map((t) => ({ label: PERMIT_TYPE_LABELS[t] ?? t, value: t })),
       attributes: { 'data-testid': 'permit-type-select' },
     },
   },
@@ -26,7 +32,7 @@ export const permitFormSchema: FormlyFieldConfig[] = [
     key: 'authority',
     type: 'input',
     props: {
-      label: 'permits.fields.authority',
+      label: 'Autorité émettrice',
       required: true,
       attributes: { 'data-testid': 'permit-authority-input' },
     },
@@ -35,7 +41,7 @@ export const permitFormSchema: FormlyFieldConfig[] = [
     key: 'reference',
     type: 'input',
     props: {
-      label: 'permits.fields.reference',
+      label: 'Référence du permis',
       required: true,
       attributes: { 'data-testid': 'permit-reference-input' },
     },
@@ -44,7 +50,7 @@ export const permitFormSchema: FormlyFieldConfig[] = [
     key: 'validFrom',
     type: 'input',
     props: {
-      label: 'permits.fields.validFrom',
+      label: 'Valide à partir du',
       type: 'date',
       required: true,
       attributes: { 'data-testid': 'permit-valid-from-input' },
@@ -54,7 +60,7 @@ export const permitFormSchema: FormlyFieldConfig[] = [
     key: 'validTo',
     type: 'input',
     props: {
-      label: 'permits.fields.validTo',
+      label: 'Valide jusqu’au',
       type: 'date',
       required: true,
       attributes: { 'data-testid': 'permit-valid-to-input' },
@@ -75,7 +81,6 @@ export const permitFormSchema: FormlyFieldConfig[] = [
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    TranslocoModule,
     MatButtonModule,
     FormlyModule,
     FormlyMaterialModule,
@@ -88,12 +93,12 @@ export const permitFormSchema: FormlyFieldConfig[] = [
       data-testid="permit-form"
       class="permit-form"
     >
-      <h1>{{ 'permits.form.titleNew' | transloco }}</h1>
+      <h1>Nouveau permis</h1>
 
       <formly-form [form]="form" [fields]="fields" [model]="model()"></formly-form>
 
       <label class="file-row">
-        <span>{{ 'permits.form.document' | transloco }}</span>
+        <span>Document (PDF)</span>
         <input
           type="file"
           accept="application/pdf"
@@ -112,7 +117,7 @@ export const permitFormSchema: FormlyFieldConfig[] = [
         [disabled]="form.invalid || submitting()"
         data-testid="permit-submit"
       >
-        {{ 'permits.form.submit' | transloco }}
+        Enregistrer le permis
       </button>
     </form>
   `,

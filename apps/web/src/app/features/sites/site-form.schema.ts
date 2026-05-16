@@ -22,15 +22,15 @@ export const IANA_TIMEZONES = [
 export const FUNCTIONAL_CURRENCIES = ['XOF', 'XAF', 'EUR', 'USD'] as const;
 
 /**
- * Formly schema for the Site form (D-24). All labels reference i18n keys —
- * no inline strings, per Pitfall 9.
+ * Formly schema for the Site form (D-24). Labels in FR direct (transloco
+ * keys did not have entries in fr.json — see drop-i18n cleanup 3bbd889).
  */
 export const siteFormSchema: FormlyFieldConfig[] = [
   {
     key: 'code',
     type: 'input',
     props: {
-      label: 'sites.fields.code',
+      label: 'Code du site',
       required: true,
       pattern: '^[a-zA-Z0-9-_]{3,30}$',
       attributes: { 'data-testid': 'site-code-input' },
@@ -40,7 +40,7 @@ export const siteFormSchema: FormlyFieldConfig[] = [
     key: 'name',
     type: 'input',
     props: {
-      label: 'sites.fields.name',
+      label: 'Nom du site',
       required: true,
       attributes: { 'data-testid': 'site-name-input' },
     },
@@ -49,7 +49,7 @@ export const siteFormSchema: FormlyFieldConfig[] = [
     key: 'countryId',
     type: 'select',
     props: {
-      label: 'sites.fields.country',
+      label: 'Pays',
       required: true,
       options: [],
       attributes: { 'data-testid': 'site-country-select' },
@@ -59,7 +59,7 @@ export const siteFormSchema: FormlyFieldConfig[] = [
     key: 'ianaTimezone',
     type: 'select',
     props: {
-      label: 'sites.fields.timezone',
+      label: 'Fuseau horaire',
       required: true,
       options: IANA_TIMEZONES.map((tz) => ({ label: tz, value: tz })),
       attributes: { 'data-testid': 'site-timezone-select' },
@@ -69,7 +69,7 @@ export const siteFormSchema: FormlyFieldConfig[] = [
     key: 'functionalCurrency',
     type: 'select',
     props: {
-      label: 'sites.fields.currency',
+      label: 'Devise fonctionnelle',
       required: true,
       options: FUNCTIONAL_CURRENCIES.map((c) => ({ label: c, value: c })),
       attributes: { 'data-testid': 'site-currency-select' },
@@ -79,7 +79,7 @@ export const siteFormSchema: FormlyFieldConfig[] = [
     key: 'gpsPoint',
     type: 'gps-picker-leaflet',
     props: {
-      label: 'sites.fields.gps',
+      label: 'Position GPS',
       required: true,
     },
   },
@@ -87,7 +87,7 @@ export const siteFormSchema: FormlyFieldConfig[] = [
     key: 'managerUserId',
     type: 'select',
     props: {
-      label: 'sites.fields.manager',
+      label: 'Responsable du site',
       options: [],
       attributes: { 'data-testid': 'site-manager-select' },
     },
@@ -96,7 +96,7 @@ export const siteFormSchema: FormlyFieldConfig[] = [
     key: 'capacityTPerDay',
     type: 'input',
     props: {
-      label: 'sites.fields.capacity',
+      label: 'Capacité (tonnes / jour)',
       type: 'number',
       min: 0,
       attributes: { 'data-testid': 'site-capacity-input' },

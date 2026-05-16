@@ -56,11 +56,11 @@ export class DashboardGroupComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     try {
       const year = new Date().getFullYear();
-      const resp = await this.http.get<any>(
+      const resp = await this.http.get<{ bySite?: Record<string, unknown>[]; [k: string]: unknown }>(
         `/api/analytics/consolidation?pivot=XOF&from=${year}-01-01&to=${year}-12-31`,
       );
 
-      const sites: SitePnL[] = (resp.bySite ?? []).map((s: any) => {
+      const sites: SitePnL[] = (resp.bySite ?? []).map((s: Record<string, unknown>) => {
         const rev = Number(s.revenueMinor ?? '0');
         const cost = Number(s.costMinor ?? '0');
         return {

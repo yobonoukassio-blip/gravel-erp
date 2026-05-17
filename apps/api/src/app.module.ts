@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClsModule } from 'nestjs-cls';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ResolveCurrentSentinelsInterceptor } from './common/interceptors/resolve-current-sentinels.interceptor';
 import { HealthModule } from './modules/health/health.module';
 import { SyncModule } from './modules/sync/sync.module';
 import { IdentityModule } from './modules/identity/identity.module';
@@ -105,6 +107,9 @@ import { SloMetricsModule } from './observability/slo-metrics.module';
     IotModule,
     NotificationModule,
     SloMetricsModule,
+  ],
+  providers: [
+    { provide: APP_INTERCEPTOR, useClass: ResolveCurrentSentinelsInterceptor },
   ],
 })
 export class AppModule {}

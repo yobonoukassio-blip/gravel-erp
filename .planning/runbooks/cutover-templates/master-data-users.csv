@@ -1,0 +1,3 @@
+email,first_name,last_name,role_code,site_code,phone_e164,locale,active
+operateur1@customer.ci,Aya,Kouassi,OPERATEUR,CI-ABJ-01,+2250707070707,fr-CI,true
+# email: unique per tenant, becomes Keycloak username; first_name/last_name: free text UTF-8; role_code: one of DIRECTEUR_SITE | CHEF_CARRIERE | MAINTENANCE_MANAGER | GESTIONNAIRE_STOCK | OPERATEUR | COMPLIANCE_OFFICER; site_code: must reference an existing row in master-data-sites.csv (FK); phone_e164: E.164 international format with leading + and country code (+225 for CI, +226 BF, +223 ML, +221 SN); locale: BCP 47 — fr-CI/fr-BF/fr-ML/fr-SN/en/ar (per i18n FR/EN/AR scope); active: true|false — false rows are created but disabled in Keycloak

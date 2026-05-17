@@ -1,0 +1,3 @@
+code,name,country_iso2,timezone,lat,lng,operational_since,billing_currency,locale_primary
+CI-ABJ-01,Carrière Abidjan Nord,CI,Africa/Abidjan,5.4567,-4.0234,2024-01-15,XOF,fr-CI
+# code: unique short slug per site (UPPERCASE, no spaces, format COUNTRY-CITY-NN); name: free text, displayed in UI; country_iso2: ISO 3166-1 alpha-2 (CI=Côte d'Ivoire, BF=Burkina Faso, ML=Mali, SN=Senegal); timezone: IANA tz database name (Africa/Abidjan for CI/BF/ML, Africa/Dakar for SN); lat/lng: WGS84 decimal degrees (positive=N/E, negative=S/W); operational_since: ISO 8601 date (YYYY-MM-DD); billing_currency: ISO 4217 (XOF for UEMOA countries CI/BF/ML/SN, XAF for CEMAC); locale_primary: BCP 47 (fr-CI, fr-BF, fr-ML, fr-SN, en for expat-led sites)

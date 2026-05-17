@@ -1,0 +1,3 @@
+code,name,country_iso2,supplier_type,contact_email,phone_e164,payment_terms_days,currency,active
+SUP-FUEL-001,TotalEnergies CI,CI,FUEL,procurement@totalenergies.ci,+2252021000000,30,XOF,true
+# code: unique per tenant (UPPERCASE, format SUP-{TYPE}-NNN); name: legal company name; country_iso2: ISO 3166-1 alpha-2 (supplier's country, may differ from tenant country for imports); supplier_type: FUEL | EXPLOSIVES | SPARE_PARTS | CONSUMABLES | SERVICES | TRANSPORT | EQUIPMENT_RENTAL; contact_email: procurement / accounts-receivable contact at the supplier; phone_e164: E.164 with leading + and country code; payment_terms_days: integer (typical: 30, 45, 60, 90); currency: ISO 4217 (XOF for UEMOA, XAF for CEMAC, EUR / USD for international suppliers); active: true|false

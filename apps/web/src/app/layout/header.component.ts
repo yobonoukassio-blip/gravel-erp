@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { TranslocoModule } from '@jsverse/transloco';
 import { AuthService } from '../core/auth/auth.service';
 import { LocaleSwitcherComponent } from './locale-switcher.component';
+import { NotificationBadgeComponent } from './notification-badge.component';
 
 @Component({
   selector: 'gravel-header',
@@ -15,6 +16,7 @@ import { LocaleSwitcherComponent } from './locale-switcher.component';
     MatIconModule,
     TranslocoModule,
     LocaleSwitcherComponent,
+    NotificationBadgeComponent,
   ],
   template: `
     <header class="gv-header" role="banner">
@@ -38,6 +40,8 @@ import { LocaleSwitcherComponent } from './locale-switcher.component';
 
       <div class="actions">
         <gravel-locale-switcher />
+        <span class="actions-sep" aria-hidden="true"></span>
+        <gravel-notification-badge />
         <span class="actions-sep" aria-hidden="true"></span>
         <button
           mat-icon-button

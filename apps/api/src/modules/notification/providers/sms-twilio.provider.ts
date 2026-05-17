@@ -2,6 +2,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import twilio from 'twilio';
 import type { Twilio } from 'twilio';
 import { NotificationJobPayload, NotificationOutcome } from '../notification.types';
+import { SmsRateLimiter } from './sms-rate-limiter';
+
+export { SmsRateLimiter, type IRedisClient } from './sms-rate-limiter';
 
 /**
  * SmsTwilioProvider (NTF-03).
@@ -96,48 +99,8 @@ function renderSmsBody(job: NotificationJobPayload): string {
   return raw.length > cap ? `${raw.slice(0, cap - 1)}…` : raw;
 }
 
-/**
- * SmsRateLimiter — Redis sliding-window over a sorted set per (tenant, phone).
- *
- * Window: 1 hour. Limit: 3 SMS. Set name = `sms:rate:{tenant}:{phone}`.
- * Operations per call (atomic Redis pipeline):
- *   ZREMRANGEBYSCORE  -> drop entries older than now-1h
- *   ZCARD             -> count remaining
- *   if count < 3:    ZADD now + EXPIRE 3600
- *
- * The limiter accepts an `IRedisClient` interface (duck-typed against ioredis)
- * so tests can pass a Map-backed fake without spinning a Redis container.
- */
-@Injectable()
-export class SmsRateLimiter {
-  private static readonly WINDOW_MS = 60 * 60 * 1000;
-  private static readonly MAX_PER_WINDOW = 3;
-
-  constructor(private readonly redis: IRedisClient | null) {}
-
-  async tryAcquire(tenantId: string, phone: string): Promise<boolean> {
-    if (!this.redis) {
-      // No Redis configured -> open by default. Production should always have Redis.
-      return true;
-    }
-    const key = `sms:rate:${tenantId}:${phone}`;
-    const now = Date.now();
-    const windowStart = now - SmsRateLimiter.WINDOW_MS;
-    await this.redis.zremrangebyscore(key, 0, windowStart);
-    const count = await this.redis.zcard(key);
-    if (count >= SmsRateLimiter.MAX_PER_WINDOW) {
-      return false;
-    }
-    await this.redis.zadd(key, now, `${now}-${Math.random().toString(36).slice(2, 8)}`);
-    await this.redis.expire(key, Math.ceil(SmsRateLimiter.WINDOW_MS / 1000));
-    return true;
-  }
-}
-
-/** Minimal Redis interface — duck-typed against ioredis for test friendliness. */
-export interface IRedisClient {
-  zremrangebyscore(key: string, min: number, max: number): Promise<number>;
-  zcard(key: string): Promise<number>;
-  zadd(key: string, score: number, member: string): Promise<number>;
-  expire(key: string, seconds: number): Promise<number>;
-}
+// `SmsRateLimiter` + `IRedisClient` extracted to ./sms-rate-limiter.ts to
+// break a temporal-dead-zone at module load (the @Injectable metadata on
+// SmsTwilioProvider above references SmsRateLimiter — if both lived in this
+// file the decorator ran before the class was initialised under Node 24).
+// Re-exported above for back-compat with existing imports.

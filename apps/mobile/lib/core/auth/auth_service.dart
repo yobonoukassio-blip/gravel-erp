@@ -1,91 +1,126 @@
-import 'package:flutter_appauth/flutter_appauth.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'oidc_config.dart';
 
-/// OIDC native-flow authentication using `flutter_appauth`.
-/// Tokens are persisted in `flutter_secure_storage` (Keychain on iOS,
-/// EncryptedSharedPreferences/Keystore on Android per D-36).
+/// Local email/password authentication mirroring the web flow.
+///
+/// POSTs {email, password} to `\$apiBaseUrl/api/auth/login` and stores the
+/// HS256 JWT in `flutter_secure_storage` (Keychain on iOS, Keystore on Android).
+/// All subsequent API calls should send the token via `Authorization: Bearer`.
 class AuthService {
   AuthService({
-    FlutterAppAuth? appAuth,
+    Dio? dio,
     FlutterSecureStorage? storage,
-  })  : _appAuth = appAuth ?? const FlutterAppAuth(),
+  })  : _dio = dio ?? Dio(BaseOptions(baseUrl: OidcConfig.apiBaseUrl)),
         _storage = storage ?? const FlutterSecureStorage();
 
-  final FlutterAppAuth _appAuth;
+  final Dio _dio;
   final FlutterSecureStorage _storage;
 
   static const _kAccessToken = 'access_token';
-  static const _kRefreshToken = 'refresh_token';
-  static const _kAccessExpiry = 'access_token_expiry';
+  static const _kUserEmail = 'user_email';
+  static const _kUserRole = 'user_role';
+  static const _kTenantId = 'tenant_id';
+  static const _kSiteIds = 'site_ids';
 
-  /// Triggers the system browser Auth Code + PKCE flow.
-  /// Returns `true` on success, `false` if the user cancelled.
-  Future<bool> login() async {
-    final AuthorizationTokenResponse? response =
-        await _appAuth.authorizeAndExchangeCode(
-      AuthorizationTokenRequest(
-        OidcConfig.clientId,
-        OidcConfig.redirectUrl,
-        issuer: OidcConfig.issuer,
-        scopes: OidcConfig.scopes,
-        allowInsecureConnections: const bool.fromEnvironment('DEV', defaultValue: true),
-      ),
-    );
-    if (response == null) return false;
-    await _persist(response.accessToken, response.refreshToken,
-        response.accessTokenExpirationDateTime);
-    return true;
-  }
-
-  /// Returns a valid access token, refreshing silently when expired.
-  Future<String?> getAccessToken() async {
-    final expiryStr = await _storage.read(key: _kAccessExpiry);
-    if (expiryStr != null) {
-      final expiry = DateTime.tryParse(expiryStr);
-      if (expiry != null && expiry.isBefore(DateTime.now())) {
-        final ok = await _refresh();
-        if (!ok) return null;
-      }
-    }
-    return _storage.read(key: _kAccessToken);
-  }
-
-  Future<bool> _refresh() async {
-    final rt = await _storage.read(key: _kRefreshToken);
-    if (rt == null) return false;
+  /// Returns `true` on successful credential validation.
+  /// Throws [AuthException] on invalid credentials / network errors.
+  Future<bool> loginWithPassword(String email, String password) async {
     try {
-      final TokenResponse? response = await _appAuth.token(
-        TokenRequest(
-          OidcConfig.clientId,
-          OidcConfig.redirectUrl,
-          issuer: OidcConfig.issuer,
-          scopes: OidcConfig.scopes,
-          refreshToken: rt,
-          grantType: 'refresh_token',
+      final response = await _dio.post<Map<String, dynamic>>(
+        '/api/auth/login',
+        data: {'email': email.trim(), 'password': password},
+        options: Options(
+          headers: {'Content-Type': 'application/json'},
+          sendTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 15),
         ),
       );
-      if (response == null) return false;
-      await _persist(response.accessToken, response.refreshToken,
-          response.accessTokenExpirationDateTime);
+
+      final body = response.data;
+      if (body == null) {
+        throw const AuthException(
+          code: 'ERR_EMPTY_RESPONSE',
+          message: 'Réponse serveur vide.',
+        );
+      }
+
+      final token = body['accessToken'] as String?;
+      final user = body['user'] as Map<String, dynamic>?;
+      if (token == null || user == null) {
+        throw const AuthException(
+          code: 'ERR_BAD_RESPONSE',
+          message: 'Réponse serveur invalide.',
+        );
+      }
+
+      await _storage.write(key: _kAccessToken, value: token);
+      await _storage.write(
+        key: _kUserEmail,
+        value: user['email']?.toString() ?? '',
+      );
+      await _storage.write(
+        key: _kUserRole,
+        value: user['role']?.toString() ?? '',
+      );
+      await _storage.write(
+        key: _kTenantId,
+        value: user['tenantId']?.toString() ?? '',
+      );
+      final siteIds = user['siteIds'] as List<dynamic>?;
+      await _storage.write(
+        key: _kSiteIds,
+        value: siteIds?.map((e) => e.toString()).join(',') ?? '',
+      );
       return true;
-    } on Exception {
-      return false;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw const AuthException(
+          code: 'ERR_AUTH_INVALID_CREDENTIALS',
+          message: 'Identifiants invalides.',
+        );
+      }
+      throw AuthException(
+        code: 'ERR_NETWORK',
+        message: 'Serveur injoignable. Réessayez dans un instant.',
+      );
     }
+  }
+
+  Future<String?> getAccessToken() => _storage.read(key: _kAccessToken);
+
+  Future<String?> getUserEmail() => _storage.read(key: _kUserEmail);
+
+  Future<String?> getUserRole() => _storage.read(key: _kUserRole);
+
+  Future<String?> getTenantId() => _storage.read(key: _kTenantId);
+
+  Future<List<String>> getSiteIds() async {
+    final raw = await _storage.read(key: _kSiteIds);
+    if (raw == null || raw.isEmpty) return const [];
+    return raw.split(',');
+  }
+
+  Future<bool> isAuthenticated() async {
+    final token = await _storage.read(key: _kAccessToken);
+    return token != null && token.isNotEmpty;
   }
 
   Future<void> logout() async {
     await _storage.delete(key: _kAccessToken);
-    await _storage.delete(key: _kRefreshToken);
-    await _storage.delete(key: _kAccessExpiry);
+    await _storage.delete(key: _kUserEmail);
+    await _storage.delete(key: _kUserRole);
+    await _storage.delete(key: _kTenantId);
+    await _storage.delete(key: _kSiteIds);
   }
+}
 
-  Future<void> _persist(String? access, String? refresh, DateTime? expiry) async {
-    if (access != null) await _storage.write(key: _kAccessToken, value: access);
-    if (refresh != null) await _storage.write(key: _kRefreshToken, value: refresh);
-    if (expiry != null) {
-      await _storage.write(key: _kAccessExpiry, value: expiry.toIso8601String());
-    }
-  }
+class AuthException implements Exception {
+  const AuthException({required this.code, required this.message});
+  final String code;
+  final String message;
+
+  @override
+  String toString() => 'AuthException($code): $message';
 }

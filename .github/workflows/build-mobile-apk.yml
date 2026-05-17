@@ -94,7 +94,8 @@ jobs:
           flutter build apk --$MODE \
             --dart-define=GRAVEL_TENANT_ID=$GRAVEL_TENANT_ID \
             --dart-define=GRAVEL_SITE_ID=$GRAVEL_SITE_ID \
-            --dart-define=GRAVEL_USER_ID=$GRAVEL_USER_ID
+            --dart-define=GRAVEL_USER_ID=$GRAVEL_USER_ID \
+            --dart-define=GRAVEL_API_BASE_URL=https://gravel-erp-production.up.railway.app
 
       - name: Rename APK with metadata
         id: rename

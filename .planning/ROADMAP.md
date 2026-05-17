@@ -83,7 +83,7 @@ Plans:
 - [x] 06-W1-P02-PLAN.md — Production cutover runbook + 4 master-data CSV templates (HRD-MVP-08)
 - [ ] 06-W1-P03-PLAN.md — DR runbook (4 scenarios) + 2026 tabletop drill template (HRD-MVP-03)
 - [ ] 06-W1-P04-PLAN.md — SLO definitions + Prometheus alerts + Grafana dashboards + NestJS metrics module + metric wiring (HRD-MVP-06)
-- [ ] 06-W1-P05-PLAN.md — Per-tenant audit export endpoint + quarterly cron + compliance_email migration (HRD-MVP-05) [moved from W2-P02 — independent of W1-P01..P04]
+- [x] 06-W1-P05-PLAN.md — Per-tenant audit export endpoint + quarterly cron + compliance_email migration (HRD-MVP-05) [moved from W2-P02 — independent of W1-P01..P04]
 - [ ] 06-W2-P01-PLAN.md — Backup & PITR drill: runbook + scripts + monthly GH Actions cron (HRD-MVP-02)
 - [ ] 06-W2-P03-PLAN.md — Extended sync chaos spec (1000×100×30%) + deadletter SOP + replay endpoint (HRD-MVP-07)
 - [ ] 06-W3-P01-PLAN.md — Pen-test artifact set: procedure + ZAP scripts + run templates + non-blocking drill schedule (HRD-MVP-01) [autonomous — session tracked separately]

@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Phases
 status: Executing Phase 06
-last_updated: "2026-05-17T19:57:10.692Z"
+last_updated: "2026-05-17T20:06:04.582Z"
 last_activity: 2026-05-17
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 14
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # STATE: Gravel Ivoire — ERP Carriere de Granite
@@ -83,6 +83,8 @@ Tech debt deferred to v2: IOT MQTT pipeline (Phase 6).
 - [Phase 08-operational-alerts-closure]: 08-W2-P01: WorkOrderService.close() atomically advances linked PM plan state (D-04) so cron does not re-open same plan on next tick — runs in same EntityManager transaction
 - [Phase 08-operational-alerts-closure]: 08-W2-P01: alert_rule seed migration aligns Phase-7 spare-part NULL-severity rule's role_codes to D-15 verbatim (MAINTENANCE_MANAGER, GESTIONNAIRE_STOCK, DIRECTEUR_SITE) via idempotent UPDATE
 - [Phase 06]: D-23/D-24/D-25 honored: v1.1-cutover.md runbook + 4 master-data CSV templates (sites/users/equipment/suppliers); Keycloak Admin API bulk provisioning; FR primary + EN secondary training; no transactional history migration
+- [Phase 06]: HRD-MVP-05: use FINANCE+DIRECTION_GROUPE for /audit/export RBAC; COMPLIANCE_OFFICER role not in GravelRole union
+- [Phase 06]: HRD-MVP-05: S3 PUT + presign are env-wired stubs producing X-Amz-Expires=86400 URL; @aws-sdk/client-s3 dep deferred per MVP-hardening no-new-deps policy
 
 ### Todos
 

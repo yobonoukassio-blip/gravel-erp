@@ -32,6 +32,13 @@ export class Tenant {
   @Column({ type: 'timestamptz', name: 'archived_at', nullable: true })
   archivedAt?: Date | null;
 
+  /**
+   * Compliance contact for the quarterly audit-export cron (HRD-MVP-05, D-16).
+   * Nullable: cron filters tenants where this is set.
+   */
+  @Column({ type: 'varchar', length: 255, name: 'compliance_email', nullable: true })
+  complianceEmail?: string | null;
+
   @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
   createdAt!: Date;
 

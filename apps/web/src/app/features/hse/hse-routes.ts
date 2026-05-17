@@ -19,4 +19,11 @@ export const HSE_ROUTES: Routes = [
         (m) => m.CorrectiveActionListComponent,
       ),
   },
+  {
+    path: 'epi',
+    loadComponent: () =>
+      import('./pages/epi-catalog.component').then(
+        (m) => m.EpiCatalogComponent,
+      ),
+  },
 ];

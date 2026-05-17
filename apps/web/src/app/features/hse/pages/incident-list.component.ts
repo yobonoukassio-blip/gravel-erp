@@ -60,7 +60,8 @@ const CATEGORY_LABEL: Record<HseCategory, string> = {
     <div class="toolbar">
       <h2>Incidents HSE</h2>
       <span class="deferred-note">
-        EPI (HSE-03) · Habilitations (HSE-04) · Audits (HSE-05) : Phase 3
+        <a routerLink="/hse/epi">Catalogue EPI</a> ·
+        Habilitations (HSE-04) · Audits (HSE-05) : Phase 3
       </span>
     </div>
 

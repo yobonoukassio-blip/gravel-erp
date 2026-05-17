@@ -3,6 +3,7 @@
   "header.sites": "site(s)",
   "header.logout": "Sign out",
   "header.signed_out": "Signed out",
+  "header.menu": "Open menu",
   "nav.sites": "Sites",
   "nav.zones": "Production zones",
   "nav.permits": "Permits",
@@ -228,5 +229,10 @@
   "finance.ohada.download": "Download OHADA export",
   "finance.ohada.site": "Site",
   "finance.ohada.from": "From",
-  "finance.ohada.to": "To"
+  "finance.ohada.to": "To",
+
+  "finance.consolidation.title": "Group Consolidation",
+  "finance.consolidation.revenue": "Revenue (XOF)",
+  "finance.consolidation.cost": "Cost (XOF)",
+  "finance.consolidation.margin": "Margin"
 }

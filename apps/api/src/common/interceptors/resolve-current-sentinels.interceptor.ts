@@ -2,6 +2,7 @@ import {
   CallHandler,
   ExecutionContext,
   Injectable,
+  Logger,
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
@@ -29,32 +30,53 @@ import type { JwtClaims } from '@gravel/shared-types';
  */
 @Injectable()
 export class ResolveCurrentSentinelsInterceptor implements NestInterceptor {
+  private readonly logger = new Logger(ResolveCurrentSentinelsInterceptor.name);
+  private hitCount = 0;
+
   intercept(ctx: ExecutionContext, next: CallHandler): Observable<unknown> {
     const req = ctx.switchToHttp().getRequest<{
+      url?: string;
+      method?: string;
       user?: JwtClaims;
       query?: Record<string, unknown>;
       params?: Record<string, unknown>;
       body?: Record<string, unknown>;
     }>();
+
+    this.hitCount++;
+    if (this.hitCount <= 5 || this.hitCount % 50 === 0) {
+      this.logger.log(
+        `[SENTINEL #${this.hitCount}] ${req.method ?? '?'} ${req.url ?? '?'} ` +
+          `user=${req.user ? 'set' : 'absent'} ` +
+          `query=${JSON.stringify(req.query ?? {})}`,
+      );
+    }
+
     const user = req.user;
     if (!user) return next.handle();
 
     const activeSiteId = user.siteIds?.[0];
     const tenantId = user.tenantId;
 
-    const rewrite = (bag: Record<string, unknown> | undefined): void => {
+    const rewrite = (bag: Record<string, unknown> | undefined, source: string): void => {
       if (!bag) return;
       for (const key of ['site_id', 'siteId']) {
-        if (bag[key] === 'current' && activeSiteId) bag[key] = activeSiteId;
+        if (bag[key] === 'current' && activeSiteId) {
+          this.logger.log(`[SENTINEL] ${source}.${key}='current' -> '${activeSiteId}'`);
+          bag[key] = activeSiteId;
+        }
       }
       for (const key of ['tenant_id', 'tenantId']) {
-        if (bag[key] === 'current' && tenantId) bag[key] = tenantId;
+        if (bag[key] === 'current' && tenantId) {
+          this.logger.log(`[SENTINEL] ${source}.${key}='current' -> '${tenantId}'`);
+          bag[key] = tenantId;
+        }
       }
     };
 
-    rewrite(req.query);
-    rewrite(req.params);
-    rewrite(req.body);
+    rewrite(req.query, 'query');
+    rewrite(req.params, 'params');
+    rewrite(req.body, 'body');
 
     return next.handle();
   }

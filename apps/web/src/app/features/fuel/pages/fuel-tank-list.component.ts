@@ -148,8 +148,11 @@ export class FuelTankListComponent implements OnInit {
       width: 180,
       valueGetter: (p: ValueGetterParams<FuelTankRow>) => {
         const row = p.data;
-        if (!row || row.capacity_liters === 0) return null;
-        return Math.round((row.balance_liters / row.capacity_liters) * 100);
+        if (!row) return null;
+        const cap = Number(row.capacity_liters);
+        const bal = Number(row.balance_liters);
+        if (!cap || !Number.isFinite(bal)) return null;
+        return Math.round((bal / cap) * 100);
       },
       cellRenderer: (p: { value: number | null }) => {
         if (p.value == null) return '—';

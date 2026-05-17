@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -128,7 +130,7 @@ class _ChargeTile extends StatelessWidget {
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
                 color: tone,
-                fontVariantNumeric: FontVariantNumeric.tabularNums,
+                fontFeatures: const [FontFeature.tabularFigures()],
                 letterSpacing: 0.3,
               ),
             ),
@@ -154,7 +156,7 @@ class _ChargeTile extends StatelessWidget {
               '${(row.actualQtyG / 1000).toStringAsFixed(2)} kg',
               style: const TextStyle(
                 fontSize: 11,
-                fontVariantNumeric: FontVariantNumeric.tabularNums,
+                fontFeatures: const [FontFeature.tabularFigures()],
                 color: GravelTokens.text,
                 fontWeight: FontWeight.w600,
               ),

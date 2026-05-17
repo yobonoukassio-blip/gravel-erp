@@ -37,6 +37,30 @@ export class AnalyticalEntry {
   @Column({ type: 'varchar', length: 3 })
   currency!: string;
 
+  // ─── FND-07: three-representation money columns ─────────────────────────
+  // Backward-compatible. `amount_minor_units` + `currency` remain the legacy
+  // "single-rep" path that current consumers read; new writers populate all
+  // three columns so consolidation/reporting can pivot without re-aggregating
+  // historic data. See migration 1718200000000__fnd07_three_rep_money.sql.
+
+  @Column({ type: 'bigint', name: 'amount_original_minor', nullable: true })
+  amountOriginalMinor!: string | null;
+
+  @Column({ type: 'bigint', name: 'amount_site_functional_minor', nullable: true })
+  amountSiteFunctionalMinor!: string | null;
+
+  @Column({ type: 'bigint', name: 'amount_group_minor', nullable: true })
+  amountGroupMinor!: string | null;
+
+  @Column({ type: 'varchar', length: 3, name: 'site_currency', nullable: true })
+  siteCurrency!: string | null;
+
+  @Column({ type: 'varchar', length: 3, name: 'group_currency', nullable: true })
+  groupCurrency!: string | null;
+
+  @Column({ type: 'uuid', name: 'fx_rate_id', nullable: true })
+  fxRateId!: string | null;
+
   @Column({ type: 'varchar', length: 1, name: 'debit_credit' })
   debitCredit!: 'D' | 'C';
 

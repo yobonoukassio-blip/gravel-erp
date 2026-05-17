@@ -11,6 +11,7 @@ import { MarginService } from './services/margin.service';
 import { OhadaExportService } from './services/ohada-export.service';
 import { AlertDispatcherService } from './services/alert-dispatcher.service';
 import { ConsolidationService } from './services/consolidation.service';
+import { FxRateService } from './services/fx-rate.service';
 import { AnalyticsController } from './controllers/analytics.controller';
 import { AnalyticalEntryWriterHandler } from './event-handlers/analytical-entry-writer.handler';
 import { CostPerTonAggregatorJob } from './jobs/cost-per-ton-aggregator.job';
@@ -41,6 +42,7 @@ import { NotificationModule } from '../notification/notification.module';
     OhadaExportService,
     AlertDispatcherService,
     ConsolidationService,
+    FxRateService,
     AnalyticalEntryWriterHandler,
     CostPerTonAggregatorJob,
   ],
@@ -51,6 +53,7 @@ import { NotificationModule } from '../notification/notification.module';
     OhadaExportService,
     AlertDispatcherService,
     ConsolidationService,
+    FxRateService,
   ],
 })
 export class AnalyticsModule {}

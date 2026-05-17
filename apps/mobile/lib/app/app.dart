@@ -13,6 +13,7 @@ import '../features/fuel/screens/equipment_refuel_form.dart';
 import '../features/hse/screens/incident_list.dart';
 import '../features/maintenance/screens/maintenance_screen.dart';
 import '../features/rh/screens/shift_entry_list.dart';
+import '../features/tir/screens/blast_charge_list.dart';
 import '../features/transport/screens/rotation_list.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/stockpile/screens/stockpile_screen.dart';
@@ -193,14 +194,7 @@ class _ShellState extends State<_Shell> {
           operatorId: GravelApp.userId,
         );
       case ModuleId.tir:
-        return const ModulePlaceholder(
-          title: 'Tir de mine',
-          subtitle:
-              'Liste des plans de tir actifs à venir. Le formulaire de '
-              'chargement explosif est accessible depuis un plan validé HSE.',
-          iconData: Icons.bolt,
-          requirementCode: 'TIR-01..07',
-        );
+        return const BlastChargeListScreen();
       case ModuleId.hse:
         return _HseSwitchboard(
           tenantId: GravelApp.tenantId,

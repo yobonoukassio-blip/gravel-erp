@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // ---------------------------------------------------------------------------
 // BlastCharge local model (SQLite / Drift offline-first)
@@ -126,5 +127,20 @@ class BlastChargeRepository {
     return _store.where((c) => c.pendingSync).length;
   }
 
+  /// List the [limit] most recent charges across ALL plans, sorted by
+  /// occurred_at_utc DESC. Used by the mobile feed view when no plan
+  /// picker is available yet.
+  Future<List<BlastCharge>> listRecent({int limit = 50}) async {
+    final copy = List<BlastCharge>.from(_store);
+    copy.sort((a, b) => b.occurredAtUtc.compareTo(a.occurredAtUtc));
+    return copy.take(limit).toList(growable: false);
+  }
+
   // NOTE: No update() or delete() — blast_charge is append-only.
 }
+
+/// Riverpod provider. Overridden at app composition root with the
+/// PowerSync-backed repository.
+final blastChargeRepositoryProvider = Provider<BlastChargeRepository>(
+  (ref) => BlastChargeRepository(),
+);

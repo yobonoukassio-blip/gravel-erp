@@ -1,0 +1,52 @@
+name: Sync Chaos — Extended (HRD-MVP-07)
+
+# Weekly chaos run + on-demand dispatch. Enforces the D-20 load profile
+# (1000 rotations × 100 clients × 30% conflict injection) as a non-regression
+# guard. Failure surfaces the chaos report artifact for triage.
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Weekly Monday 06:00 UTC
+  workflow_dispatch: {}
+
+concurrency:
+  group: sync-chaos-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  chaos:
+    name: Extended sync chaos spec
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build shared-types
+        run: pnpm --filter @gravel/shared-types build
+
+      - name: Run extended chaos spec (D-20 load profile)
+        working-directory: apps/api
+        run: pnpm exec jest --selectProjects chaos --testPathPatterns sync-chaos-extended
+
+      - name: Upload chaos report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chaos-report-${{ github.run_id }}
+          path: |
+            apps/api/test/chaos/**/*.json
+            apps/api/test/chaos/**/*.log
+          if-no-files-found: ignore
+          retention-days: 30

@@ -1,0 +1,113 @@
+name: Monthly Backup & PITR Drill
+
+on:
+  schedule:
+    - cron: '0 2 1 * *'  # 1st of month, 02:00 UTC — D-05
+  workflow_dispatch:
+    inputs:
+      target_time:
+        description: 'PITR target time (ISO-8601 UTC, default = 1 hour ago)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write  # Required to commit the drill artifact back to the repo
+
+jobs:
+  drill:
+    name: Restore + schema-diff + commit artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 90  # RTO target = 60 min; budget 90 incl. setup/teardown
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.DRILL_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.DRILL_AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: eu-central-1
+      PGBACKREST_REPO_S3_BUCKET: gravel-prod-backups
+      PGBACKREST_STANZA: gravel-prod
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install pgBackRest + psql client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pgbackrest postgresql-client-18 awscli
+
+      - name: Fetch production schema reference dump from S3
+        run: |
+          aws s3 cp \
+            "s3://${PGBACKREST_REPO_S3_BUCKET}/schema/latest.sql" \
+            ./prod-schema.sql
+
+      - name: Run restore drill (PITR to T-1h or supplied target)
+        id: restore
+        run: |
+          ARGS="--scratch-port 5433"
+          if [ -n "${{ inputs.target_time }}" ]; then
+            ARGS="$ARGS --target-time ${{ inputs.target_time }}"
+          fi
+          bash scripts/dr/restore-pgbackrest.sh $ARGS
+          echo "--- drill-result.json ---"
+          cat /tmp/drill-result.json
+
+      - name: Run schema diff (zero-drift assertion)
+        id: schema_diff
+        run: |
+          bash scripts/dr/schema-diff.sh \
+            --scratch-port 5433 \
+            --reference-dump ./prod-schema.sql
+
+      - name: Tear down scratch DB
+        if: always()
+        run: |
+          docker rm -f pg-drill-scratch || true
+
+      - name: Generate drill artifact
+        if: always()
+        run: |
+          YYYYMM=$(date -u +%Y%m)
+          ARTIFACT=".planning/drills/backup-${YYYYMM}.md"
+          mkdir -p .planning/drills
+          {
+            echo "# Backup & PITR Drill — ${YYYYMM}"
+            echo ""
+            echo "## Trigger"
+            echo "- Workflow: \`.github/workflows/backup-drill.yml\`"
+            echo "- Run ID: ${{ github.run_id }}"
+            echo "- Triggered by: ${{ github.event_name }}"
+            echo "- Run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo ""
+            echo "## Result"
+            echo '```json'
+            cat /tmp/drill-result.json 2>/dev/null || echo "{\"error\":\"no result — restore phase failed\"}"
+            echo '```'
+            echo ""
+            echo "## Schema diff"
+            echo "- Status: ${{ steps.schema_diff.outcome }}"
+            echo ""
+            echo "## RTO/RPO targets"
+            echo "- Target RTO: 3600 s (1 h) — D-06"
+            echo "- Target RPO: 300 s (5 min) — D-06"
+            echo ""
+            echo "## References"
+            echo "- Runbook: \`.planning/runbooks/backup-restore-drill.md\`"
+            echo "- Decisions: D-05, D-06, D-07"
+          } > "$ARTIFACT"
+          echo "--- artifact $ARTIFACT ---"
+          cat "$ARTIFACT"
+
+      - name: Commit drill artifact
+        if: always()
+        run: |
+          git config user.name "gravel-drill-bot"
+          git config user.email "drill@gravel-ivoire.local"
+          git add .planning/drills/backup-*.md
+          if git diff --staged --quiet; then
+            echo "No artifact changes to commit"
+          else
+            git commit -m "chore(drill): backup-pitr $(date -u +%Y%m)"
+            git push
+          fi

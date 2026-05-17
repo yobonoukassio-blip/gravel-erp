@@ -10,7 +10,7 @@ import {
   withInterceptorsFromDi,
 } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { AuthModule, authInterceptor } from 'angular-auth-oidc-client';
+import { AuthModule } from 'angular-auth-oidc-client';
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyMaterialModule } from '@ngx-formly/material';
 import { GpsPickerLeafletType } from './shared/formly/gps-picker-leaflet.type';
@@ -21,6 +21,7 @@ import { oidcConfig } from './core/auth/oidc.config';
 import { provideAppTransloco } from './core/i18n/transloco.config';
 import { startWebOtel } from './core/otel/otel';
 import { silentErrorInterceptor } from './core/http/silent-error.interceptor';
+import { localAuthInterceptor } from './core/http/local-auth.interceptor';
 
 // Start OTel BEFORE the Angular bootstrap so the document-load instrumentation
 // captures the cold-start span. Idempotent on repeat calls (HMR / SSR replay).
@@ -38,7 +39,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withInterceptorsFromDi(), withInterceptors([authInterceptor(), silentErrorInterceptor])),
+    provideHttpClient(withInterceptorsFromDi(), withInterceptors([localAuthInterceptor, silentErrorInterceptor])),
     provideAnimationsAsync(),
     importProvidersFrom(AuthModule.forRoot({ config: oidcConfig })),
     importProvidersFrom(

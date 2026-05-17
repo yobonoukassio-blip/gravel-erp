@@ -19,5 +19,5 @@ export const environment = {
   keycloakUrl: 'https://keycloak.placeholder.invalid',
   keycloakRealm: 'gravel-demo',
   otelEndpoint: '',
-  mockAuth: true,
+  mockAuth: false,
 };

@@ -1,59 +1,130 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { OidcSecurityService } from 'angular-auth-oidc-client';
-import { Observable, map, of } from 'rxjs';
+import { BehaviorSubject, Observable, firstValueFrom, of } from 'rxjs';
 import type { JwtClaims } from '@gravel/shared-types';
 import { environment } from '../../../environments/environment';
 
+const STORAGE_KEY = 'gravel.auth.session';
+
+interface StoredSession {
+  accessToken: string;
+  user: {
+    id: string;
+    email: string;
+    displayName: string;
+    role: JwtClaims['role'];
+    tenantId: string;
+    siteIds: string[];
+    groupScope: 'group' | null;
+    preferredLocale: string;
+  };
+}
+
+interface LoginResponse extends StoredSession {}
+
 const DEV_CLAIMS: JwtClaims = {
   userId: '00000000-0000-0000-0000-000000000001',
-  tenantId: '24cd97f8-0170-453e-89da-e9213dd710d7',   // Gravel Ivoire tenant (Supabase)
-  siteIds: ['5213953c-3820-4da4-97ed-89bfbd605c07'],  // Carrière Mobaye
+  tenantId: '24cd97f8-0170-453e-89da-e9213dd710d7',
+  siteIds: ['5213953c-3820-4da4-97ed-89bfbd605c07'],
   role: 'DIRECTION_GROUPE',
   groupScope: null,
   preferredLocale: 'fr-CI',
 };
 
 /**
- * Thin wrapper over OidcSecurityService exposing typed JwtClaims and a
- * narrow API consumed by guards + components.
+ * Local email/password auth client.
  *
- * When environment.mockAuth=true (local dev without Keycloak), all observables
- * return the hardcoded DEV_CLAIMS and isAuthenticated emits true immediately.
+ * Flow: loginWithPassword(email, pwd) → POST /auth/login → store HS256 JWT +
+ * user claims in localStorage. HTTP interceptor reads accessToken on every
+ * outgoing request. logout() clears the session.
+ *
+ * `environment.mockAuth=true` retains the old auto-login DEV_CLAIMS path for
+ * local dev convenience; in any deployment with real users, set mockAuth=false.
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly oidc = inject(OidcSecurityService);
+  private readonly http = inject(HttpClient);
+  private readonly session$ = new BehaviorSubject<StoredSession | null>(this.readStored());
 
-  login(): void {
-    if (environment.mockAuth) return;
-    this.oidc.authorize();
+  async loginWithPassword(email: string, password: string): Promise<void> {
+    const resp = await firstValueFrom(
+      this.http.post<LoginResponse>('/api/auth/login', { email, password }),
+    );
+    this.persist(resp);
   }
 
   logout(): Observable<unknown> {
-    if (environment.mockAuth) return of(null);
-    return this.oidc.logoff();
+    this.persist(null);
+    return of(null);
   }
 
-  readonly isAuthenticated$: Observable<boolean> = environment.mockAuth
-    ? of(true)
-    : this.oidc.isAuthenticated$.pipe(map((r) => r.isAuthenticated));
+  /** Legacy OIDC entry — kept for callers that haven't migrated. No-op now. */
+  login(): void {
+    // Local auth uses loginWithPassword(). OIDC redirect path removed.
+  }
 
-  readonly userClaims$: Observable<JwtClaims | null> = environment.mockAuth
-    ? of(DEV_CLAIMS)
-    : this.oidc.userData$.pipe(
-        map((r) => {
-          const u = (r?.userData ?? null) as Record<string, unknown> | null;
-          if (!u) return null;
-          return {
-            userId: String(u['sub'] ?? ''),
-            tenantId: String(u['tenant_id'] ?? ''),
-            siteIds: Array.isArray(u['site_ids']) ? (u['site_ids'] as string[]) : [],
-            role: u['role'] as JwtClaims['role'],
-            groupScope: (u['group_scope'] as JwtClaims['groupScope']) ?? null,
-            preferredLocale: String(u['preferred_locale'] ?? 'fr-CI'),
-          } satisfies JwtClaims;
-        }),
-      );
+  get isAuthenticated$(): Observable<boolean> {
+    if (environment.mockAuth) return of(true);
+    return new Observable((sub) => {
+      const s = this.session$.subscribe((v) => sub.next(v !== null));
+      return () => s.unsubscribe();
+    });
+  }
 
-  readonly accessToken$ = environment.mockAuth ? of('dev-mock-token') : this.oidc.getAccessToken();
+  get userClaims$(): Observable<JwtClaims | null> {
+    if (environment.mockAuth) return of(DEV_CLAIMS);
+    return new Observable((sub) => {
+      const s = this.session$.subscribe((v) => sub.next(v ? this.toClaims(v) : null));
+      return () => s.unsubscribe();
+    });
+  }
+
+  get accessToken$(): Observable<string | null> {
+    if (environment.mockAuth) return of('dev-mock-token');
+    return new Observable((sub) => {
+      const s = this.session$.subscribe((v) => sub.next(v?.accessToken ?? null));
+      return () => s.unsubscribe();
+    });
+  }
+
+  /** Synchronous accessor for the HTTP interceptor. */
+  getAccessTokenSync(): string | null {
+    if (environment.mockAuth) return null;
+    return this.session$.value?.accessToken ?? null;
+  }
+
+  isAuthenticatedSync(): boolean {
+    if (environment.mockAuth) return true;
+    return this.session$.value !== null;
+  }
+
+  private toClaims(s: StoredSession): JwtClaims {
+    return {
+      userId: s.user.id,
+      tenantId: s.user.tenantId,
+      siteIds: s.user.siteIds,
+      role: s.user.role,
+      groupScope: s.user.groupScope,
+      preferredLocale: s.user.preferredLocale,
+    };
+  }
+
+  private readStored(): StoredSession | null {
+    if (typeof window === 'undefined') return null;
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw) as StoredSession;
+    } catch {
+      return null;
+    }
+  }
+
+  private persist(s: StoredSession | null): void {
+    if (typeof window !== 'undefined') {
+      if (s) window.localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+      else window.localStorage.removeItem(STORAGE_KEY);
+    }
+    this.session$.next(s);
+  }
 }

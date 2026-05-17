@@ -642,9 +642,10 @@ export class DashboardAggregatorService {
            CASE WHEN COUNT(*) = 0 THEN 100
                 ELSE ROUND((COUNT(*) FILTER (WHERE status = 'closed')::float / COUNT(*)) * 100)
            END::int AS pct
-         FROM corrective_action
-         WHERE tenant_id = $1 AND site_id = $2
-           AND created_at_utc >= now() - INTERVAL '6 months'`,
+         FROM corrective_action ca
+         JOIN hse_incident i ON i.id = ca.incident_id AND i.tenant_id = ca.tenant_id
+         WHERE ca.tenant_id = $1 AND i.site_id = $2
+           AND ca.created_at_utc >= now() - INTERVAL '6 months'`,
         [tenantId, siteId],
       ) as Promise<Array<{ pct: number }>>,
     ]);

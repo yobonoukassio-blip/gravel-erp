@@ -3,12 +3,9 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { AlertChannel, AlertRule, AlertSeverity } from '../entities/alert-rule.entity';
-import {
-  EmailProvider,
-  NotificationMessage,
-  Recipient,
-  SmsProvider,
-} from './notification-providers';
+import { Recipient } from './notification-providers';
+import { NotificationService } from '../../notification/notification.service';
+import { NotificationJobPayload } from '../../notification/notification.types';
 
 export interface AlertPayload {
   tenantId: string;
@@ -21,6 +18,22 @@ export interface AlertPayload {
   context?: Record<string, unknown>;
 }
 
+/** Map analytics AlertSeverity to NotificationJobPayload metadata.severity */
+function toNotifSeverity(
+  s: AlertSeverity,
+): 'info' | 'warning' | 'high' | 'critical' {
+  switch (s) {
+    case 'critical':
+      return 'critical';
+    case 'high':
+      return 'high';
+    case 'warning':
+      return 'warning';
+    default:
+      return 'info';
+  }
+}
+
 /**
  * AlertDispatcherService (DSH-06).
  *
@@ -28,15 +41,14 @@ export interface AlertPayload {
  * (email / sms / in_app) per `alert_rule` config. Recipients are resolved from
  * `rule.user_ids` + `rule.role_codes` against the `user` table.
  *
- * Channel providers are injected:
- *   - in_app : direct INSERT into the alert table
- *   - email  : EmailProvider (SendGrid REST when SENDGRID_API_KEY is set,
- *              otherwise structured `notification.email.queued` log line)
- *   - sms    : SmsProvider (Twilio REST when TWILIO_* env vars are set,
- *              otherwise structured `notification.sms.queued` log line)
+ * Channel providers are wired through the BullMQ `NotificationService`:
+ *   - in_app : enqueues in_app job -> InAppProvider persists notification row
+ *   - email  : enqueues email job  -> EmailBrevoProvider (or dry_run fallback)
+ *   - sms    : enqueues sms job    -> SmsTwilioProvider  (or dry_run fallback)
  *
- * The "log-fallback" path is intentional: it preserves audit + lets ops
- * wire a sidecar consumer without forcing a vendor choice into the API.
+ * Async dispatch via BullMQ: delivery is decoupled from the event handler so
+ * a Brevo/Twilio outage does not block the event loop. Retries and DLQ are
+ * handled by the NotificationProcessor.
  */
 @Injectable()
 export class AlertDispatcherService {
@@ -44,8 +56,7 @@ export class AlertDispatcherService {
 
   constructor(
     @InjectDataSource() private readonly ds: DataSource,
-    private readonly emailProvider: EmailProvider,
-    private readonly smsProvider: SmsProvider,
+    private readonly notifications: NotificationService,
   ) {}
 
   @OnEvent('production.stockpile.threshold_crossed')
@@ -185,49 +196,42 @@ export class AlertDispatcherService {
     rule: AlertRule,
     alert: AlertPayload,
   ): Promise<void> {
-    switch (channel) {
-      case 'in_app':
-        await this.ds.query(
-          `INSERT INTO alert (tenant_id, type, severity, title, body, context, status)
-           VALUES ($1, $2, $3, $4, $5, $6, 'open')
-           ON CONFLICT DO NOTHING`,
-          [
-            alert.tenantId,
-            alert.eventType,
-            alert.severity,
-            alert.title,
-            alert.body,
-            JSON.stringify(alert.context ?? {}),
-          ],
-        );
-        return;
+    const recipients = await this.resolveRecipients(rule);
+    if (recipients.length === 0) {
+      this.logger.warn(
+        `no recipients resolved for rule ${rule.id} (event=${alert.eventType} channel=${channel})`,
+      );
+      return;
+    }
 
-      case 'email':
-      case 'sms': {
-        const recipients = await this.resolveRecipients(rule);
-        if (recipients.length === 0) {
-          this.logger.warn(
-            `no recipients resolved for rule ${rule.id} (event=${alert.eventType} channel=${channel})`,
-          );
-          return;
-        }
-        const message: NotificationMessage = {
-          tenantId: alert.tenantId,
-          eventType: alert.eventType,
-          severity: alert.severity,
+    const notifSeverity = toNotifSeverity(alert.severity);
+
+    // Enqueue one BullMQ job per recipient — each job carries its own
+    // retry budget and is individually observable in Bull Board.
+    for (const recipient of recipients) {
+      const payload: NotificationJobPayload = {
+        tenantId: alert.tenantId,
+        channel: channel === 'in_app' ? 'in_app' : channel === 'email' ? 'email' : 'sms',
+        recipient: {
+          userId: recipient.userId,
+          email: recipient.email,
+          phone: recipient.phone,
+          displayName: recipient.displayName,
+          locale: recipient.locale,
+        },
+        templateKey: alert.eventType,
+        payload: {
           title: alert.title,
           body: alert.body,
-          recipients,
-        };
-        const provider = channel === 'email' ? this.emailProvider : this.smsProvider;
-        const result = await provider.send(message);
-        if (result.failed > 0) {
-          this.logger.error(
-            `${channel} delivery: ${result.delivered}/${result.delivered + result.failed} succeeded — errors: ${result.errors.join('; ')}`,
-          );
-        }
-        return;
-      }
+          ...(alert.context ?? {}),
+        },
+        metadata: {
+          eventType: alert.eventType,
+          ruleId: rule.id,
+          severity: notifSeverity,
+        },
+      };
+      await this.notifications.dispatch(payload);
     }
   }
 

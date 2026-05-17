@@ -14,7 +14,7 @@ import { ConsolidationService } from './services/consolidation.service';
 import { AnalyticsController } from './controllers/analytics.controller';
 import { AnalyticalEntryWriterHandler } from './event-handlers/analytical-entry-writer.handler';
 import { CostPerTonAggregatorJob } from './jobs/cost-per-ton-aggregator.job';
-import { EmailProvider, SmsProvider } from './services/notification-providers';
+import { NotificationModule } from '../notification/notification.module';
 
 /**
  * AnalyticsModule (Phase 4).
@@ -31,6 +31,7 @@ import { EmailProvider, SmsProvider } from './services/notification-providers';
   imports: [
     TypeOrmModule.forFeature([CostPerTonSnapshot, Budget, AnalyticalEntry, AlertRule]),
     EventEmitterModule,
+    NotificationModule,
   ],
   controllers: [AnalyticsController],
   providers: [
@@ -42,8 +43,6 @@ import { EmailProvider, SmsProvider } from './services/notification-providers';
     ConsolidationService,
     AnalyticalEntryWriterHandler,
     CostPerTonAggregatorJob,
-    EmailProvider,
-    SmsProvider,
   ],
   exports: [
     CostPerTonAggregatorService,

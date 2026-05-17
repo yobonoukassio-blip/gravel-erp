@@ -22,9 +22,9 @@
 
 ### Notification Delivery (email + SMS)
 
-- [ ] **NTF-01**: Un provider email (Brevo/SendGrid) est integre via BullMQ queue — les alertes `alert_rule` declenchent un email au(x) destinataire(s) configure(s)
-- [ ] **NTF-02**: Un provider SMS (Twilio/Vonage) est integre via BullMQ queue — les alertes severity >= `high` declenchent un SMS au responsable site
-- [ ] **NTF-03**: Les stubs `logger.log()` dans `AlertDispatcherService` sont remplaces par des appels reels au job queue (email + SMS)
+- [x] **NTF-01**: Un provider email (Brevo/SendGrid) est integre via BullMQ queue — les alertes `alert_rule` declenchent un email au(x) destinataire(s) configure(s)
+- [x] **NTF-02**: Un provider SMS (Twilio/Vonage) est integre via BullMQ queue — les alertes severity >= `high` declenchent un SMS au responsable site
+- [x] **NTF-03**: Les stubs `logger.log()` dans `AlertDispatcherService` sont remplaces par des appels reels au job queue (email + SMS)
 
 ## Traceability
 
@@ -38,9 +38,9 @@
 | FIN-R06 | 07-finance-real | Done (Plan 01 — 3924856) |
 | ALT-01 | 08-operational-alerts-closure | Complete |
 | ALT-02 | 08-operational-alerts-closure | Complete |
-| NTF-01 | 09-notification-delivery | Pending |
-| NTF-02 | 09-notification-delivery | Pending |
-| NTF-03 | 09-notification-delivery | Pending |
+| NTF-01 | 09-notification-delivery | Complete |
+| NTF-02 | 09-notification-delivery | Complete |
+| NTF-03 | 09-notification-delivery | Complete |
 
 ## Out of Scope (v1.2 / v2)
 

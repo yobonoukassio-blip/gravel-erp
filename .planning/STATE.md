@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Phases
-status: Executing Phase 08
-last_updated: "2026-05-16T17:57:13.980Z"
-last_activity: 2026-05-16
+status: Phase complete — ready for verification
+last_updated: "2026-05-17T12:46:26.016Z"
+last_activity: 2026-05-17
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 6
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # STATE: Gravel Ivoire — ERP Carriere de Granite
@@ -17,21 +17,21 @@ progress:
 ## Project Reference
 
 - **Core Value:** Donner a un groupe minier une visibilite temps reel consolidee sur la production, les couts a la tonne et la securite de chaque site/pays, avec saisie terrain mobile fiable meme en mode offline.
-- **Current Focus:** Phase 08 — operational-alerts-closure
+- **Current Focus:** Phase 09 — notification-delivery
 - **Domain:** Mining / Quarry ERP — multi-site, multi-country (West Africa / OHADA)
 - **Stack:** NestJS 11 / Node 24, PostgreSQL 18 + PostGIS + TimescaleDB, Flutter + PowerSync + Drift, Angular 20, Keycloak 26
 
 ## Current Position
 
-Phase: 08 (operational-alerts-closure) — EXECUTING
-Plan: 1 of 3
+Phase: 09 (notification-delivery) — EXECUTING
+Plan: 1 of 1
 **Milestone v1.1 EXECUTING — Phase 7 Plan 01 complete (FIN-R01/R02/R06).**
 
 - **Goal:** Passer de v1.0 code-complete a v1.1 production-ready pour le premier client reel
 - **Scope (80/20 cut):** Finance Real + Operational Alerts Closure + Notification Delivery
 - **Phases:** 7 (Finance Real), 8 (Operational Alerts Closure), 9 (Notification Delivery)
 - **REQ coverage:** 11/11 mapped (6 FIN-R + 2 ALT + 3 NTF)
-- **Last activity:** 2026-05-16
+- **Last activity:** 2026-05-17
 
 ### v1.0 (previous, complete)
 
@@ -77,6 +77,8 @@ Tech debt deferred to v2: IOT MQTT pipeline (Phase 6).
 - [Phase 08]: 08-W1-P01: IF-HIGHER guard implemented in SQL WHERE clause (atomic, race-free) — not in application logic. All UPDATEs scope by tenant_id (RLS-safe).
 - [Phase 08]: Phase-8 canonical severity boundary mapping: emitters use 'warning'|'critical' payload labels; AlertsEventHandlers maps 'warning' -> Alert.severity 'high' at the handler boundary (keeps emitters decoupled from Alert enum).
 - [Phase 08]: Spare-part stockout comparator is 'newQuantity <= 0' (not '=== 0') — forward-compatible against negative-balance edge cases.
+- [Phase 09]: BullMQ NotificationService replaces EmailProvider/SmsProvider stubs in AlertDispatcherService — async delivery via queue decouples Brevo/Twilio outages from event loop
+- [Phase 09]: NTF_DRY_RUN=true default in dev — queue always drains for audit symmetry, SDK calls skipped until BREVO_API_KEY/TWILIO_* are set
 
 ### Todos
 

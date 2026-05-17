@@ -41,8 +41,27 @@ jobs:
           const { Client } = require('pg');
           const fs   = require('fs');
           const path = require('path');
-          const dir  = 'src/migrations';
-          const files = fs.readdirSync(dir).filter(f => f.endsWith('.sql')).sort();
+          // Collect SQL files from both:
+          //   - src/migrations/                       (legacy, single-folder)
+          //   - src/modules/<feature>/migrations/     (modular per-module)
+          // Sort globally by basename so timestamp prefix ordering still applies
+          // across modules.
+          function collect(root) {
+            const out = [];
+            for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+              const p = path.join(root, entry.name);
+              if (entry.isDirectory()) out.push(...collect(p));
+              else if (entry.isFile() && entry.name.endsWith('.sql')) out.push(p);
+            }
+            return out;
+          }
+          const all = [
+            ...(fs.existsSync('src/migrations') ? collect('src/migrations') : []),
+            ...(fs.existsSync('src/modules') ? collect('src/modules').filter(p => p.includes('/migrations/') || p.includes('\\\\migrations\\\\')) : []),
+          ];
+          // Sort by basename so 1715..._foo.sql ordering is preserved across folders.
+          all.sort((a, b) => path.basename(a).localeCompare(path.basename(b)));
+          const files = all.map(p => ({ name: path.basename(p), fullPath: p }));
           (async () => {
             const client = new Client({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
             await client.connect();
@@ -57,13 +76,13 @@ jobs:
 
             let applied_now = 0, skipped = 0;
             for (const f of files) {
-              if (applied.has(f)) { skipped++; continue; }
-              console.log('Applying', f);
-              const sql = fs.readFileSync(path.join(dir, f), 'utf8');
+              if (applied.has(f.name)) { skipped++; continue; }
+              console.log('Applying', f.name, '(from', f.fullPath + ')');
+              const sql = fs.readFileSync(f.fullPath, 'utf8');
               try {
                 await client.query('BEGIN');
                 await client.query(sql);
-                await client.query('INSERT INTO _ci_applied_migrations (file_name) VALUES (\$1) ON CONFLICT DO NOTHING', [f]);
+                await client.query('INSERT INTO _ci_applied_migrations (file_name) VALUES (\$1) ON CONFLICT DO NOTHING', [f.name]);
                 await client.query('COMMIT');
                 applied_now++;
               } catch (err) {
@@ -75,10 +94,10 @@ jobs:
                 const reapplyable = /already exists|duplicate_object|duplicate key|extension .* is already/i.test(msg);
                 if (reapplyable) {
                   console.log('  -> already present, marking as applied without re-running');
-                  await client.query('INSERT INTO _ci_applied_migrations (file_name) VALUES (\$1) ON CONFLICT DO NOTHING', [f]);
+                  await client.query('INSERT INTO _ci_applied_migrations (file_name) VALUES (\$1) ON CONFLICT DO NOTHING', [f.name]);
                   applied_now++;
                 } else {
-                  console.error('FATAL migration', f, ':', msg);
+                  console.error('FATAL migration', f.name, ':', msg);
                   throw err;
                 }
               }

@@ -10,6 +10,7 @@ import { TenantContextMiddleware } from '../../common/middleware/tenant-context.
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { RoleGuard } from './role.decorator';
+import { AuthController } from './auth.controller';
 
 /**
  * Identity module:
@@ -24,7 +25,7 @@ import { RoleGuard } from './role.decorator';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     TypeOrmModule.forFeature([User]),
   ],
-  controllers: [UsersController],
+  controllers: [UsersController, AuthController],
   providers: [
     JwtStrategy,
     UsersService,

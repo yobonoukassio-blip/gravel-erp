@@ -1,7 +1,8 @@
 import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import type { JwtClaims } from '@gravel/shared-types';
+import * as jwt from 'jsonwebtoken';
+import type { JwtClaims, GravelRole } from '@gravel/shared-types';
 
 export const IS_PUBLIC_KEY = 'isPublic';
 export const Public =
@@ -45,6 +46,17 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     ]);
     if (isPublic) return true;
 
+    // Local HS256 token issued by AuthController.login — verified against
+    // AUTH_JWT_SECRET, in addition to the Keycloak RS256 path below. The
+    // existing Keycloak JwtStrategy will reject HS256 tokens, so we try local
+    // first and fall through on failure.
+    const localClaims = this.tryLocalToken(ctx);
+    if (localClaims) {
+      const req = ctx.switchToHttp().getRequest<{ user: JwtClaims }>();
+      req.user = localClaims;
+      return true;
+    }
+
     // SECURITY P0-4 (audit 2026-05-16): DEV_BYPASS_JWT MUST be ignored in production.
     // Even with the env var set, NODE_ENV=production aborts the bypass — defense
     // against env-var leakage from a misconfigured Railway deploy.
@@ -58,6 +70,36 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     }
 
     return super.canActivate(ctx);
+  }
+
+  private tryLocalToken(ctx: ExecutionContext): JwtClaims | null {
+    const secret = process.env['AUTH_JWT_SECRET'];
+    if (!secret) return null;
+
+    const req = ctx.switchToHttp().getRequest<{ headers: Record<string, string | string[] | undefined> }>();
+    const auth = req.headers['authorization'];
+    const header = Array.isArray(auth) ? auth[0] : auth;
+    if (!header || !header.toLowerCase().startsWith('bearer ')) return null;
+    const token = header.slice(7).trim();
+    if (!token) return null;
+
+    try {
+      const payload = jwt.verify(token, secret, {
+        algorithms: ['HS256'],
+        issuer: 'gravel-local-auth',
+      }) as jwt.JwtPayload;
+      if (!payload['tenant_id'] || !payload['role']) return null;
+      return {
+        userId: String(payload.sub ?? ''),
+        tenantId: String(payload['tenant_id']),
+        siteIds: Array.isArray(payload['site_ids']) ? (payload['site_ids'] as string[]) : [],
+        role: payload['role'] as GravelRole,
+        groupScope: (payload['group_scope'] as 'group' | null) ?? null,
+        preferredLocale: String(payload['preferred_locale'] ?? 'fr-CI'),
+      };
+    } catch {
+      return null;
+    }
   }
 
   handleRequest<TUser>(err: unknown, user: TUser): TUser {

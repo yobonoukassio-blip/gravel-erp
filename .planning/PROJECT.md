@@ -37,7 +37,7 @@ Donner à un groupe minier (Gravel Ivoire) une visibilité temps réel consolid�
 - [ ] Dashboards temps réel + KPIs Production / Finance / HSE
 - [ ] Reporting consolidé groupe
 - [ ] Application mobile iOS pour saisie terrain (Android livré Phase 1)
-- [ ] Alertes et notifications opérationnelles
+- ✓ Alertes et notifications opérationnelles — Phase 9 (NTF-01, NTF-02, NTF-03 ; BullMQ queue + Brevo email + Twilio SMS + Angular badge)
 - [ ] Intégration GPS/télématique flotte et capteurs carburant (IoT)
 
 ### Out of Scope
@@ -83,6 +83,10 @@ Donner à un groupe minier (Gravel Ivoire) une visibilité temps réel consolid�
 | Transformation aval reportée hors MVP | Optionnelle dans le draft, complexité usine ≠ carrière, à isoler pour V2 | — Pending |
 | Paie complète hors MVP | SIRH dédiés existent ; ERP fournira export vers paie tierce | — Pending |
 | OTel + Grafana LGTM self-host (pas Datadog) | Coût IoT-heavy ingestion ; OSS souverain ; OTLP/HTTP unifié api/web/mobile | ✓ Phase 1 |
+
+## Current State
+
+Phase 9 complete (2026-05-17) — notification delivery fully wired. All logger.log() stubs replaced with real BullMQ async dispatch (Brevo email, Twilio SMS, in-app DB rows). Angular badge polls unread count. Phase 9 was the last planned phase in v1.1 milestone.
 
 ## Evolution
 

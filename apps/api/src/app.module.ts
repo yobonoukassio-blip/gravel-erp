@@ -25,6 +25,7 @@ import { MaintenanceModule } from './modules/maintenance/maintenance.module';
 import { VentesModule } from './modules/ventes/ventes.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { IotModule } from './modules/iot/iot.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 /**
  * Root application module.
@@ -101,6 +102,7 @@ import { IotModule } from './modules/iot/iot.module';
     VentesModule,
     AnalyticsModule,
     IotModule,
+    NotificationModule,
   ],
 })
 export class AppModule {}

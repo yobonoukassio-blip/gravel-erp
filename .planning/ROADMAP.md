@@ -13,9 +13,9 @@ Donner a un groupe minier une visibilite temps reel consolidee sur la production
 
 ## v1.1 Phases
 
-- [~] **Phase 7: Finance Real** — Plan 01 complete (cost writers + @Cron + alert seed). Plan 02 (UI tiles) pending.
-- [ ] **Phase 8: Operational Alerts Closure** — Preventive maintenance scheduler + spare-part threshold handler firing real alerts
-- [ ] **Phase 9: Notification Delivery** — BullMQ workers + Brevo email + Twilio SMS + in-app notifications replacing logger.log stubs
+- [x] **Phase 7: Finance Real** — Cost writers + @Cron aggregator + alert_rule seed + Finance/HSE UI tiles (complete 2026-05-16)
+- [x] **Phase 8: Operational Alerts Closure** — Preventive-maintenance scheduler + spare-part threshold handler firing real alerts (complete 2026-05-17)
+- [x] **Phase 9: Notification Delivery** — BullMQ + Brevo email + Twilio SMS + in-app notification badge replacing logger.log stubs (complete 2026-05-17)
 
 ## Phase Details
 
@@ -58,7 +58,9 @@ Plans:
   2. Une alerte de severity ≥ `high` declenche un SMS reel via Twilio au responsable site — verifiable dans Twilio logs ou sur le telephone de test.
   3. `AlertDispatcherService` n'appelle plus aucun `logger.log()` stub pour la livraison : tous les envois passent par BullMQ avec retry exponentiel (3 tentatives min) et dead-letter queue.
   4. Un utilisateur connecte voit un badge de notifications non-lues dans le header Angular qui decrement quand il clique l'alerte.
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [x] 09-W1-P01-PLAN.md --- NotificationModule + BullMQ + Brevo + Twilio + AlertDispatcher refactor + in-app badge (2026-05-17)
 **UI hint**: yes
 
 ## Deferred (v2)
@@ -73,8 +75,10 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 7. Finance Real | 2/2 | Complete   | 2026-05-16 |
-| 8. Operational Alerts Closure | 0/? | Not started | - |
-| 9. Notification Delivery | 0/? | Not started | - |
+| 8. Operational Alerts Closure | 3/3 | Complete | 2026-05-17 |
+| 9. Notification Delivery | 1/1 | Complete | 2026-05-17 |
+
+**v1.1 status:** all 3 phases complete. Ready for milestone close + v1.2 planning.
 
 ## Known Tech Debt (from v1.0 audit, deferred to v1.1)
 

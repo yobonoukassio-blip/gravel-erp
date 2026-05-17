@@ -86,7 +86,7 @@ Donner à un groupe minier (Gravel Ivoire) une visibilité temps réel consolid�
 
 ## Current State
 
-Phase 9 complete (2026-05-17) — notification delivery fully wired. All logger.log() stubs replaced with real BullMQ async dispatch (Brevo email, Twilio SMS, in-app DB rows). Angular badge polls unread count. Phase 9 was the last planned phase in v1.1 milestone.
+Phases 8 and 9 complete (2026-05-17) — operational alerts now fire automatically (PM scheduler @Cron hourly + spare-part threshold subscribers writing to alert table), and notification delivery is fully wired (BullMQ → Brevo email + Twilio SMS + Angular in-app badge). All `logger.log()` stubs removed. Phase 8 + Phase 9 close the operational silence loop end-to-end. ALT-01, ALT-02, NTF-01, NTF-02, NTF-03 all satisfied. v1.1 milestone phases all complete (Phase 6 hardening/multi-country remains out-of-milestone next step).
 
 ## Evolution
 

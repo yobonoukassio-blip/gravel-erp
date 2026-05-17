@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { RhModule } from '../rh/rh.module';
 import { FuelTank } from './entities/fuel-tank.entity';
 import { FuelTankEvent } from './entities/fuel-tank-event.entity';
 import { EquipmentRefuel } from './entities/equipment-refuel.entity';
@@ -41,6 +42,7 @@ import { FuelReconciliationJob } from './jobs/fuel-reconciliation.job';
     ]),
     EventEmitterModule,
     ScheduleModule.forRoot(),
+    RhModule,
   ],
   controllers: [FuelController],
   providers: [

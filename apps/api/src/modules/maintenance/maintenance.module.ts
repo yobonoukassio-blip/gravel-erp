@@ -3,6 +3,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AlertsModule } from '../alerts/alerts.module';
+import { RhModule } from '../rh/rh.module';
 import { WorkOrder } from './entities/work-order.entity';
 import { PreventiveMaintenancePlan } from './entities/preventive-maintenance-plan.entity';
 import { SparePart } from './entities/spare-part.entity';
@@ -38,6 +39,7 @@ import { MaintenanceController } from './controllers/maintenance.controller';
     EventEmitterModule,
     ScheduleModule.forRoot(),
     AlertsModule,
+    RhModule,
   ],
   controllers: [MaintenanceController],
   providers: [

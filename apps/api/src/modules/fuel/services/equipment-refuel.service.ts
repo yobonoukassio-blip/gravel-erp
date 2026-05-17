@@ -3,6 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, EntityManager } from 'typeorm';
+import { RhHabilitationService } from '../../rh/services/rh-habilitation.service';
 import { EquipmentRefuel } from '../entities/equipment-refuel.entity';
 import { FuelTankEventService } from './fuel-tank-event.service';
 
@@ -38,6 +39,7 @@ export class EquipmentRefuelService {
     @InjectDataSource() private readonly ds: DataSource,
     private readonly fuelEventService: FuelTankEventService,
     private readonly events: EventEmitter2,
+    private readonly habilitation: RhHabilitationService,
   ) {}
 
   /**
@@ -51,6 +53,16 @@ export class EquipmentRefuelService {
    * All in one transaction. Emits production.fuel.refuel_appended post-commit.
    */
   async create(input: CreateEquipmentRefuelInput): Promise<EquipmentRefuel> {
+    // HSE-04 gate (audit 2026-05-17): block fuel dispensing when the
+    // operator does not hold a valid CONDUCTEUR_ENGIN certification. The
+    // gate runs BEFORE the transaction so a failure short-circuits without
+    // touching fuel_tank_event or any of the 3 INSERTs.
+    await this.habilitation.assertValidAt(
+      input.operatorId,
+      'CONDUCTEUR_ENGIN',
+      new Date(),
+    );
+
     const result = await this.ds.transaction(async (em: EntityManager) => {
       // Validate hour meter monotonicity
       await this.validateHourMeter(em, input.tenantId, input.equipmentId, input.equipmentHourMeterReading);

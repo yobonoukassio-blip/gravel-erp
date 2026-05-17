@@ -16,6 +16,7 @@ Donner a un groupe minier une visibilite temps reel consolidee sur la production
 - [x] **Phase 7: Finance Real** — Cost writers + @Cron aggregator + alert_rule seed + Finance/HSE UI tiles (complete 2026-05-16)
 - [x] **Phase 8: Operational Alerts Closure** — Preventive-maintenance scheduler + spare-part threshold handler firing real alerts (complete 2026-05-17)
 - [x] **Phase 9: Notification Delivery** — BullMQ + Brevo email + Twilio SMS + in-app notification badge replacing logger.log stubs (complete 2026-05-17)
+- [ ] **Phase 6: Hardening MVP (Section 6A)** — Pen-test + backup drill + DR runbook + secrets rotation + audit export + SLO observability + sync chaos + cutover runbook (production-hardening for first paying customer)
 
 ## Phase Details
 
@@ -63,12 +64,36 @@ Plans:
 - [x] 09-W1-P01-PLAN.md --- NotificationModule + BullMQ + Brevo + Twilio + AlertDispatcher refactor + in-app badge (2026-05-17)
 **UI hint**: yes
 
+### Phase 6: Hardening MVP (v1.1-MVP, Section 6A — planned 2026-05-17, revised 2026-05-17)
+**Goal**: Section 6A — production-hardening MVP for the first paying customer go-live (Côte d'Ivoire). Pen-test against the 3-layer RLS defense + audit chain, backup/PITR drill, DR runbook + tabletop, secrets rotation procedures, per-tenant audit export, SLO + production observability, mobile + sync chaos extension, production cutover runbook.
+**Depends on**: v1.0 + Phase 9 (NotificationService used by audit-export cron); runs in parallel with v1.1 work
+**Requirements**: HRD-MVP-01, HRD-MVP-02, HRD-MVP-03, HRD-MVP-04, HRD-MVP-05, HRD-MVP-06, HRD-MVP-07, HRD-MVP-08
+**Success Criteria** (what must be TRUE):
+  1. Pen-test artifact set shipped (procedure + ZAP/Caido scripts + 2026-Q2 SCOPE/FINDINGS/REMEDIATION templates + drill schedule); session itself is non-blocking parallel track (HRD-MVP-01).
+  2. Monthly backup-restore drill runs in CI and produces artifact in `.planning/drills/backup-YYYYMM.md` (HRD-MVP-02).
+  3. DR runbook covers 4 named scenarios (DB loss, tenant compromise, region outage, deadletter pileup) with comms + post-mortem templates; first 2026 tabletop scheduled (HRD-MVP-03).
+  4. Secrets rotation runbook covers 6 secret families with cadence + JWT dual-key window documented (HRD-MVP-04).
+  5. `GET /api/audit/export` endpoint returns chain-verified + S3-signed CSV; quarterly cron auto-emails compliance contact per tenant (HRD-MVP-05).
+  6. 4 SLOs locked (API p95 < 500ms, sync > 99.5%, queue < 10min, dispatch < 60s) with Prometheus burn-rate alerts + 5 Grafana dashboards + custom metrics WIRED into emitters; Grafana OnCall paging configured (HRD-MVP-06).
+  7. Extended sync chaos spec (1000×100×30% load) passes with deadletter rate < 1%; triage SOP + manual replay endpoint shipped (HRD-MVP-07).
+  8. `v1.1-cutover.md` runbook + 4 master-data CSV templates ready for first-customer onboarding (HRD-MVP-08).
+**Plans**: 8 plans (3 waves — Wave 1: 5 parallel, Wave 2: 2 parallel, Wave 3: 1)
+Plans:
+- [ ] 06-W1-P01-PLAN.md — Secrets rotation runbook + .env.example cross-link (HRD-MVP-04)
+- [ ] 06-W1-P02-PLAN.md — Production cutover runbook + 4 master-data CSV templates (HRD-MVP-08)
+- [ ] 06-W1-P03-PLAN.md — DR runbook (4 scenarios) + 2026 tabletop drill template (HRD-MVP-03)
+- [ ] 06-W1-P04-PLAN.md — SLO definitions + Prometheus alerts + Grafana dashboards + NestJS metrics module + metric wiring (HRD-MVP-06)
+- [ ] 06-W1-P05-PLAN.md — Per-tenant audit export endpoint + quarterly cron + compliance_email migration (HRD-MVP-05) [moved from W2-P02 — independent of W1-P01..P04]
+- [ ] 06-W2-P01-PLAN.md — Backup & PITR drill: runbook + scripts + monthly GH Actions cron (HRD-MVP-02)
+- [ ] 06-W2-P03-PLAN.md — Extended sync chaos spec (1000×100×30%) + deadletter SOP + replay endpoint (HRD-MVP-07)
+- [ ] 06-W3-P01-PLAN.md — Pen-test artifact set: procedure + ZAP scripts + run templates + non-blocking drill schedule (HRD-MVP-01) [autonomous — session tracked separately]
+
 ## Deferred (v2)
 
-### Phase 6: Hardening, Scale & Multi-Country Rollout
-**Goal**: Le systeme est pret a scaler du premier pays production-tested vers un second pays/site, avec pen-test, drills, et capacites multi-region.
-**Requirements**: HRD-01..08, EXP-01..04, SST-01..02 (v2 only)
-**Plans**: TBD
+### Phase 6B: Hardening, Scale & Multi-Country Rollout (DEFERRED v2)
+**Goal**: Le systeme est pret a scaler du premier pays production-tested vers un second pays/site, avec multi-region, IoT broker, service mesh, DB-per-tenant migration.
+**Requirements (v2 only)**: EXP-01..04 (multi-country: per-country Keycloak realms, OHADA country packs, XOF↔XAF, second-country provisioning), HRD-multi-region (Postgres logical replication + read-only failover), HRD-active-active, IOT-01..03 (EMQX broker + edge gateway + Teltonika telematics adapter), SST-01..02 (service mesh Istio/Linkerd + bounded-context microservice extraction), HRD-multi-tenant-DB-per-tenant (ADR-0005 upgrade path — trigger: tenant_count > 50 or noisy-neighbor), third-party pen-test, AWS infrastructure pen-test
+**Plans**: TBD (v2 milestone)
 
 ## Progress
 
@@ -77,8 +102,9 @@ Plans:
 | 7. Finance Real | 2/2 | Complete   | 2026-05-16 |
 | 8. Operational Alerts Closure | 3/3 | Complete | 2026-05-17 |
 | 9. Notification Delivery | 1/1 | Complete | 2026-05-17 |
+| 6. Hardening MVP (Section 6A) | 0/8 | Planned | — |
 
-**v1.1 status:** all 3 phases complete. Ready for milestone close + v1.2 planning.
+**v1.1 status:** Phases 7/8/9 complete; Phase 6 (Hardening MVP Section 6A) planned 2026-05-17, revised 2026-05-17 — 8 plans across 3 waves (Wave 1: 5 parallel, Wave 2: 2 parallel, Wave 3: 1 autonomous). Production-hardening required before first paying customer cutover.
 
 ## Known Tech Debt (from v1.0 audit, deferred to v1.1)
 
@@ -89,7 +115,7 @@ Plans:
 | MNT-04 | spare_part.threshold_crossed alert handler | 2h | P2 | Phase 8 (ALT-02) |
 | Phase 4 | 4/7 cost components hardcoded to 0n, alert_rule not seeded, email/SMS stubs | 1-2d | P2 | Phase 7 + Phase 9 |
 | i18n AR | Arabic locale absent from web + mobile (backend ready) | 4h | P3 | Deferred v1.2 |
-| IOT-01/02/03 | MQTT broker + edge gateway + Teltonika adapter (backend only today) | 2-3w | DEFER v2 | Phase 6 |
+| IOT-01/02/03 | MQTT broker + edge gateway + Teltonika adapter (backend only today) | 2-3w | DEFER v2 | Phase 6B |
 | DSH-05 | Dashboard groupe consolidé (Finance group-level) | 1d | P2 | Phase 7 (FIN-R03) |
 | Mobile | Maintenance + Ventes screens are 19-line placeholder shells | 2d | P2 | Deferred v1.2 |
 
@@ -97,3 +123,5 @@ Plans:
 *Roadmap created: 2026-05-12*
 *v1.0 archived: 2026-05-16*
 *v1.1 phases drafted: 2026-05-16*
+*Phase 6 (Hardening MVP Section 6A) planned: 2026-05-17*
+*Phase 6 revised: 2026-05-17 (W2-P02 → W1-P05; W3-P01 autonomous; W1-P04 + metric wiring)*

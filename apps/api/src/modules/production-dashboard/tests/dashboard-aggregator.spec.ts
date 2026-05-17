@@ -25,6 +25,7 @@ describe('DashboardAggregatorService', () => {
     service = new DashboardAggregatorService(
       mockDs as never,
       mockCostPerTon as unknown as CostPerTonProvisionalService,
+      {} as never,
     );
   });
 

@@ -265,7 +265,7 @@ describe('StockpileController (append-only contract)', () => {
   it('PATCH/DELETE → 405', () => {
     // The framework would route HTTP verbs to rejectMutation via @All.
     // Direct invocation reproduces the 405 throw.
-    const ctrl = new StockpileController({} as never);
+    const ctrl = new StockpileController({} as never, {} as never);
     expect(() => ctrl.rejectMutation('any-id')).toThrow(/append-only/i);
   });
 });

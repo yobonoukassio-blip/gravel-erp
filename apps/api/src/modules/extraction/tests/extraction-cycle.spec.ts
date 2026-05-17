@@ -104,7 +104,7 @@ describe('ExtractionCycleService — EXT-01', () => {
   beforeEach(() => {
     repo = new InMemoryCycleRepo();
     equipment = new StubEquipmentService();
-    svc = new ExtractionCycleService(repo as never, equipment as never);
+    svc = new ExtractionCycleService(repo as never, equipment as never, { emit: jest.fn() } as never);
   });
 
   it('EXT-01: persists a new extraction cycle for an active excavator', async () => {

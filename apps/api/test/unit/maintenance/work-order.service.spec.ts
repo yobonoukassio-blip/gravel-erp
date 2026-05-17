@@ -3,6 +3,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { DataSource } from 'typeorm';
 import { WorkOrderService } from '../../../src/modules/maintenance/services/work-order.service';
 import { MtbfCalculatorService } from '../../../src/modules/maintenance/services/mtbf-calculator.service';
+import { RhHabilitationService } from '../../../src/modules/rh/services/rh-habilitation.service';
 import { WorkOrder } from '../../../src/modules/maintenance/entities/work-order.entity';
 import { PreventiveMaintenancePlan } from '../../../src/modules/maintenance/entities/preventive-maintenance-plan.entity';
 import { ProductionEquipment } from '../../../src/modules/master-data/production-equipment.entity';
@@ -56,7 +57,7 @@ describe('WorkOrderService — Phase 8 W2-P01', () => {
       findOneOrFail: jest.fn(),
     };
 
-    mockTransaction = jest.fn(async (cb: any) => cb(mockManager));
+    mockTransaction = jest.fn(async (cb: (m: unknown) => unknown) => cb(mockManager));
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -75,6 +76,10 @@ describe('WorkOrderService — Phase 8 W2-P01', () => {
         {
           provide: MtbfCalculatorService,
           useValue: { refreshForEquipment: jest.fn() },
+        },
+        {
+          provide: RhHabilitationService,
+          useValue: { assertValidAt: jest.fn().mockResolvedValue(undefined), isValidAt: jest.fn().mockResolvedValue(true) },
         },
       ],
     }).compile();
@@ -307,8 +312,8 @@ describe('WorkOrderService — Phase 8 W2-P01', () => {
       laborHours: 2,
     };
 
-    function wireFindOne(workOrder: any, plan: any | null, equipment: any | null = null) {
-      mockManager.findOne.mockImplementation((entity: any) => {
+    function wireFindOne(workOrder: Record<string, unknown>, plan: unknown | null, equipment: unknown | null = null) {
+      mockManager.findOne.mockImplementation((entity: unknown) => {
         if (entity === WorkOrder) return Promise.resolve(workOrder);
         if (entity === PreventiveMaintenancePlan) return Promise.resolve(plan);
         if (entity === ProductionEquipment) return Promise.resolve(equipment);

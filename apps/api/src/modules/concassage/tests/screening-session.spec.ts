@@ -55,10 +55,7 @@ describe('ScreeningSessionService', () => {
       }),
     };
 
-    service = new ScreeningSessionService(
-      mockDs as unknown as Parameters<typeof service.constructor>[0],
-      mockOutbox as unknown as Parameters<typeof service.constructor>[1],
-    );
+    service = new ScreeningSessionService(mockDs as never, mockOutbox as never);
 
     (service as unknown as { _testManager: typeof mockManager })._testManager = mockManager;
   });

@@ -33,10 +33,7 @@ describe('CrusherSessionCompletedHandler', () => {
     mockStockpileEvents = { append: jest.fn().mockResolvedValue({ id: 'event-001' }) };
     mockDs = { query: jest.fn() };
 
-    handler = new CrusherSessionCompletedHandler(
-      mockDs as unknown as Parameters<typeof handler.constructor>[0],
-      mockStockpileEvents as unknown as Parameters<typeof handler.constructor>[1],
-    );
+    handler = new CrusherSessionCompletedHandler(mockDs as never, mockStockpileEvents as never);
   });
 
   it('calls append once with correct payload for a fresh event', async () => {

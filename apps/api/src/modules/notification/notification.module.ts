@@ -56,12 +56,16 @@ const rateLimiterProvider: Provider = {
       useFactory: (cfg: ConfigService) => {
         const url = cfg.get<string>('REDIS_URL');
         if (!url) {
-          // No REDIS_URL — fall back to localhost so the module boots in dev
-          // without Redis (jobs will fail on enqueue, which is acceptable when
-          // NTF_DRY_RUN=true is the dev default).
           return { connection: { host: '127.0.0.1', port: 6379 } };
         }
-        return { connection: { url } as never };
+        // Pass a pre-constructed IORedis instance so BullMQ workers get the
+        // correct maxRetriesPerRequest:null required by the BullMQ worker contract.
+        return {
+          connection: new IORedis(url, {
+            maxRetriesPerRequest: null,
+            enableReadyCheck: false,
+          }),
+        };
       },
     }),
     BullModule.registerQueue({ name: NOTIFICATION_QUEUE_NAME }),

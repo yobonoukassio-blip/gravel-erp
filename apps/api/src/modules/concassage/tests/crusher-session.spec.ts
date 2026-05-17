@@ -63,11 +63,7 @@ describe('CrusherSessionService', () => {
       }),
     };
 
-    service = new CrusherSessionService(
-      mockDs as unknown as Parameters<typeof service.constructor>[0],
-      mockOutbox as unknown as Parameters<typeof service.constructor>[1],
-      mockEnergy as unknown as Parameters<typeof service.constructor>[2],
-    );
+    service = new CrusherSessionService(mockDs as never, mockOutbox as never, mockEnergy as never);
 
     // Wire manager to service for introspection
     (service as unknown as { _testManager: typeof mockManager })._testManager = mockManager;

@@ -18,15 +18,13 @@ export interface AlertPayload {
   context?: Record<string, unknown>;
 }
 
-/** Map analytics AlertSeverity to NotificationJobPayload metadata.severity */
+/** Map analytics AlertSeverity ('info'|'warning'|'critical') to NotificationJobPayload metadata.severity */
 function toNotifSeverity(
   s: AlertSeverity,
 ): 'info' | 'warning' | 'high' | 'critical' {
   switch (s) {
     case 'critical':
       return 'critical';
-    case 'high':
-      return 'high';
     case 'warning':
       return 'warning';
     default:

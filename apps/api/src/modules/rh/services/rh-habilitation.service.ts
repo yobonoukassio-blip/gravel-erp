@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -69,6 +69,25 @@ export class RhHabilitationService {
     )) as Array<Record<string, unknown>>;
 
     return rows.length > 0;
+  }
+
+  /**
+   * Throws `BadRequestException` when the employee does NOT hold a valid
+   * certification of `certCode` on `asOfDate`. Convenience wrapper around
+   * `isValidAt` for callers that need a hard gate (e.g. work-order closure
+   * requiring FORMATION_HSE — HSE-04).
+   */
+  async assertValidAt(
+    employeeId: string,
+    certCode: string,
+    asOfDate: Date,
+  ): Promise<void> {
+    const valid = await this.isValidAt(employeeId, certCode, asOfDate);
+    if (!valid) {
+      throw new BadRequestException(
+        `Employee ${employeeId} does not hold a valid ${certCode} certification as of ${asOfDate.toISOString().slice(0, 10)}`,
+      );
+    }
   }
 
   /**

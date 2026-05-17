@@ -190,7 +190,7 @@ function makeService(): {
   const ds = new FakeDataSource();
   const bus = new EventEmitter2();
   const fuelEventSvc = new FuelTankEventService(ds as unknown as never, bus);
-  const svc = new EquipmentRefuelService(ds as unknown as never, fuelEventSvc, bus);
+  const svc = new EquipmentRefuelService(ds as unknown as never, fuelEventSvc, bus, { assertValidAt: async () => {} } as never);
   return { svc, ds, bus };
 }
 

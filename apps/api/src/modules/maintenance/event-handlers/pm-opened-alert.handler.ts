@@ -7,7 +7,7 @@ interface PmOpenedPayload {
   tenant_id: string;
   site_id: string;
   equipment_id: string;
-  pm_plan_id: string;
+  pm_plan_id: string | null;
   work_order_id: string;
   severity: 'warning' | 'critical';
   due_reason: 'hours' | 'km' | 'days' | null;
@@ -40,12 +40,18 @@ export class PmOpenedAlertHandler {
   async onPreventiveOpened(evt: PmOpenedPayload): Promise<void> {
     const alertSeverity: AlertSeverity = evt.severity === 'critical' ? 'critical' : 'high';
 
+    // Dedupe: 1 open alert per pm_plan overdue cycle. Falls back to
+    // work_order_id when no plan (manual preventive WO without a plan link).
+    const dedupeKey = evt.pm_plan_id
+      ? `pm:${evt.pm_plan_id}:overdue`
+      : `pm:wo:${evt.work_order_id}`;
+
     await this.alerts.createFromEvent({
       tenantId: evt.tenant_id,
       siteId: evt.site_id,
       sourceEventType: 'maintenance.work_order.preventive_opened',
       sourceEventId: evt.work_order_id,
-      dedupeKey: `pm:${evt.pm_plan_id}:overdue`,
+      dedupeKey,
       severity: alertSeverity,
       payload: {
         equipment_id: evt.equipment_id,

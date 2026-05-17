@@ -80,7 +80,7 @@ Plans:
 **Plans**: 8 plans (3 waves — Wave 1: 5 parallel, Wave 2: 2 parallel, Wave 3: 1)
 Plans:
 - [ ] 06-W1-P01-PLAN.md — Secrets rotation runbook + .env.example cross-link (HRD-MVP-04)
-- [ ] 06-W1-P02-PLAN.md — Production cutover runbook + 4 master-data CSV templates (HRD-MVP-08)
+- [x] 06-W1-P02-PLAN.md — Production cutover runbook + 4 master-data CSV templates (HRD-MVP-08)
 - [ ] 06-W1-P03-PLAN.md — DR runbook (4 scenarios) + 2026 tabletop drill template (HRD-MVP-03)
 - [ ] 06-W1-P04-PLAN.md — SLO definitions + Prometheus alerts + Grafana dashboards + NestJS metrics module + metric wiring (HRD-MVP-06)
 - [ ] 06-W1-P05-PLAN.md — Per-tenant audit export endpoint + quarterly cron + compliance_email migration (HRD-MVP-05) [moved from W2-P02 — independent of W1-P01..P04]

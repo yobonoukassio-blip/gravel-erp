@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Phases
-status: Ready to plan
-last_updated: "2026-05-17T13:38:57.898Z"
+status: Executing Phase 06
+last_updated: "2026-05-17T19:57:10.692Z"
 last_activity: 2026-05-17
 progress:
-  total_phases: 4
+  total_phases: 5
   completed_phases: 3
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 14
+  completed_plans: 7
 ---
 
 # STATE: Gravel Ivoire — ERP Carriere de Granite
@@ -17,14 +17,14 @@ progress:
 ## Project Reference
 
 - **Core Value:** Donner a un groupe minier une visibilite temps reel consolidee sur la production, les couts a la tonne et la securite de chaque site/pays, avec saisie terrain mobile fiable meme en mode offline.
-- **Current Focus:** Phase 08 — operational-alerts-closure
+- **Current Focus:** Phase 06 — hardening-scale-multi-country-rollout
 - **Domain:** Mining / Quarry ERP — multi-site, multi-country (West Africa / OHADA)
 - **Stack:** NestJS 11 / Node 24, PostgreSQL 18 + PostGIS + TimescaleDB, Flutter + PowerSync + Drift, Angular 20, Keycloak 26
 
 ## Current Position
 
-Phase: 09
-Plan: Not started
+Phase: 06 (hardening-scale-multi-country-rollout) — EXECUTING
+Plan: 1 of 8
 **Milestone v1.1 EXECUTING — Phase 7 Plan 01 complete (FIN-R01/R02/R06).**
 
 - **Goal:** Passer de v1.0 code-complete a v1.1 production-ready pour le premier client reel
@@ -82,6 +82,7 @@ Tech debt deferred to v2: IOT MQTT pipeline (Phase 6).
 - [Phase 08-operational-alerts-closure]: 08-W2-P01: PreventiveMaintenanceSchedulerJob @Cron('0 * * * *') with tenant fan-out under SET LOCAL app.current_tenant; three interval-unit paths (days/hours/km) with severity escalation per D-12; idempotency via WorkOrderService.findOpen()
 - [Phase 08-operational-alerts-closure]: 08-W2-P01: WorkOrderService.close() atomically advances linked PM plan state (D-04) so cron does not re-open same plan on next tick — runs in same EntityManager transaction
 - [Phase 08-operational-alerts-closure]: 08-W2-P01: alert_rule seed migration aligns Phase-7 spare-part NULL-severity rule's role_codes to D-15 verbatim (MAINTENANCE_MANAGER, GESTIONNAIRE_STOCK, DIRECTEUR_SITE) via idempotent UPDATE
+- [Phase 06]: D-23/D-24/D-25 honored: v1.1-cutover.md runbook + 4 master-data CSV templates (sites/users/equipment/suppliers); Keycloak Admin API bulk provisioning; FR primary + EN secondary training; no transactional history migration
 
 ### Todos
 

@@ -1,0 +1,112 @@
+{
+  "title": "SLO-D — Alert dispatch latency (p95 < 60s)",
+  "uid": "slo-d-alert-dispatch",
+  "tags": ["slo", "slo-d", "alerts", "notifications", "v1.1"],
+  "timezone": "UTC",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-7d", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "severity",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "query": "label_values(alert_dispatch_latency_seconds_count, severity)",
+        "multi": true,
+        "includeAll": true
+      },
+      {
+        "name": "channel",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "query": "label_values(alert_dispatch_latency_seconds_count, channel)",
+        "multi": true,
+        "includeAll": true
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Current p95 dispatch (28d)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(alert_dispatch_latency_seconds_bucket[28d])))"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 60 }
+            ]
+          }
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Dispatch latency over time (p50 + p95 + p99, 1h rolling)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.50, sum by (le) (rate(alert_dispatch_latency_seconds_bucket[1h])))",
+          "legendFormat": "p50"
+        },
+        {
+          "refId": "B",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(alert_dispatch_latency_seconds_bucket[1h])))",
+          "legendFormat": "p95"
+        },
+        {
+          "refId": "C",
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(alert_dispatch_latency_seconds_bucket[1h])))",
+          "legendFormat": "p99"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "gridPos": { "h": 8, "w": 18, "x": 6, "y": 0 }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Error-budget burn-down (28d, 5% budget — dispatches > 60s / total)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "1 - (sum(rate(alert_dispatch_latency_seconds_bucket{le=\"60\"}[28d])) / sum(rate(alert_dispatch_latency_seconds_count[28d])))",
+          "legendFormat": "burn"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percentunit" } },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "p95 by severity x channel",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (le, severity, channel) (rate(alert_dispatch_latency_seconds_bucket[1h])))",
+          "legendFormat": "{{severity}}/{{channel}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 }
+    }
+  ]
+}

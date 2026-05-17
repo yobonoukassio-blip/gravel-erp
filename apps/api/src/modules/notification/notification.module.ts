@@ -11,6 +11,7 @@ import { EmailBrevoProvider } from './providers/email-brevo.provider';
 import { InAppProvider } from './providers/in-app.provider';
 import { IRedisClient, SmsRateLimiter, SmsTwilioProvider } from './providers/sms-twilio.provider';
 import { NOTIFICATION_QUEUE_NAME } from './notification.types';
+import { SloMetricsModule } from '../../observability/slo-metrics.module';
 
 export const REDIS_CLIENT_TOKEN = 'NOTIFICATION_REDIS_CLIENT';
 
@@ -69,6 +70,9 @@ const rateLimiterProvider: Provider = {
       },
     }),
     BullModule.registerQueue({ name: NOTIFICATION_QUEUE_NAME }),
+    // HRD-MVP-06 Task 4: NotificationProcessor injects bullmq_job_duration_seconds
+    // and alert_dispatch_latency_seconds histograms for SLO-C / SLO-D.
+    SloMetricsModule,
   ],
   controllers: [NotificationController],
   providers: [

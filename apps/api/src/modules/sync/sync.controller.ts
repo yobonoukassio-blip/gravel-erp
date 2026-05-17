@@ -10,6 +10,8 @@ import {
   Put,
 } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
+import { InjectMetric } from '@willsoto/nestjs-prometheus';
+import type { Counter } from 'prom-client';
 import type { DataSource, QueryRunner } from 'typeorm';
 import { ConflictRegistry } from './registry';
 
@@ -31,7 +33,11 @@ import { ConflictRegistry } from './registry';
 export class SyncController {
   private readonly logger = new Logger(SyncController.name);
 
-  constructor(@InjectDataSource() private readonly ds: DataSource) {}
+  constructor(
+    @InjectDataSource() private readonly ds: DataSource,
+    @InjectMetric('sync_attempts_total')
+    private readonly syncAttempts: Counter<string>,
+  ) {}
 
   @Get('registry')
   getRegistry(): Record<string, unknown> {
@@ -47,6 +53,22 @@ export class SyncController {
   @HttpCode(HttpStatus.OK)
   async pushActivityLog(
     @Body() body: { mutations: ActivityLogMutation[] },
+  ): Promise<{ accepted: number; duplicates: number; ids: string[] }> {
+    // SLO-B (HRD-MVP-06): record every sync attempt for the success-rate ratio.
+    // The label is set before the try/catch so failure path uses the same tenant id.
+    const tenantId = body?.mutations?.[0]?.tenantId ?? 'unknown';
+    try {
+      const out = await this._pushActivityLogImpl(body);
+      this.syncAttempts.inc({ tenant_id: tenantId, result: 'success' });
+      return out;
+    } catch (err) {
+      this.syncAttempts.inc({ tenant_id: tenantId, result: 'failure' });
+      throw err;
+    }
+  }
+
+  private async _pushActivityLogImpl(
+    body: { mutations: ActivityLogMutation[] },
   ): Promise<{ accepted: number; duplicates: number; ids: string[] }> {
     const mutations = body?.mutations ?? [];
     if (!Array.isArray(mutations) || mutations.length === 0) {
@@ -123,6 +145,24 @@ export class SyncController {
   @Put('preferences')
   @HttpCode(HttpStatus.OK)
   async putPreference(@Body() body: PreferenceMutation): Promise<{
+    userId: string;
+    key: string;
+    serverReceivedAt: string;
+    superseded: boolean;
+  }> {
+    // SLO-B: also count preference replica writes as sync attempts.
+    const tenantId = body?.tenantId ?? 'unknown';
+    try {
+      const out = await this._putPreferenceImpl(body);
+      this.syncAttempts.inc({ tenant_id: tenantId, result: 'success' });
+      return out;
+    } catch (err) {
+      this.syncAttempts.inc({ tenant_id: tenantId, result: 'failure' });
+      throw err;
+    }
+  }
+
+  private async _putPreferenceImpl(body: PreferenceMutation): Promise<{
     userId: string;
     key: string;
     serverReceivedAt: string;

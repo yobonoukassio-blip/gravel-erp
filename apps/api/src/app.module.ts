@@ -26,6 +26,7 @@ import { VentesModule } from './modules/ventes/ventes.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { IotModule } from './modules/iot/iot.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { SloMetricsModule } from './observability/slo-metrics.module';
 
 /**
  * Root application module.
@@ -103,6 +104,7 @@ import { NotificationModule } from './modules/notification/notification.module';
     AnalyticsModule,
     IotModule,
     NotificationModule,
+    SloMetricsModule,
   ],
 })
 export class AppModule {}

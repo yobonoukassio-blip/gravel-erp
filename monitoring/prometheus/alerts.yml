@@ -1,0 +1,149 @@
+# Prometheus alert rules — Gravel Ivoire ERP SLOs (HRD-MVP-06)
+#
+# Burn-rate alert pattern: SLOFastBurn (1h window, 14.4x burn) + SLOSlowBurn (6h window, 6x burn)
+# Per Google SRE multi-window multi-burn-rate (https://sre.google/workbook/alerting-on-slos/)
+#
+# Source contract: .planning/runbooks/slo-definitions.md
+# Naming: concrete rules use per-SLO suffix (SloAFastBurn, SloASlowBurn, ..., SloDSlowBurn).
+groups:
+  - name: slo-burn-rates
+    rules:
+      # ─────────────────────────────────────────────────────────────────────
+      # SLO-A — API latency (p95 < 500ms, 5% error budget)
+      # ─────────────────────────────────────────────────────────────────────
+      - alert: SloAFastBurn
+        expr: |
+          (
+            1 - (
+              sum(rate(http_request_duration_seconds_bucket{le="0.5",route!~"/api/analytics/.*"}[1h]))
+              /
+              sum(rate(http_request_duration_seconds_count{route!~"/api/analytics/.*"}[1h]))
+            )
+          ) > (14.4 * 0.05)
+        for: 5m
+        labels:
+          severity: page
+          slo: A
+          window: 1h
+        annotations:
+          summary: "API latency SLO fast burn (1h)"
+          description: "Error budget burn rate > 14.4x over 1h — 28d budget exhausted in < 2d at this pace."
+          runbook_url: ".planning/runbooks/slo-definitions.md#slo-a-api-latency"
+
+      - alert: SloASlowBurn
+        expr: |
+          (
+            1 - (
+              sum(rate(http_request_duration_seconds_bucket{le="0.5",route!~"/api/analytics/.*"}[6h]))
+              /
+              sum(rate(http_request_duration_seconds_count{route!~"/api/analytics/.*"}[6h]))
+            )
+          ) > (6 * 0.05)
+        for: 30m
+        labels:
+          severity: ticket
+          slo: A
+          window: 6h
+        annotations:
+          summary: "API latency SLO slow burn (6h)"
+          description: "Error budget burn rate > 6x over 6h — sustained degradation, ticket."
+          runbook_url: ".planning/runbooks/slo-definitions.md#slo-a-api-latency"
+
+      # ─────────────────────────────────────────────────────────────────────
+      # SLO-B — Sync success rate (> 99.5%, 0.5% error budget)
+      # ─────────────────────────────────────────────────────────────────────
+      - alert: SloBFastBurn
+        expr: |
+          (
+            1 - (
+              sum(rate(sync_attempts_total{result="success"}[1h]))
+              /
+              sum(rate(sync_attempts_total[1h]))
+            )
+          ) > (14.4 * 0.005)
+        for: 5m
+        labels:
+          severity: page
+          slo: B
+          window: 1h
+        annotations:
+          summary: "Sync success SLO fast burn (1h)"
+          description: "Sync failure rate burn > 14.4x over 1h — page on-call."
+          runbook_url: ".planning/runbooks/slo-definitions.md#slo-b-sync-success-rate"
+
+      - alert: SloBSlowBurn
+        expr: |
+          (
+            1 - (
+              sum(rate(sync_attempts_total{result="success"}[6h]))
+              /
+              sum(rate(sync_attempts_total[6h]))
+            )
+          ) > (6 * 0.005)
+        for: 30m
+        labels:
+          severity: ticket
+          slo: B
+          window: 6h
+        annotations:
+          summary: "Sync success SLO slow burn (6h)"
+          description: "Sync failure rate burn > 6x over 6h — ticket."
+          runbook_url: ".planning/runbooks/slo-definitions.md#slo-b-sync-success-rate"
+
+      # ─────────────────────────────────────────────────────────────────────
+      # SLO-C — BullMQ notification queue drain (p95 < 10 min)
+      # ─────────────────────────────────────────────────────────────────────
+      - alert: SloCFastBurn
+        expr: |
+          histogram_quantile(0.95, sum by (le) (rate(bullmq_job_duration_seconds_bucket{queue="notifications"}[1h]))) > 600
+        for: 5m
+        labels:
+          severity: page
+          slo: C
+          window: 1h
+        annotations:
+          summary: "BullMQ queue drain SLO fast burn (p95 > 10 min over 1h)"
+          description: "Notification queue p95 drain time exceeds 600s budget — page on-call."
+          runbook_url: ".planning/runbooks/slo-definitions.md#slo-c-bullmq-notification-queue-drain"
+
+      - alert: SloCSlowBurn
+        expr: |
+          histogram_quantile(0.95, sum by (le) (rate(bullmq_job_duration_seconds_bucket{queue="notifications"}[6h]))) > 600
+        for: 30m
+        labels:
+          severity: ticket
+          slo: C
+          window: 6h
+        annotations:
+          summary: "BullMQ queue drain SLO slow burn (p95 > 10 min over 6h)"
+          description: "Sustained queue drain > 600s over 6h — ticket."
+          runbook_url: ".planning/runbooks/slo-definitions.md#slo-c-bullmq-notification-queue-drain"
+
+      # ─────────────────────────────────────────────────────────────────────
+      # SLO-D — Alert dispatch latency (p95 < 60s)
+      # ─────────────────────────────────────────────────────────────────────
+      - alert: SloDFastBurn
+        expr: |
+          histogram_quantile(0.95, sum by (le) (rate(alert_dispatch_latency_seconds_bucket[1h]))) > 60
+        for: 5m
+        labels:
+          severity: page
+          slo: D
+          window: 1h
+        annotations:
+          summary: "Alert dispatch latency SLO fast burn (p95 > 60s over 1h)"
+          description: "End-to-end alert dispatch p95 exceeds 60s budget — page on-call."
+          runbook_url: ".planning/runbooks/slo-definitions.md#slo-d-alert-dispatch-latency"
+
+      - alert: SloDSlowBurn
+        expr: |
+          histogram_quantile(0.95, sum by (le) (rate(alert_dispatch_latency_seconds_bucket[6h]))) > 60
+        for: 30m
+        labels:
+          severity: ticket
+          slo: D
+          window: 6h
+        annotations:
+          summary: "Alert dispatch latency SLO slow burn (p95 > 60s over 6h)"
+          description: "Sustained alert dispatch p95 > 60s over 6h — ticket."
+          runbook_url: ".planning/runbooks/slo-definitions.md#slo-d-alert-dispatch-latency"

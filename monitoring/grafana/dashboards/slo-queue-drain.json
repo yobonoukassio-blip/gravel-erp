@@ -1,0 +1,99 @@
+{
+  "title": "SLO-C — BullMQ notification queue drain (p95 < 10 min)",
+  "uid": "slo-c-queue-drain",
+  "tags": ["slo", "slo-c", "bullmq", "notifications", "v1.1"],
+  "timezone": "UTC",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-7d", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "job_name",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "query": "label_values(bullmq_job_duration_seconds_count{queue=\"notifications\"}, job_name)",
+        "multi": true,
+        "includeAll": true
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Current p95 drain (28d)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(bullmq_job_duration_seconds_bucket{queue=\"notifications\"}[28d])))"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 600 }
+            ]
+          }
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "p95 drain over time (1h rolling)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(bullmq_job_duration_seconds_bucket{queue=\"notifications\"}[1h])))",
+          "legendFormat": "p95"
+        },
+        {
+          "refId": "B",
+          "expr": "histogram_quantile(0.50, sum by (le) (rate(bullmq_job_duration_seconds_bucket{queue=\"notifications\"}[1h])))",
+          "legendFormat": "p50"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "gridPos": { "h": 8, "w": 18, "x": 6, "y": 0 }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Error-budget burn (jobs > 600s / total jobs, 10% budget)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "1 - (sum(rate(bullmq_job_duration_seconds_bucket{queue=\"notifications\",le=\"600\"}[28d])) / sum(rate(bullmq_job_duration_seconds_count{queue=\"notifications\"}[28d])))",
+          "legendFormat": "burn"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percentunit" } },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "p95 drain by job_name (top 10)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(10, histogram_quantile(0.95, sum by (le, job_name) (rate(bullmq_job_duration_seconds_bucket{queue=\"notifications\"}[1h]))))",
+          "legendFormat": "{{job_name}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 }
+    }
+  ]
+}

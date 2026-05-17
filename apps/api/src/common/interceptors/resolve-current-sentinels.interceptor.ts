@@ -58,25 +58,66 @@ export class ResolveCurrentSentinelsInterceptor implements NestInterceptor {
     const activeSiteId = user.siteIds?.[0];
     const tenantId = user.tenantId;
 
-    const rewrite = (bag: Record<string, unknown> | undefined, source: string): void => {
-      if (!bag) return;
+    // Rewrite via full reassignment — NestJS @Query() / pipes sometimes
+    // capture req.query / req.params by reference at request init, so an
+    // in-place property assignment can be lost. Building a fresh shallow copy
+    // and reassigning is the most defensive form.
+    const rewriteBag = (
+      bag: Record<string, unknown> | undefined,
+      source: string,
+    ): Record<string, unknown> | undefined => {
+      if (!bag) return bag;
+      const next: Record<string, unknown> = { ...bag };
+      let mutated = false;
       for (const key of ['site_id', 'siteId']) {
-        if (bag[key] === 'current' && activeSiteId) {
+        if (next[key] === 'current' && activeSiteId) {
           this.logger.log(`[SENTINEL] ${source}.${key}='current' -> '${activeSiteId}'`);
-          bag[key] = activeSiteId;
+          next[key] = activeSiteId;
+          mutated = true;
         }
       }
       for (const key of ['tenant_id', 'tenantId']) {
-        if (bag[key] === 'current' && tenantId) {
+        if (next[key] === 'current' && tenantId) {
           this.logger.log(`[SENTINEL] ${source}.${key}='current' -> '${tenantId}'`);
-          bag[key] = tenantId;
+          next[key] = tenantId;
+          mutated = true;
         }
       }
+      return mutated ? next : bag;
     };
 
-    rewrite(req.query, 'query');
-    rewrite(req.params, 'params');
-    rewrite(req.body, 'body');
+    const newQuery = rewriteBag(req.query, 'query');
+    if (newQuery !== req.query) {
+      try {
+        (req as { query?: Record<string, unknown> }).query = newQuery;
+      } catch {
+        // req.query may be a non-writable getter in some Express versions;
+        // fall back to mutating the existing object plus rewriting req.url.
+        if (req.query && newQuery) Object.assign(req.query, newQuery);
+        if (req.url && activeSiteId) {
+          const u = req.url
+            .replace(/([?&])site_id=current(?=&|$)/g, `$1site_id=${activeSiteId}`)
+            .replace(/([?&])siteId=current(?=&|$)/g, `$1siteId=${activeSiteId}`);
+          if (u !== req.url) (req as { url?: string }).url = u;
+        }
+      }
+    }
+    const newParams = rewriteBag(req.params, 'params');
+    if (newParams !== req.params) {
+      try {
+        (req as { params?: Record<string, unknown> }).params = newParams;
+      } catch {
+        if (req.params && newParams) Object.assign(req.params, newParams);
+      }
+    }
+    const newBody = rewriteBag(req.body, 'body');
+    if (newBody !== req.body) {
+      try {
+        (req as { body?: Record<string, unknown> }).body = newBody;
+      } catch {
+        if (req.body && newBody) Object.assign(req.body, newBody);
+      }
+    }
 
     return next.handle();
   }

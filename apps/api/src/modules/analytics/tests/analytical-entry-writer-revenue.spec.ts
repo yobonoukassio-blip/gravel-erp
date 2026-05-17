@@ -172,7 +172,7 @@ describe('AnalyticalEntryWriterHandler (FIN-04 revenue + cost)', () => {
     expect(inserts).toHaveLength(0);
   });
 
-  it('swallows BL handler errors so a bad fixture does not crash the event bus', async () => {
+  it('rethrows BL handler errors so EventEmitter2 retry path can handle them (SF-001)', async () => {
     const ds = {
       query: async (sql: string) => {
         if (/INSERT INTO analytical_entry/i.test(sql)) {
@@ -190,7 +190,8 @@ describe('AnalyticalEntryWriterHandler (FIN-04 revenue + cost)', () => {
     };
     const handler = new AnalyticalEntryWriterHandler(ds as never);
 
-    // No throw — handler MUST log + continue.
+    // Post-SF-001 (audit 2026-05-16): handler MUST rethrow so the outbox
+    // worker can retry. Previous swallow caused silent ledger drops.
     await expect(
       handler.onBlSigned({
         tenantId: TENANT,
@@ -199,6 +200,6 @@ describe('AnalyticalEntryWriterHandler (FIN-04 revenue + cost)', () => {
         tonnageKg: '10000',
         signedAtUtc: '2026-05-15T08:00:00Z',
       }),
-    ).resolves.toBeUndefined();
+    ).rejects.toThrow(/synthetic insert failure/);
   });
 });

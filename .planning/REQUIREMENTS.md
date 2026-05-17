@@ -30,13 +30,13 @@
 
 Production-hardening requirements for the first paying customer go-live (Côte d'Ivoire). Each is bound to one or more plans under `phases/06-hardening-scale-multi-country-rollout/`.
 
-- [ ] **HRD-MVP-01**: Pen-test artifact set shipped — procedure runbook + ZAP/Caido automation + SCOPE/FINDINGS/REMEDIATION templates for 2026-Q2 internal red-team. Session itself tracked as non-blocking parallel track per `feedback_human_prereqs_non_blocking`.
-- [ ] **HRD-MVP-02**: Monthly backup-restore drill runs in CI and produces dated artifact under `.planning/drills/backup-YYYYMM.md` proving PITR works end-to-end.
-- [ ] **HRD-MVP-03**: DR runbook covers 4 named scenarios (DB loss, tenant compromise, region outage, deadletter pileup) with comms + post-mortem templates; first 2026 tabletop scheduled.
-- [ ] **HRD-MVP-04**: Secrets rotation runbook covers 6 secret families (JWT, DB, S3, Brevo, Twilio, Redis) with cadence + JWT dual-key window documented; `.env.example` cross-linked.
+- [x] **HRD-MVP-01**: Pen-test artifact set shipped — procedure runbook + ZAP/Caido automation + SCOPE/FINDINGS/REMEDIATION templates for 2026-Q2 internal red-team. Session itself tracked as non-blocking parallel track per `feedback_human_prereqs_non_blocking`.
+- [x] **HRD-MVP-02**: Monthly backup-restore drill runs in CI and produces dated artifact under `.planning/drills/backup-YYYYMM.md` proving PITR works end-to-end.
+- [x] **HRD-MVP-03**: DR runbook covers 4 named scenarios (DB loss, tenant compromise, region outage, deadletter pileup) with comms + post-mortem templates; first 2026 tabletop scheduled.
+- [x] **HRD-MVP-04**: Secrets rotation runbook covers 6 secret families (JWT, DB, S3, Brevo, Twilio, Redis) with cadence + JWT dual-key window documented; `.env.example` cross-linked.
 - [x] **HRD-MVP-05**: `GET /api/audit/export` endpoint returns chain-verified + S3-signed CSV; quarterly cron auto-emails compliance contact per tenant; `tenant.compliance_email` migration shipped.
-- [ ] **HRD-MVP-06**: 4 SLOs locked (API p95 < 500ms, sync > 99.5%, queue < 10min, dispatch < 60s) with Prometheus burn-rate alerts + 5 Grafana dashboards + custom metrics wired into emitters; Grafana OnCall paging configured.
-- [ ] **HRD-MVP-07**: Extended sync chaos spec (1000×100×30% load) passes with deadletter rate < 1%; triage SOP + manual replay endpoint shipped.
+- [x] **HRD-MVP-06**: 4 SLOs locked (API p95 < 500ms, sync > 99.5%, queue < 10min, dispatch < 60s) with Prometheus burn-rate alerts + 5 Grafana dashboards + custom metrics wired into emitters; Grafana OnCall paging configured.
+- [x] **HRD-MVP-07**: Extended sync chaos spec (1000×100×30% load) passes with deadletter rate < 1%; triage SOP + manual replay endpoint shipped.
 - [x] **HRD-MVP-08**: `v1.1-cutover.md` runbook + 4 master-data CSV templates (sites, users, equipment, suppliers) ready for first-customer onboarding. Employee/customer CSVs deferred to v1.1.1 if first-customer demand surfaces.
 
 ## Traceability
@@ -54,13 +54,13 @@ Production-hardening requirements for the first paying customer go-live (Côte d
 | NTF-01 | 09-notification-delivery | Complete |
 | NTF-02 | 09-notification-delivery | Complete |
 | NTF-03 | 09-notification-delivery | Complete |
-| HRD-MVP-01 | 06-hardening-scale-multi-country-rollout | Pending |
-| HRD-MVP-02 | 06-hardening-scale-multi-country-rollout | Pending |
-| HRD-MVP-03 | 06-hardening-scale-multi-country-rollout | Pending |
-| HRD-MVP-04 | 06-hardening-scale-multi-country-rollout | Pending |
+| HRD-MVP-01 | 06-hardening-scale-multi-country-rollout | Complete |
+| HRD-MVP-02 | 06-hardening-scale-multi-country-rollout | Complete |
+| HRD-MVP-03 | 06-hardening-scale-multi-country-rollout | Complete |
+| HRD-MVP-04 | 06-hardening-scale-multi-country-rollout | Complete |
 | HRD-MVP-05 | 06-hardening-scale-multi-country-rollout | Complete |
-| HRD-MVP-06 | 06-hardening-scale-multi-country-rollout | Pending |
-| HRD-MVP-07 | 06-hardening-scale-multi-country-rollout | Pending |
+| HRD-MVP-06 | 06-hardening-scale-multi-country-rollout | Complete |
+| HRD-MVP-07 | 06-hardening-scale-multi-country-rollout | Complete |
 | HRD-MVP-08 | 06-hardening-scale-multi-country-rollout | Complete |
 
 ## Out of Scope (v1.2 / v2)

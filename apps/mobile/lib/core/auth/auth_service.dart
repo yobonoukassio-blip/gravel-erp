@@ -81,9 +81,23 @@ class AuthService {
           message: 'Identifiants invalides.',
         );
       }
+      final base = OidcConfig.apiBaseUrl.isEmpty
+          ? '(empty — build-time env var missing)'
+          : OidcConfig.apiBaseUrl;
+      final reason = switch (e.type) {
+        DioExceptionType.connectionTimeout => 'timeout connexion',
+        DioExceptionType.sendTimeout => 'timeout envoi',
+        DioExceptionType.receiveTimeout => 'timeout réception',
+        DioExceptionType.badCertificate => 'certificat SSL invalide',
+        DioExceptionType.connectionError => 'connexion refusée / DNS',
+        DioExceptionType.cancel => 'annulé',
+        DioExceptionType.badResponse =>
+          'réponse ${e.response?.statusCode ?? "?"}',
+        DioExceptionType.unknown => 'erreur inconnue',
+      };
       throw AuthException(
         code: 'ERR_NETWORK',
-        message: 'Serveur injoignable. Réessayez dans un instant.',
+        message: 'Serveur injoignable ($reason).\nAPI: $base\n${e.message ?? ""}',
       );
     }
   }

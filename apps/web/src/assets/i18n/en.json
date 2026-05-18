@@ -93,10 +93,15 @@
   "permits.columns.validTo": "Valid to",
   "permits.columns.status": "Status",
 
+  "sites.list.title": "Sites",
+  "sites.list.newSite": "New site",
+  "sites.form.titleNew": "New site",
+  "sites.form.titleEdit": "Edit site",
   "sites.form.submit": "Save site",
   "sites.form.archive": "Archive site",
   "sites.form.saved": "Site saved.",
   "sites.form.error": "Failed to save site.",
+  "sites.form.confirmArchive": "Confirm site archive?",
 
   "zones.list.title": "Production zones",
   "zones.list.newZone": "New zone",

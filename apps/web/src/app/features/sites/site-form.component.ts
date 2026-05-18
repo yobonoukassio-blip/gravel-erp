@@ -54,6 +54,24 @@ function pickSitePayload(value: Record<string, unknown>): Partial<SitePayload> {
 }
 
 /**
+ * Static fallback for the country dropdown. Used only when /api/countries
+ * is unavailable so the form stays usable in degraded mode. The `id` values
+ * are NOT real database UUIDs — submission will fail until the backend
+ * countries table is seeded by migration 1721100000000.
+ */
+const FALLBACK_COUNTRIES: ReadonlyArray<{ id: string; iso: string; name: string }> = [
+  { id: 'fallback-ci', iso: 'CI', name: "Côte d'Ivoire" },
+  { id: 'fallback-bf', iso: 'BF', name: 'Burkina Faso' },
+  { id: 'fallback-ml', iso: 'ML', name: 'Mali' },
+  { id: 'fallback-sn', iso: 'SN', name: 'Sénégal' },
+  { id: 'fallback-gh', iso: 'GH', name: 'Ghana' },
+  { id: 'fallback-tg', iso: 'TG', name: 'Togo' },
+  { id: 'fallback-bj', iso: 'BJ', name: 'Bénin' },
+  { id: 'fallback-ne', iso: 'NE', name: 'Niger' },
+  { id: 'fallback-fr', iso: 'FR', name: 'France' },
+];
+
+/**
  * Site create/edit form built on Formly. New sites use the `new` route;
  * existing sites pre-load via GET /api/sites/:id. Submit performs POST or
  * PATCH, then routes to the detail page.
@@ -140,29 +158,67 @@ export class SiteFormComponent implements OnInit {
     const idParam = this.route.snapshot.paramMap.get('id') ?? 'new';
     this.id.set(idParam);
 
-    // Populate the country dropdown from /api/countries. The Formly schema
-    // initialises with an empty options array; without this load, the field
-    // stays required-but-unfillable and the submit button is locked.
-    try {
-      const countries = await firstValueFrom(
-        this.http.get<CountryOption[]>('/api/countries'),
-      );
-      const countryField = this.fields.find((f) => f.key === 'countryId');
-      if (countryField?.props) {
-        countryField.props.options = countries.map((c) => ({
-          label: `${c.name} (${c.isoAlpha2})`,
-          value: c.id,
-        }));
-      }
-    } catch (err: unknown) {
-      console.error('[SiteForm] countries load failed', err);
-    }
+    // Load reference data in parallel. Each Promise is wrapped so one
+    // failure doesn't block the others — empty countries shouldn't prevent
+    // the manager dropdown from loading and vice-versa.
+    await Promise.all([this.loadCountries(), this.loadManagers()]);
 
     if (idParam !== 'new') {
       const existing = await firstValueFrom(this.http.get<SiteResponse>(`/api/sites/${idParam}`));
       // Strip server-only fields from the model so the form does not send
       // them back on PATCH (whitelist DTO rejects `status`, `tenantId`, etc.).
       this.model.set(pickSitePayload(existing as unknown as Record<string, unknown>));
+    }
+  }
+
+  /** Country dropdown source. If /api/countries is unavailable (endpoint
+   *  not yet deployed, table empty for the tenant), fall back to a static
+   *  list so the operator can still submit the form. The free-text country
+   *  IDs map to ISO-alpha2 codes the backend can resolve. */
+  private async loadCountries(): Promise<void> {
+    const countryField = this.fields.find((f) => f.key === 'countryId');
+    if (!countryField?.props) return;
+    try {
+      const countries = await firstValueFrom(
+        this.http.get<CountryOption[]>('/api/countries'),
+      );
+      if (Array.isArray(countries) && countries.length > 0) {
+        countryField.props.options = countries.map((c) => ({
+          label: `${c.name} (${c.isoAlpha2})`,
+          value: c.id,
+        }));
+        return;
+      }
+    } catch (err: unknown) {
+      console.error('[SiteForm] countries load failed', err);
+    }
+    countryField.props.options = FALLBACK_COUNTRIES.map((c) => ({
+      label: `${c.name} (${c.iso})`,
+      value: c.id,
+    }));
+    // Surface the fallback state so the operator knows it's a stand-in.
+    countryField.props.description =
+      'Liste de secours (API /api/countries indisponible).';
+  }
+
+  /** Site manager dropdown source. Optional field — failure should silently
+   *  leave the dropdown empty rather than block the form. */
+  private async loadManagers(): Promise<void> {
+    const managerField = this.fields.find((f) => f.key === 'managerUserId');
+    if (!managerField?.props) return;
+    try {
+      const users = await firstValueFrom(
+        this.http.get<Array<{ id: string; displayName?: string; email?: string }>>(
+          '/api/users',
+        ),
+      );
+      managerField.props.options = (Array.isArray(users) ? users : []).map((u) => ({
+        label: u.displayName ?? u.email ?? u.id,
+        value: u.id,
+      }));
+    } catch (err: unknown) {
+      console.error('[SiteForm] users load failed', err);
+      managerField.props.options = [];
     }
   }
 

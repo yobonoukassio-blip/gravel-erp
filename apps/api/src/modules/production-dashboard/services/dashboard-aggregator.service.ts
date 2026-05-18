@@ -640,7 +640,7 @@ export class DashboardAggregatorService {
       this.ds.query(
         `SELECT
            CASE WHEN COUNT(*) = 0 THEN 100
-                ELSE ROUND((COUNT(*) FILTER (WHERE status = 'closed')::float / COUNT(*)) * 100)
+                ELSE ROUND((COUNT(*) FILTER (WHERE ca.status = 'closed')::float / COUNT(*)) * 100)
            END::int AS pct
          FROM corrective_action ca
          JOIN hse_incident i ON i.id = ca.incident_id AND i.tenant_id = ca.tenant_id

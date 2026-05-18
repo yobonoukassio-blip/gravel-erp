@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/auth/auth_service.dart';
+import '../features/login/login_screen.dart';
 import '../features/activity_log/activity_log_screen.dart';
 import '../features/alerts/screens/alerts_screen.dart';
 import '../features/concassage/screens/concassage_screen.dart';
@@ -50,7 +52,41 @@ class GravelApp extends ConsumerWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('fr'), Locale('en')],
-      home: const _Shell(),
+      routes: {
+        '/': (_) => const _AuthGate(),
+        '/login': (_) => const LoginScreen(),
+        '/home': (_) => const _Shell(),
+      },
+      initialRoute: '/',
+    );
+  }
+}
+
+/// Decides between LoginScreen and _Shell based on stored auth token.
+class _AuthGate extends StatefulWidget {
+  const _AuthGate();
+
+  @override
+  State<_AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<_AuthGate> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _decide());
+  }
+
+  Future<void> _decide() async {
+    final authed = await AuthService().isAuthenticated();
+    if (!mounted) return;
+    Navigator.of(context).pushReplacementNamed(authed ? '/home' : '/login');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(child: CircularProgressIndicator()),
     );
   }
 }

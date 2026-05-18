@@ -25,12 +25,40 @@ import { MatCardModule } from '@angular/material/card';
     </mat-card>
   `,
   styles: [`
-    .kpi-tile { min-width: 160px; text-align: center; }
-    .kpi-label { font-size: 12px; color: rgba(0,0,0,.54); text-transform: uppercase; letter-spacing: .05em; }
-    .kpi-value { font-size: 32px; font-weight: 700; line-height: 1; }
-    .kpi-unit  { font-size: 14px; color: rgba(0,0,0,.6); }
+    :host { display: block; min-width: 0; }
+    .kpi-tile {
+      min-width: 0;
+      text-align: center;
+      overflow: hidden;
+    }
+    .kpi-label {
+      font-size: 11px;
+      color: rgba(0,0,0,.54);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      overflow-wrap: anywhere;
+      hyphens: auto;
+    }
+    .kpi-value {
+      display: block;
+      font-size: clamp(20px, 6vw, 32px);
+      font-weight: 700;
+      line-height: 1.05;
+      overflow-wrap: anywhere;
+      font-variant-numeric: tabular-nums;
+    }
+    .kpi-unit  {
+      font-size: 13px;
+      color: rgba(0,0,0,.6);
+      margin-left: 4px;
+      white-space: nowrap;
+    }
     .kpi-warn .kpi-value { color: #e65100; }
     .kpi-ok   .kpi-value { color: #2e7d32; }
+
+    @media (max-width: 600px) {
+      .kpi-label { font-size: 10.5px; }
+    }
   `],
 })
 export class KpiTileComponent {

@@ -125,6 +125,13 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
 html, body {
   height: 100%;
   margin: 0;
@@ -135,6 +142,7 @@ html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  overscroll-behavior-y: none;
 }
 
 body {
@@ -420,3 +428,173 @@ code, .gv-num {
 
 /* Page content above the body texture */
 gravel-main-layout { position: relative; z-index: 1; }
+
+/* -------------------------------------------------------------------------- */
+/*  Responsive / mobile                                                        */
+/* -------------------------------------------------------------------------- */
+
+/* Tablet */
+@media (max-width: 960px) {
+  h1 { font-size: 22px; }
+  h2 { font-size: 17px; }
+}
+
+/* Phone — keep type scale legible, prevent iOS form zoom (>=16px inputs), give
+   touch targets room, and lighten heavy GPU effects. */
+@media (max-width: 600px) {
+  html, body { font-size: 15px; }
+
+  h1 { font-size: 20px; }
+  h2 { font-size: 16px; }
+  h3 { font-size: 15px; }
+
+  /* Prevent automatic zoom on focus in iOS Safari (triggers when font < 16px) */
+  input, select, textarea {
+    font-size: 16px;
+  }
+
+  /* Compositor-cheaper backdrop on phones */
+  .gv-header { backdrop-filter: saturate(160%) blur(6px) !important; }
+
+  /* Dim the noise overlay; it's expensive at low DPR and adds little */
+  body::before { opacity: 0.18; }
+
+  /* Slim scrollbars on touch devices */
+  *::-webkit-scrollbar { width: 6px; height: 6px; }
+
+  /* Material card padding can crowd on small screens */
+  .mat-mdc-card { border-radius: var(--gv-radius-md); }
+  .mat-mdc-card-content { padding: var(--gv-space-4) !important; }
+  .mat-mdc-card-header { padding: var(--gv-space-4) var(--gv-space-4) 0 !important; }
+
+  /* AG Grid: allow horizontal scroll instead of crushing columns */
+  .ag-theme-quartz, .ag-theme-material {
+    --ag-grid-size: 5px;
+    --ag-header-height: 38px;
+    --ag-row-height: 40px;
+    --ag-font-size: 12.5px;
+  }
+  .ag-theme-quartz .ag-root-wrapper,
+  .ag-theme-material .ag-root-wrapper {
+    border-radius: var(--gv-radius);
+  }
+
+  /* Honor reduced motion is already handled globally; ensure smooth-scroll
+     does not fight users who disable it */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+}
+
+/* Touch-only (no hover): make all hover-only affordances visible */
+@media (hover: none) {
+  .nav-link:hover { padding-left: 16px; } /* don't shift on tap */
+}
+
+/* Safe-area padding for notched devices */
+@supports (padding: max(0px)) {
+  .gv-header {
+    padding-left: max(var(--gv-space-3), env(safe-area-inset-left)) !important;
+    padding-right: max(var(--gv-space-3), env(safe-area-inset-right)) !important;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Cross-page mobile fixes                                                    */
+/*  Page toolbars, headers, button rows and cards across all feature modules   */
+/*  use ad-hoc flex layouts that don't wrap. These rules force graceful        */
+/*  collapse without touching each component.                                  */
+/* -------------------------------------------------------------------------- */
+
+/* Anything horizontally bigger than the viewport should never push the page */
+.layout-main, .layout-main > * { min-width: 0; }
+.layout-main {
+  overflow-x: hidden;
+}
+
+/* Material cards: never let inner content force a horizontal overflow */
+.mat-mdc-card { min-width: 0; max-width: 100%; }
+.mat-mdc-card-content,
+.mat-mdc-card-header,
+.mat-mdc-card-title-group { min-width: 0; }
+.mat-mdc-card-title,
+.mat-mdc-card-subtitle {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Common page-level flex rows used throughout features */
+.toolbar,
+.page-header,
+.page-toolbar,
+.page-actions,
+.mat-mdc-card-actions,
+.mat-mdc-card-header,
+.mat-toolbar {
+  flex-wrap: wrap;
+  row-gap: var(--gv-space-2);
+  min-width: 0;
+}
+.toolbar > *,
+.page-header > *,
+.page-toolbar > * { min-width: 0; }
+
+/* Phone — force toolbars to stack, headings to wrap, action buttons to size right */
+@media (max-width: 600px) {
+  /* Stack toolbars so title and actions don't fight for the same row */
+  .toolbar,
+  .page-header,
+  .page-toolbar {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: var(--gv-space-3);
+  }
+  .toolbar > .gv-spacer,
+  .page-header > .gv-spacer { display: none; }
+
+  /* Action button groups: spread evenly across the row, allow them to grow */
+  .page-actions,
+  .mat-mdc-card-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .page-actions .mat-mdc-button,
+  .page-actions .mat-mdc-raised-button,
+  .page-actions .mat-mdc-flat-button,
+  .page-actions .mat-mdc-outlined-button,
+  .toolbar .mat-mdc-raised-button,
+  .toolbar .mat-mdc-flat-button,
+  .toolbar .mat-mdc-outlined-button {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  /* Material buttons should not be truncated mid-letter */
+  .mat-mdc-button .mdc-button__label,
+  .mat-mdc-raised-button .mdc-button__label,
+  .mat-mdc-flat-button .mdc-button__label,
+  .mat-mdc-outlined-button .mdc-button__label {
+    white-space: normal;
+    text-align: center;
+    overflow-wrap: anywhere;
+    line-height: 1.2;
+    padding: 4px 0;
+  }
+
+  /* Headings inside features — keep them from forcing a wider row */
+  .layout-main h1, .layout-main h2 {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  /* Form fields take full width on phone */
+  .mat-mdc-form-field { width: 100%; }
+
+  /* Tabs scroll horizontally instead of overlapping */
+  .mat-mdc-tab-header { max-width: 100%; }
+
+  /* AG Grid — let it scroll inside its own container; never push the page */
+  .ag-root-wrapper,
+  ag-grid-angular { max-width: 100%; }
+}

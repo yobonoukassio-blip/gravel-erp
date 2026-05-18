@@ -96,9 +96,15 @@ export class TruckRotationController {
 
   @Get()
   async list(
-    @Query('operational_day_id') operationalDayId: string,
+    @Query('operational_day_id') operationalDayId: string | undefined,
     @Req() req: AuthedRequest,
   ): Promise<TruckRotation[]> {
+    // Optional filter: without operational_day_id we return the most recent
+    // rotations for the tenant. The dispatch board calls this without args
+    // on first paint to populate the grid.
+    if (!operationalDayId) {
+      return this.service.listRecent(req.user.tenantId);
+    }
     return this.service.listForOperationalDay(
       operationalDayId,
       req.user.tenantId,

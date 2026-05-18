@@ -325,3 +325,77 @@
   font-size: 13px;
   color: var(--gv-text-muted);
 }
+
+/* ------------------------------------------------------------------------- */
+/*  Responsive — tablet & phone                                              */
+/* ------------------------------------------------------------------------- */
+@media (max-width: 960px) {
+  .dashboard-shell { gap: var(--gv-space-5); }
+
+  .dashboard-header {
+    padding: var(--gv-space-4) var(--gv-space-5);
+    align-items: flex-start;
+    flex-wrap: wrap;
+    row-gap: var(--gv-space-3);
+  }
+  .dashboard-title { font-size: 22px; }
+  .dashboard-title::before { font-size: 10px; letter-spacing: 0.14em; }
+
+  .kpi-grid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+  .gauge-row {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+  .provisional-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-shell { gap: var(--gv-space-4); }
+
+  .dashboard-header {
+    padding: var(--gv-space-4);
+    flex-direction: column;
+    align-items: stretch;
+    border-radius: var(--gv-radius-md);
+  }
+  .dashboard-header::before { width: 220px; height: 220px; right: -20%; }
+  .dashboard-title { font-size: 19px; }
+  .last-updated {
+    align-self: flex-start;
+    font-size: 11px;
+  }
+
+  /* 2-up KPI grid on phones — keeps tiles readable but compact */
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gv-space-2);
+  }
+  .gauge-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gv-space-2);
+  }
+
+  .section-title {
+    font-size: 10.5px;
+    padding-left: var(--gv-space-2);
+  }
+
+  .oos-item {
+    padding: var(--gv-space-3);
+    gap: var(--gv-space-2);
+    font-size: 12.5px;
+  }
+  .oos-item:hover { padding-left: var(--gv-space-3); }
+
+  .api-error {
+    padding: var(--gv-space-4);
+    gap: var(--gv-space-3);
+  }
+}
+
+@media (max-width: 380px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+}

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,13 +22,24 @@ import { NotificationBadgeComponent } from './notification-badge.component';
     <header class="gv-header" role="banner">
       <span class="gv-header-bar" aria-hidden="true"></span>
 
+      <button
+        *ngIf="showMenuButton"
+        mat-icon-button
+        type="button"
+        class="menu-btn"
+        (click)="menuToggle.emit()"
+        [attr.aria-label]="'header.menu' | transloco"
+      >
+        <mat-icon>menu</mat-icon>
+      </button>
+
       <ng-container *ngIf="claims$ | async as claims; else anonymous">
         <div class="identity">
           <span class="identity-pill">{{ claims.role }}</span>
           <span class="identity-sites">
             <mat-icon class="identity-icon" aria-hidden="true">terrain</mat-icon>
             <span class="gv-num">{{ claims.siteIds.length }}</span>
-            <span>{{ 'header.sites' | transloco }}</span>
+            <span class="identity-sites-label">{{ 'header.sites' | transloco }}</span>
           </span>
         </div>
       </ng-container>
@@ -88,10 +99,16 @@ import { NotificationBadgeComponent } from './notification-badge.component';
         opacity: 0.7;
       }
 
+      .menu-btn {
+        color: var(--gv-text);
+        margin-left: calc(var(--gv-space-2) * -1);
+      }
+
       .identity {
         display: inline-flex;
         align-items: center;
         gap: var(--gv-space-3);
+        min-width: 0;
       }
       .identity-pill {
         display: inline-flex;
@@ -104,6 +121,7 @@ import { NotificationBadgeComponent } from './notification-badge.component';
         letter-spacing: 0.06em;
         text-transform: uppercase;
         border-radius: 999px;
+        white-space: nowrap;
         box-shadow:
           inset 0 1px 0 oklch(100% 0 0 / 0.08),
           0 1px 2px oklch(20% 0.06 260 / 0.18);
@@ -123,6 +141,7 @@ import { NotificationBadgeComponent } from './notification-badge.component';
         gap: 6px;
         font-size: 13px;
         color: var(--gv-text-muted);
+        white-space: nowrap;
       }
       .identity-icon {
         font-size: 16px !important;
@@ -152,12 +171,31 @@ import { NotificationBadgeComponent } from './notification-badge.component';
 
       .logout-btn { color: var(--gv-text-muted); transition: color var(--gv-duration-1) var(--gv-ease); }
       .logout-btn:hover { color: var(--gv-danger); }
+
+      @media (max-width: 960px) {
+        .gv-header { padding: 0 var(--gv-space-4); gap: var(--gv-space-3); height: 56px; }
+      }
+
+      @media (max-width: 600px) {
+        .gv-header { padding: 0 var(--gv-space-3); gap: var(--gv-space-2); height: 56px; }
+        .identity-sites-label { display: none; }
+        .actions-sep { display: none; }
+        .actions { gap: 0; }
+      }
+
+      @media (max-width: 380px) {
+        .identity-pill { padding: 4px var(--gv-space-2); font-size: 10px; }
+        .identity-sites { font-size: 12px; }
+      }
     `,
   ],
 })
 export class HeaderComponent {
   private readonly auth = inject(AuthService);
   readonly claims$ = this.auth.userClaims$;
+
+  @Input() showMenuButton = false;
+  @Output() readonly menuToggle = new EventEmitter<void>();
 
   logout(): void {
     this.auth.logout().subscribe();

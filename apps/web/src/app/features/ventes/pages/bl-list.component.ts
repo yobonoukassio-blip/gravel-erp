@@ -6,8 +6,10 @@ import {
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { TranslocoModule } from '@jsverse/transloco';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AgGridAngular } from 'ag-grid-angular';
@@ -19,11 +21,20 @@ import { BlSignDialogComponent } from './bl-sign-dialog.component';
 @Component({
   selector: 'gravel-bl-list',
   standalone: true,
-  imports: [CommonModule, TranslocoModule, MatButtonModule, AgGridAngular],
+  imports: [CommonModule, RouterLink, TranslocoModule, MatButtonModule, MatIconModule, AgGridAngular],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="page-header">
       <h2>{{ 'ventes.bl.title' | transloco }}</h2>
+      <a
+        mat-flat-button
+        color="primary"
+        routerLink="new"
+        data-testid="bl-new-button"
+      >
+        <mat-icon>add</mat-icon>
+        <span>Nouveau BL</span>
+      </a>
     </div>
 
     <ag-grid-angular
@@ -36,7 +47,15 @@ import { BlSignDialogComponent } from './bl-sign-dialog.component';
     />
   `,
   styles: [`
-    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--gv-space-4);
+      margin-bottom: 12px;
+    }
+    .page-header h2 { margin: 0; }
+    .page-header a mat-icon { margin-right: 6px; }
   `],
 })
 export class BlListComponent implements OnInit {

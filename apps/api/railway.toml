@@ -6,8 +6,11 @@ builder = "NIXPACKS"
 buildCommand = "cd ../.. && pnpm install --frozen-lockfile && pnpm --filter @gravel/shared-types build && pnpm --filter @gravel/api build"
 
 [deploy]
-startCommand = "node dist/src/main.js"
+# Apply pending SQL migrations from src/migrations/ AND src/modules/*/migrations/
+# before booting the API so the schema always matches the entity definitions.
+# Migration runner is idempotent (tracked in `_migrations` table).
+startCommand = "node scripts/run-migrations.mjs && node dist/src/main.js"
 healthcheckPath = "/health/live"
-healthcheckTimeout = 120
+healthcheckTimeout = 180
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3

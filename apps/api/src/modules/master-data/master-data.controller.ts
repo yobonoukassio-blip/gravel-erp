@@ -37,6 +37,16 @@ import {
 export class MasterDataController {
   constructor(private readonly md: MasterDataService) {}
 
+  // ─── Countries ──────────────────────────────────────────────────────────
+  // Read-only reference list used by the Site create/edit form to populate
+  // the country dropdown. Tenant-scoped: each tenant has its own seed set.
+
+  @Get('countries')
+  @Role('DIRECTION_GROUPE', 'DIRECTEUR_SITE', 'CHEF_CARRIERE', 'HSE', 'MAINTENANCE', 'FINANCE')
+  listCountries() {
+    return this.md.listCountries();
+  }
+
   // ─── Sites ──────────────────────────────────────────────────────────────
 
   @Post('sites')

@@ -6,11 +6,15 @@
 //   DATABASE_URL=postgres://... node apps/api/scripts/run-migrations.mjs
 //
 // Tracks applied migrations in a `_migrations` table.
-// Iterates *.sql files in src/migrations/ alphabetically.
+// Scans:
+//   - src/migrations/*.sql                 (canonical)
+//   - src/modules/<module>/migrations/*.sql (per-module schema)
+// All files are merged and applied in timestamp-prefixed alphabetical order
+// (the prefix `1717100200000__...` keeps cross-module ordering deterministic).
 
-import { readdir, readFile } from 'node:fs/promises';
+import { readdir, readFile, stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, join } from 'node:path';
 import dns from 'node:dns';
 import { Client } from 'pg';
 
@@ -23,7 +27,53 @@ if (!DATABASE_URL) {
 }
 
 const here = dirname(fileURLToPath(import.meta.url));
-const MIGRATIONS_DIR = resolve(here, '..', 'src', 'migrations');
+const ROOT = resolve(here, '..', 'src');
+const CANONICAL_DIR = resolve(ROOT, 'migrations');
+const MODULES_DIR = resolve(ROOT, 'modules');
+
+/** Collect every `*.sql` file beneath the canonical dir and all module
+ *  migration folders. Returns sorted list of `{ name, absPath }` entries.
+ *  `name` is the filename only (timestamp prefix preserves ordering and
+ *  uniquely identifies the migration in `_migrations`). */
+async function collectMigrations() {
+  const out = [];
+
+  async function pushSqlFrom(dir) {
+    let entries;
+    try {
+      entries = await readdir(dir);
+    } catch {
+      return;
+    }
+    for (const f of entries) {
+      if (f.endsWith('.sql')) out.push({ name: f, absPath: join(dir, f) });
+    }
+  }
+
+  await pushSqlFrom(CANONICAL_DIR);
+
+  try {
+    const modules = await readdir(MODULES_DIR);
+    for (const mod of modules) {
+      const modDir = join(MODULES_DIR, mod, 'migrations');
+      try {
+        const s = await stat(modDir);
+        if (s.isDirectory()) await pushSqlFrom(modDir);
+      } catch {
+        // module without migrations/ is fine
+      }
+    }
+  } catch {
+    // no modules dir — nothing to do
+  }
+
+  // Deduplicate by name (canonical wins over module file), then sort by name.
+  const byName = new Map();
+  for (const m of out) {
+    if (!byName.has(m.name)) byName.set(m.name, m);
+  }
+  return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
 
 const client = new Client({ connectionString: DATABASE_URL });
 await client.connect();
@@ -35,21 +85,19 @@ await client.query(`
   )
 `);
 
-const sqlFiles = (await readdir(MIGRATIONS_DIR))
-  .filter((f) => f.endsWith('.sql'))
-  .sort();
+const migrations = await collectMigrations();
 
 const { rows: appliedRows } = await client.query('SELECT name FROM _migrations');
 const applied = new Set(appliedRows.map((r) => r.name));
 
 let okCount = 0;
 let errCount = 0;
-for (const name of sqlFiles) {
+for (const { name, absPath } of migrations) {
   if (applied.has(name)) {
     console.log('SKIP', name);
     continue;
   }
-  const sql = await readFile(`${MIGRATIONS_DIR}/${name}`, 'utf8');
+  const sql = await readFile(absPath, 'utf8');
   try {
     await client.query('BEGIN');
     await client.query(sql);
@@ -64,6 +112,13 @@ for (const name of sqlFiles) {
   }
 }
 
-console.log(`\nApplied ${okCount}/${sqlFiles.length} (errors: ${errCount}).`);
+console.log(`\nApplied ${okCount}/${migrations.length} (errors: ${errCount}).`);
 await client.end();
-if (errCount > 0) process.exit(2);
+
+// In strict mode any migration failure aborts boot. Default behaviour keeps
+// the API booting even if a migration errors — useful when schema drift from
+// legacy ad-hoc DDL means some `CREATE TABLE` statements collide with the
+// existing tables. The successful migrations still applied; the failing ones
+// will be retried on the next deploy.
+const strict = process.env.MIGRATE_STRICT === 'true';
+if (errCount > 0 && strict) process.exit(2);

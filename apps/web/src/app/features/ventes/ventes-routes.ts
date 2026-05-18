@@ -18,6 +18,11 @@ export const VENTES_ROUTES: Routes = [
       import('./pages/bl-list.component').then((m) => m.BlListComponent),
   },
   {
+    path: 'bl/new',
+    loadComponent: () =>
+      import('./pages/bl-create.component').then((m) => m.BlCreateComponent),
+  },
+  {
     path: 'invoices',
     loadComponent: () =>
       import('./pages/invoice-list.component').then((m) => m.InvoiceListComponent),

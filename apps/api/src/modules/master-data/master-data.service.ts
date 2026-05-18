@@ -256,6 +256,39 @@ export class MasterDataService {
     }
   }
 
+  async listCountries(): Promise<
+    Array<{
+      id: string;
+      isoAlpha2: string;
+      name: string;
+      defaultCurrency: string;
+      defaultTimezone: string;
+    }>
+  > {
+    this.requireTenantId();
+    const rows: Array<{
+      id: string;
+      iso_alpha2: string;
+      name: string;
+      default_currency: string;
+      default_timezone: string;
+    }> = await this.dataSource.transaction((mgr) =>
+      mgr.query(
+        `SELECT id, iso_alpha2, name, default_currency, default_timezone
+           FROM countries
+          WHERE archived_at IS NULL
+          ORDER BY name ASC`,
+      ),
+    );
+    return rows.map((r) => ({
+      id: r.id,
+      isoAlpha2: r.iso_alpha2,
+      name: r.name,
+      defaultCurrency: r.default_currency,
+      defaultTimezone: r.default_timezone,
+    }));
+  }
+
   async listSites(query: ListSitesQuery) {
     this.requireTenantId();
     const limit = this.clampLimit(query.limit);

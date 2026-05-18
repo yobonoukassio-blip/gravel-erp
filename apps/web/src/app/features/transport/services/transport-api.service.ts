@@ -80,7 +80,7 @@ export class TransportApiService {
 
   listAvailableTrucks(): Observable<ProductionEquipment[]> {
     return this.http.get<ProductionEquipment[]>(
-      '/api/master-data/equipment?type=truck&status=active',
+      '/api/equipment?type=truck&status=active',
     );
   }
 }

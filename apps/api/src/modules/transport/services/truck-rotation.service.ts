@@ -207,6 +207,15 @@ export class TruckRotationService {
     });
   }
 
+  async listRecent(tenantId: string, limit = 200): Promise<TruckRotation[]> {
+    const repo = this.dataSource.getRepository(TruckRotation);
+    return repo.find({
+      where: { tenantId },
+      order: { loadedAtUtc: 'DESC' },
+      take: limit,
+    });
+  }
+
   async listPendingDispatch(tenantId: string): Promise<TruckRotation[]> {
     // TRP-03: rotations with no truck yet assigned and not yet completed.
     const repo = this.dataSource.getRepository(TruckRotation);

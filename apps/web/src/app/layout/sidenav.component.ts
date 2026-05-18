@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -41,6 +41,7 @@ interface NavSection {
               [routerLink]="item.path"
               routerLinkActive="is-active"
               class="nav-link"
+              (click)="navigate.emit()"
             >
               <span class="nav-indicator" aria-hidden="true"></span>
               <mat-icon class="nav-icon" aria-hidden="true">{{ item.icon }}</mat-icon>
@@ -289,9 +290,31 @@ interface NavSection {
                   0 0 8px oklch(64% 0.16 152 / 0.6);
       animation: gv-pulse-dot 2.4s var(--gv-ease) infinite;
     }
+
+    /* Smooth, momentum-friendly scroll inside the nav list */
+    .nav {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+    }
+
+    /* Touch-friendly tap targets on small screens */
+    @media (max-width: 960px) {
+      .brand { padding: var(--gv-space-4) var(--gv-space-4); min-height: 60px; }
+      .nav { padding: var(--gv-space-2) var(--gv-space-2) var(--gv-space-8); }
+      .nav-link {
+        padding: 12px var(--gv-space-3) 12px 16px;
+        font-size: 14px;
+      }
+      .nav-link:hover { padding-left: 18px; }
+      .nav-icon { font-size: 20px; width: 20px; height: 20px; line-height: 20px; }
+      .nav-foot { padding: var(--gv-space-3) var(--gv-space-4) calc(var(--gv-space-3) + env(safe-area-inset-bottom)); }
+    }
   `],
 })
 export class SidenavComponent {
+  @Output() readonly navigate = new EventEmitter<void>();
+
   readonly sections: readonly NavSection[] = [
     {
       id: 'overview',

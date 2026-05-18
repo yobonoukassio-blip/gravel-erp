@@ -84,4 +84,19 @@ export class VentesApiService {
   ): Observable<BonDeLivraison> {
     return this.http.patch<BonDeLivraison>(`/api/ventes/bl/${blId}/sign`, body);
   }
+
+  createBL(body: {
+    siteId: string;
+    number: string;
+    customerId: string;
+    saleContractId: string;
+    stockpileId: string;
+    calibreCode: string;
+    tonnageKg: number;
+    deliveryDate: string;
+    truckRotationId?: string;
+    transporterId?: string;
+  }): Observable<BonDeLivraison> {
+    return this.http.post<BonDeLivraison>('/api/ventes/bl', body);
+  }
 }

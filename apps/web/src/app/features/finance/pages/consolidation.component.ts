@@ -1,10 +1,17 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { TranslocoModule } from '@jsverse/transloco';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AgGridAngular } from 'ag-grid-angular';
-import type { ColDef } from 'ag-grid-community';
+import type { ColDef, ValueFormatterParams } from 'ag-grid-community';
 import { ConsolidatedPnL, FinanceApiService } from '../services/finance-api.service';
+
+interface SiteLite {
+  id: string;
+  code: string;
+  name: string;
+}
 
 interface SiteRow {
   siteId: string;
@@ -74,13 +81,23 @@ interface SiteRow {
 })
 export class ConsolidationComponent implements OnInit {
   private readonly api = inject(FinanceApiService);
+  private readonly http = inject(HttpClient);
   private readonly snack = inject(MatSnackBar);
 
   readonly pnl = signal<ConsolidatedPnL | null>(null);
   readonly rows = signal<SiteRow[]>([]);
+  private readonly siteNames = new Map<string, string>();
 
   readonly columnDefs: ColDef[] = [
-    { field: 'siteId', headerName: 'Site', flex: 1 },
+    {
+      field: 'siteId',
+      headerName: 'Site',
+      flex: 1,
+      valueFormatter: (p: ValueFormatterParams<SiteRow, string>) => {
+        const id = p.value ?? '';
+        return this.siteNames.get(id) ?? id;
+      },
+    },
     { field: 'revenueMinor', headerName: 'Revenue', width: 160 },
     { field: 'costMinor', headerName: 'Cost', width: 160 },
     { field: 'marginMinor', headerName: 'Margin', width: 160 },
@@ -88,8 +105,22 @@ export class ConsolidationComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    // Load site name lookup so the grid shows "Carrière Mobaye" instead of UUID.
+    this.http.get<{ data: SiteLite[] }>('/api/sites').subscribe({
+      next: (resp) => {
+        for (const s of resp.data ?? []) this.siteNames.set(s.id, s.name);
+        // Force grid re-render of the rows we already loaded (if any).
+        this.rows.set([...this.rows()]);
+      },
+      error: () => {
+        /* Cosmetic — fall back to UUID display */
+      },
+    });
+
     const now = new Date();
-    const from = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().slice(0, 10);
+    const from = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+      .toISOString()
+      .slice(0, 10);
     const to = now.toISOString().slice(0, 10);
     this.api.consolidate('XOF', from, to).subscribe({
       next: (p) => {

@@ -62,6 +62,20 @@ jobs:
         # The mobile project ships without android/ — generate it here.
         run: flutter create . --platforms=android --org=ci.gravelivoire --project-name=gravel_mobile
 
+      - name: Patch AndroidManifest.xml for INTERNET permission
+        # Flutter only injects INTERNET into the debug manifest. Release APKs
+        # built from a fresh `flutter create` have no internet access, which
+        # causes "Failed host lookup" on every network call. Inject the
+        # permission into the main manifest before assembling the release.
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          if ! grep -q "android.permission.INTERNET" "$MANIFEST"; then
+            sed -i 's|<manifest |<manifest xmlns:tools="http://schemas.android.com/tools" |' "$MANIFEST"
+            sed -i 's|<application|<uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>\n    <application|' "$MANIFEST"
+          fi
+          echo "--- patched manifest ---"
+          cat "$MANIFEST"
+
       - name: Cache pub
         uses: actions/cache@v4
         with:
